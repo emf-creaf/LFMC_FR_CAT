@@ -1,4 +1,4 @@
-##########################LAI DATA##########################
+##########################LAI MODIS DATA##########################
 
 library(MODIStsp)
 library(terra)
@@ -35,4 +35,4 @@ for(i in 1:length(LAIrasters)) {
 
 #export LAI DATA
 
-write.csv(LAI_all, "data/LAI_DATA.csv", row.names=FALSE)
+write.csv(LAI_all, "data/LAI_DATA_MODIS.csv", row.names=FALSE)
