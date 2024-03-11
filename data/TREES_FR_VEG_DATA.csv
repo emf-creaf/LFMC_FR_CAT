@@ -1,97 +1,31 @@
-"Date","Code_Site.x","Placette","sp_category","sp","cov_category","coverage","height_category","height"
-2016-06-02,"D06S2",1,"esp1_arbore","Mimosas","taux_esp1_arbore","20","ht_toit_esp1_arbore","830"
-2016-06-02,"D06S2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-02,"D06S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-05-17,"D05S1",1,"esp1_arbore","Pin noir","taux_esp1_arbore","25","ht_toit_esp1_arbore","380"
-2016-05-17,"D05S1",1,"esp2_arbore","Co (Coronille à confirmer)","taux_esp2_arbore","15","ht_toit_esp2_arbore","300"
-2016-05-17,"D05S1",1,"esp3_arbore","Erable à feuilles d'obier","taux_esp3_arbore","10","ht_toit_esp3_arbore","500"
-2016-05-09,"D07S1",1,"esp1_arbore","Chene vert","taux_esp1_arbore","25","ht_toit_esp1_arbore","250"
-2016-05-09,"D07S1",1,"esp2_arbore","Arbousier","taux_esp2_arbore","15","ht_toit_esp2_arbore","250"
-2016-05-09,"D07S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2017-05-15,"D2BS3",1,"esp1_arbore","Arbousier","taux_esp1_arbore","5","ht_toit_esp1_arbore","280"
-2017-05-15,"D2BS3",1,"esp2_arbore","Bruyere arborescente","taux_esp2_arbore","5","ht_toit_esp2_arbore","250"
-2017-05-15,"D2BS3",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-07-25,"D48S1",1,"esp1_arbore","Pin sylvestre","taux_esp1_arbore","10","ht_toit_esp1_arbore","550"
-2016-07-25,"D48S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-07-25,"D48S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-08,"D11S1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-08,"D11S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-08,"D11S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2017-05-18,"D2AS2",1,"esp1_arbore",NA,"taux_esp1_arbore",NA,"ht_toit_esp1_arbore",NA
-2017-05-18,"D2AS2",1,"esp2_arbore",NA,"taux_esp2_arbore",NA,"ht_toit_esp2_arbore",NA
-2017-05-18,"D2AS2",1,"esp3_arbore",NA,"taux_esp3_arbore",NA,"ht_toit_esp3_arbore",NA
-2016-05-31,"D83S3",1,"esp1_arbore","Pin d'Alep","taux_esp1_arbore","20","ht_toit_esp1_arbore","1500"
-2016-05-31,"D83S3",1,"esp2_arbore","Chene vert","taux_esp2_arbore","15","ht_toit_esp2_arbore","400"
-2016-05-31,"D83S3",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-04-27,"D13S1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-04-27,"D13S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-04-27,"D13S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-04-27,"D13S1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-04-27,"D13S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-04-27,"D13S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-04-03,"D13S2",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-04-03,"D13S2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-04-03,"D13S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-06,"D34S1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-06,"D34S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-06,"D34S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-07,"D34S1",2,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-07,"D34S1",2,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-07,"D34S1",2,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-07-07,"D83S1",1,"esp1_arbore",NA,"taux_esp1_arbore",NA,"ht_toit_esp1_arbore","220"
-2016-07-07,"D83S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-07-07,"D83S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-08,"D11S2",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-08,"D11S2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-08,"D11S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-NA,"D11S2",2,"esp1_arbore",NA,"taux_esp1_arbore",NA,"ht_toit_esp1_arbore",NA
-NA,"D11S2",2,"esp2_arbore",NA,"taux_esp2_arbore",NA,"ht_toit_esp2_arbore",NA
-NA,"D11S2",2,"esp3_arbore",NA,"taux_esp3_arbore",NA,"ht_toit_esp3_arbore",NA
-2016-05-31,"D83S2",1,"esp1_arbore","Chene vert","taux_esp1_arbore","35","ht_toit_esp1_arbore","310"
-2016-05-31,"D83S2",1,"esp2_arbore","Chene blanc","taux_esp2_arbore","15","ht_toit_esp2_arbore","450"
-2016-05-31,"D83S2",1,"esp3_arbore","Pin d'Alep","taux_esp3_arbore","10","ht_toit_esp3_arbore","550"
-2016-06-08,"D66S1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-08,"D66S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-08,"D66S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-06,"D34S2",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-06-06,"D34S2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-06,"D34S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-07-26,"D30S2",1,"esp1_arbore","Chene vert","taux_esp1_arbore","30","ht_toit_esp1_arbore","300"
-2016-07-26,"D30S2",1,"esp2_arbore","Pin d'alep","taux_esp2_arbore","20","ht_toit_esp2_arbore","600"
-2016-07-26,"D30S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-09,"D66S2",1,"esp1_arbore","Chene liège","taux_esp1_arbore","voir avec nico martin","ht_toit_esp1_arbore","470"
-2016-06-09,"D66S2",1,"esp2_arbore","Chene blanc","taux_esp2_arbore","voir avec nico martin","ht_toit_esp2_arbore","250"
-2016-06-09,"D66S2",1,"esp3_arbore","Genevrier cade","taux_esp3_arbore","voir avec nico martin","ht_toit_esp3_arbore","220"
-2017-05-17,"D2AS3",1,"esp1_arbore","Arbousier","taux_esp1_arbore","15 dont 3 mort","ht_toit_esp1_arbore","260"
-2017-05-17,"D2AS3",1,"esp2_arbore","Bruyere arborescente dont 1 mort","taux_esp2_arbore","7","ht_toit_esp2_arbore","220"
-2017-05-17,"D2AS3",1,"esp3_arbore","Filaire a feuilles etroites","taux_esp3_arbore","7","ht_toit_esp3_arbore","240"
-2016-05-18,"D04S1",1,"esp1_arbore","Pin d'Alep","taux_esp1_arbore","15","ht_toit_esp1_arbore","950"
-2016-05-18,"D04S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-05-18,"D04S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-01,"D06S3",1,"esp1_arbore","Chene vert","taux_esp1_arbore","20","ht_toit_esp1_arbore","450"
-2016-06-01,"D06S3",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-01,"D06S3",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-05-18,"D04S2",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2016-05-18,"D04S2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-05-18,"D04S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-06-02,"D06S1",1,"esp1_arbore","Pin d'Alep","taux_esp1_arbore","25","ht_toit_esp1_arbore","400"
-2016-06-02,"D06S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-06-02,"D06S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-04-28,"D84S1",1,"esp1_arbore","Chene vert","taux_esp1_arbore","10","ht_toit_esp1_arbore","280"
-2016-04-28,"D84S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-04-28,"D84S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-05-26,"D84S2",1,"esp1_arbore","Chene vert","taux_esp1_arbore","30","ht_toit_esp1_arbore","300"
-2016-05-26,"D84S2",1,"esp2_arbore","Pin d'Alep","taux_esp2_arbore","5","ht_toit_esp2_arbore","350"
-2016-05-26,"D84S2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2017-05-16,"D2BS2",1,"esp1_arbore","Chene vert","taux_esp1_arbore","100","ht_toit_esp1_arbore","450"
-2017-05-16,"D2BS2",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2017-05-16,"D2BS2",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-07-25,"D30S1",1,"esp1_arbore","Pin maritime","taux_esp1_arbore","70","ht_toit_esp1_arbore","1500"
-2016-07-25,"D30S1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2016-07-25,"D30S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2016-04-04,"D26S1",1,"esp1_arbore","Pin d'Alep","taux_esp1_arbore","15","ht_toit_esp1_arbore","450"
-2016-04-04,"D26S1",1,"esp2_arbore","Chene blanc","taux_esp2_arbore","5","ht_toit_esp2_arbore","270"
-2016-04-04,"D26S1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
-2017-05-19,"D2AS1",1,"esp1_arbore",NA,"taux_esp1_arbore","0","ht_toit_esp1_arbore",NA
-2017-05-19,"D2AS1",1,"esp2_arbore",NA,"taux_esp2_arbore","0","ht_toit_esp2_arbore",NA
-2017-05-19,"D2AS1",1,"esp3_arbore",NA,"taux_esp3_arbore","0","ht_toit_esp3_arbore",NA
+"Date","Code_Site.x","Placette","sp","sp_accepted_name","coverage","height"
+2016-06-02,"D06S2",1,"Mimosas","Acacia dealbata","20","830"
+2016-05-17,"D05S1",1,"Pin noir","Pinus nigra","25","380"
+2016-05-17,"D05S1",1,"Erable à feuilles d'obier","Acer opalus","10","500"
+2016-05-09,"D07S1",1,"Chene vert","Quercus ilex","25","250"
+2016-05-09,"D07S1",1,"Arbousier","Arbutus unedo","15","250"
+2017-05-15,"D2BS3",1,"Arbousier","Arbutus unedo","5","280"
+2017-05-15,"D2BS3",1,"Bruyere arborescente","Erica arborea","5","250"
+2016-07-25,"D48S1",1,"Pin sylvestre","Pinus sylvestris","10","550"
+2016-05-31,"D83S3",1,"Pin d'Alep","Pinus halepensis","20","1500"
+2016-05-31,"D83S3",1,"Chene vert","Quercus ilex","15","400"
+2016-05-31,"D83S2",1,"Chene vert","Quercus ilex","35","310"
+2016-05-31,"D83S2",1,"Chene blanc","Quercus pubescens","15","450"
+2016-05-31,"D83S2",1,"Pin d'Alep","Pinus halepensis","10","550"
+2016-07-26,"D30S2",1,"Chene vert","Quercus ilex","30","300"
+2016-07-26,"D30S2",1,"Pin d'alep","Pinus halepensis","20","600"
+2016-06-09,"D66S2",1,"Chene liège","Quercus suber","voir avec nico martin","470"
+2016-06-09,"D66S2",1,"Chene blanc","Quercus pubescens","voir avec nico martin","250"
+2016-06-09,"D66S2",1,"Genevrier cade","Juniperus oxycedrus","voir avec nico martin","220"
+2017-05-17,"D2AS3",1,"Arbousier","Arbutus unedo","15 dont 3 mort","260"
+2017-05-17,"D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia","7","240"
+2016-05-18,"D04S1",1,"Pin d'Alep","Pinus halepensis","15","950"
+2016-06-01,"D06S3",1,"Chene vert","Quercus ilex","20","450"
+2016-06-02,"D06S1",1,"Pin d'Alep","Pinus halepensis","25","400"
+2016-04-28,"D84S1",1,"Chene vert","Quercus ilex","10","280"
+2016-05-26,"D84S2",1,"Chene vert","Quercus ilex","30","300"
+2016-05-26,"D84S2",1,"Pin d'Alep","Pinus halepensis","5","350"
+2017-05-16,"D2BS2",1,"Chene vert","Quercus ilex","100","450"
+2016-07-25,"D30S1",1,"Pin maritime","Pinus pinaster","70","1500"
+2016-04-04,"D26S1",1,"Pin d'Alep","Pinus halepensis","15","450"
+2016-04-04,"D26S1",1,"Chene blanc","Quercus pubescens","5","270"

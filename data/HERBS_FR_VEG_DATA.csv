@@ -1,129 +1,62 @@
-"Date","Code_Site.x","Placette","sp_category","sp","coverage"
-2016-06-02,"D06S2",1,"esp1_herbacee","Graminées",30
-2016-06-02,"D06S2",1,"esp2_herbacee",NA,30
-2016-06-02,"D06S2",1,"esp3_herbacee",NA,30
-2016-06-02,"D06S2",1,"esp4_herbacee",NA,30
-2016-05-17,"D05S1",1,"esp1_herbacee","Graminées",95
-2016-05-17,"D05S1",1,"esp2_herbacee","Vesce",95
-2016-05-17,"D05S1",1,"esp3_herbacee","Gaillet",95
-2016-05-17,"D05S1",1,"esp4_herbacee",NA,95
-2016-05-09,"D07S1",1,"esp1_herbacee","Asperge sauvage",10
-2016-05-09,"D07S1",1,"esp2_herbacee","Graminées indéterminées",10
-2016-05-09,"D07S1",1,"esp3_herbacee",NA,10
-2016-05-09,"D07S1",1,"esp4_herbacee",NA,10
-2017-05-15,"D2BS3",1,"esp1_herbacee","Graminées",15
-2017-05-15,"D2BS3",1,"esp2_herbacee","Asphodele",15
-2017-05-15,"D2BS3",1,"esp3_herbacee","genre fenouil",15
-2017-05-15,"D2BS3",1,"esp4_herbacee","autres",15
-2016-07-25,"D48S1",1,"esp1_herbacee",NA,0
-2016-07-25,"D48S1",1,"esp2_herbacee",NA,0
-2016-07-25,"D48S1",1,"esp3_herbacee",NA,0
-2016-07-25,"D48S1",1,"esp4_herbacee",NA,0
-2016-06-08,"D11S1",1,"esp1_herbacee","Aphyllante de Montpellier",35
-2016-06-08,"D11S1",1,"esp2_herbacee","Brachypode",35
-2016-06-08,"D11S1",1,"esp3_herbacee","Euphorbe",35
-2016-06-08,"D11S1",1,"esp4_herbacee","Lys",35
-2017-05-18,"D2AS2",1,"esp1_herbacee","brachypode",80
-2017-05-18,"D2AS2",1,"esp2_herbacee","Asphodele",80
-2017-05-18,"D2AS2",1,"esp3_herbacee","autres",80
-2017-05-18,"D2AS2",1,"esp4_herbacee",NA,80
-2016-05-31,"D83S3",1,"esp1_herbacee","Brachypode rameux",40
-2016-05-31,"D83S3",1,"esp2_herbacee","Graminées indéterminées",40
-2016-05-31,"D83S3",1,"esp3_herbacee",NA,40
-2016-05-31,"D83S3",1,"esp4_herbacee",NA,40
-2016-04-27,"D13S1",1,"esp1_herbacee",NA,10
-2016-04-27,"D13S1",1,"esp2_herbacee",NA,10
-2016-04-27,"D13S1",1,"esp3_herbacee",NA,10
-2016-04-27,"D13S1",1,"esp4_herbacee",NA,10
-2016-04-27,"D13S1",1,"esp1_herbacee",NA,60
-2016-04-27,"D13S1",1,"esp2_herbacee",NA,60
-2016-04-27,"D13S1",1,"esp3_herbacee",NA,60
-2016-04-27,"D13S1",1,"esp4_herbacee",NA,60
-2016-04-03,"D13S2",1,"esp1_herbacee","Brachypode rameux",60
-2016-04-03,"D13S2",1,"esp2_herbacee","Salesepareille",60
-2016-04-03,"D13S2",1,"esp3_herbacee",NA,60
-2016-04-03,"D13S2",1,"esp4_herbacee",NA,60
-2016-06-06,"D34S1",1,"esp1_herbacee","Graminées",10
-2016-06-06,"D34S1",1,"esp2_herbacee","Immortelle",10
-2016-06-06,"D34S1",1,"esp3_herbacee","Suculante",10
-2016-06-06,"D34S1",1,"esp4_herbacee",NA,10
-2016-06-07,"D34S1",2,"esp1_herbacee","Graminées",30
-2016-06-07,"D34S1",2,"esp2_herbacee",NA,30
-2016-06-07,"D34S1",2,"esp3_herbacee",NA,30
-2016-06-07,"D34S1",2,"esp4_herbacee",NA,30
-2016-07-07,"D83S1",1,"esp1_herbacee","Graminées",75
-2016-07-07,"D83S1",1,"esp2_herbacee","Fétuque",75
-2016-07-07,"D83S1",1,"esp3_herbacee","Chevrefeuille",75
-2016-07-07,"D83S1",1,"esp4_herbacee",NA,75
-2016-06-08,"D11S2",1,"esp1_herbacee","Graminées",40
-2016-06-08,"D11S2",1,"esp2_herbacee",NA,40
-2016-06-08,"D11S2",1,"esp3_herbacee",NA,40
-2016-06-08,"D11S2",1,"esp4_herbacee",NA,40
-NA,"D11S2",2,"esp1_herbacee","Fétuque",50
-NA,"D11S2",2,"esp2_herbacee",NA,50
-NA,"D11S2",2,"esp3_herbacee",NA,50
-NA,"D11S2",2,"esp4_herbacee",NA,50
-2016-05-31,"D83S2",1,"esp1_herbacee","Graminées",80
-2016-05-31,"D83S2",1,"esp2_herbacee",NA,80
-2016-05-31,"D83S2",1,"esp3_herbacee",NA,80
-2016-05-31,"D83S2",1,"esp4_herbacee",NA,80
-2016-06-08,"D66S1",1,"esp1_herbacee","Brachypode rameux",90
-2016-06-08,"D66S1",1,"esp2_herbacee","Graminées indéterminées",90
-2016-06-08,"D66S1",1,"esp3_herbacee",NA,90
-2016-06-08,"D66S1",1,"esp4_herbacee",NA,90
-2016-06-06,"D34S2",1,"esp1_herbacee","Brachypode rameux",60
-2016-06-06,"D34S2",1,"esp2_herbacee","Graminées indéterminées",60
-2016-06-06,"D34S2",1,"esp3_herbacee",NA,60
-2016-06-06,"D34S2",1,"esp4_herbacee",NA,60
-2016-07-26,"D30S2",1,"esp1_herbacee","Fétuque",70
-2016-07-26,"D30S2",1,"esp2_herbacee","Autres",70
-2016-07-26,"D30S2",1,"esp3_herbacee","Asperge sauvage",70
-2016-07-26,"D30S2",1,"esp4_herbacee",NA,70
-2016-06-09,"D66S2",1,"esp1_herbacee","Brachypode rameux",80
-2016-06-09,"D66S2",1,"esp2_herbacee","Trèfle",80
-2016-06-09,"D66S2",1,"esp3_herbacee","Millepertuis",80
-2016-06-09,"D66S2",1,"esp4_herbacee",NA,80
-2017-05-17,"D2AS3",1,"esp1_herbacee","brachypode",80
-2017-05-17,"D2AS3",1,"esp2_herbacee","Asphodele",80
-2017-05-17,"D2AS3",1,"esp3_herbacee","autres",80
-2017-05-17,"D2AS3",1,"esp4_herbacee",NA,80
-2016-05-18,"D04S1",1,"esp1_herbacee","Aphyllante de Montpellier",70
-2016-05-18,"D04S1",1,"esp2_herbacee","Fetuque ovine",70
-2016-05-18,"D04S1",1,"esp3_herbacee","Graminées indéterminées",70
-2016-05-18,"D04S1",1,"esp4_herbacee",NA,70
-2016-06-01,"D06S3",1,"esp1_herbacee","Graminées",75
-2016-06-01,"D06S3",1,"esp2_herbacee","Liseron",75
-2016-06-01,"D06S3",1,"esp3_herbacee",NA,75
-2016-06-01,"D06S3",1,"esp4_herbacee",NA,75
-2016-05-18,"D04S2",1,"esp1_herbacee","Graminées",10
-2016-05-18,"D04S2",1,"esp2_herbacee","Fetuque ovine",10
-2016-05-18,"D04S2",1,"esp3_herbacee","Saponaire",10
-2016-05-18,"D04S2",1,"esp4_herbacee",NA,10
-2016-06-02,"D06S1",1,"esp1_herbacee","Aphyllante de Montpellier",1
-2016-06-02,"D06S1",1,"esp2_herbacee","Fetuque",1
-2016-06-02,"D06S1",1,"esp3_herbacee",NA,1
-2016-06-02,"D06S1",1,"esp4_herbacee",NA,1
-2016-04-28,"D84S1",1,"esp1_herbacee","Brachypode rameux",20
-2016-04-28,"D84S1",1,"esp2_herbacee","Aphyllante de Montpellier",20
-2016-04-28,"D84S1",1,"esp3_herbacee","Euphorbe",20
-2016-04-28,"D84S1",1,"esp4_herbacee",NA,20
-2016-05-26,"D84S2",1,"esp1_herbacee","Brachypode rameux",20
-2016-05-26,"D84S2",1,"esp2_herbacee","Graminées indéterminées",20
-2016-05-26,"D84S2",1,"esp3_herbacee",NA,20
-2016-05-26,"D84S2",1,"esp4_herbacee",NA,20
-2017-05-16,"D2BS2",1,"esp1_herbacee","Graminées",25
-2017-05-16,"D2BS2",1,"esp2_herbacee","autres",25
-2017-05-16,"D2BS2",1,"esp3_herbacee",NA,25
-2017-05-16,"D2BS2",1,"esp4_herbacee",NA,25
-2016-07-25,"D30S1",1,"esp1_herbacee","Eperviere",5
-2016-07-25,"D30S1",1,"esp2_herbacee","Autres",5
-2016-07-25,"D30S1",1,"esp3_herbacee",NA,5
-2016-07-25,"D30S1",1,"esp4_herbacee",NA,5
-2016-04-04,"D26S1",1,"esp1_herbacee","Graminées",90
-2016-04-04,"D26S1",1,"esp2_herbacee","Aphyllante de Montpellier",90
-2016-04-04,"D26S1",1,"esp3_herbacee","Dorycnie",90
-2016-04-04,"D26S1",1,"esp4_herbacee",NA,90
-2017-05-19,"D2AS1",1,"esp1_herbacee","brachypode",50
-2017-05-19,"D2AS1",1,"esp2_herbacee","Asphodele",50
-2017-05-19,"D2AS1",1,"esp3_herbacee","autres",50
-2017-05-19,"D2AS1",1,"esp4_herbacee",NA,50
+"Date","Code_Site.x","Placette","sp","sp_accepted_name","coverage"
+2016-06-02,"D06S2",1,"Graminées","Poaceae",30
+2016-05-17,"D05S1",1,"Graminées","Poaceae",95
+2016-05-17,"D05S1",1,"Vesce","Vicia",95
+2016-05-17,"D05S1",1,"Gaillet","Galium",95
+2016-05-09,"D07S1",1,"Asperge sauvage","Asparagus acutifolius",10
+2016-05-09,"D07S1",1,"Graminées indéterminées","Poaceae",10
+2017-05-15,"D2BS3",1,"Graminées","Poaceae",15
+2017-05-15,"D2BS3",1,"Asphodele","Asphodelus",15
+2017-05-15,"D2BS3",1,"genre fenouil","Apiaceae",15
+2016-06-08,"D11S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",35
+2016-06-08,"D11S1",1,"Brachypode","Brachypodium",35
+2016-06-08,"D11S1",1,"Euphorbe","Euphorbia",35
+2016-06-08,"D11S1",1,"Lys","Lilium",35
+2017-05-18,"D2AS2",1,"brachypode","Brachypodium",80
+2017-05-18,"D2AS2",1,"Asphodele","Asphodelus",80
+2016-05-31,"D83S3",1,"Brachypode rameux","Brachypodium retusum",40
+2016-05-31,"D83S3",1,"Graminées indéterminées","Poaceae",40
+2016-04-03,"D13S2",1,"Brachypode rameux","Brachypodium retusum",60
+2016-04-03,"D13S2",1,"Salesepareille","Smilax aspera",60
+2016-06-06,"D34S1",1,"Graminées","Poaceae",10
+2016-06-06,"D34S1",1,"Immortelle","Helichrysum italicum",10
+2016-06-06,"D34S1",1,"Suculante",NA,10
+2016-06-07,"D34S1",2,"Graminées","Poaceae",30
+2016-07-07,"D83S1",1,"Graminées","Poaceae",75
+2016-07-07,"D83S1",1,"Fétuque","Festuca",75
+2016-07-07,"D83S1",1,"Chevrefeuille","Lonicera",75
+2016-06-08,"D11S2",1,"Graminées","Poaceae",40
+NA,"D11S2",2,"Fétuque","Festuca",50
+2016-05-31,"D83S2",1,"Graminées","Poaceae",80
+2016-06-08,"D66S1",1,"Brachypode rameux","Brachypodium retusum",90
+2016-06-08,"D66S1",1,"Graminées indéterminées","Poaceae",90
+2016-06-06,"D34S2",1,"Brachypode rameux","Brachypodium retusum",60
+2016-06-06,"D34S2",1,"Graminées indéterminées","Poaceae",60
+2016-07-26,"D30S2",1,"Fétuque","Festuca",70
+2016-07-26,"D30S2",1,"Asperge sauvage","Asparagus acutifolius",70
+2016-06-09,"D66S2",1,"Brachypode rameux","Brachypodium retusum",80
+2016-06-09,"D66S2",1,"Trèfle","Trifolium",80
+2016-06-09,"D66S2",1,"Millepertuis","Hypericum",80
+2017-05-17,"D2AS3",1,"brachypode","Brachypodium",80
+2017-05-17,"D2AS3",1,"Asphodele","Asphodelus",80
+2016-05-18,"D04S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",70
+2016-05-18,"D04S1",1,"Fetuque ovine","Festuca ovina",70
+2016-05-18,"D04S1",1,"Graminées indéterminées","Poaceae",70
+2016-06-01,"D06S3",1,"Graminées","Poaceae",75
+2016-06-01,"D06S3",1,"Liseron","Convolvulus",75
+2016-05-18,"D04S2",1,"Graminées","Poaceae",10
+2016-05-18,"D04S2",1,"Fetuque ovine","Festuca ovina",10
+2016-05-18,"D04S2",1,"Saponaire","Saponaria officinalis",10
+2016-06-02,"D06S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",1
+2016-04-28,"D84S1",1,"Brachypode rameux","Brachypodium retusum",20
+2016-04-28,"D84S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",20
+2016-04-28,"D84S1",1,"Euphorbe","Euphorbia",20
+2016-05-26,"D84S2",1,"Brachypode rameux","Brachypodium retusum",20
+2016-05-26,"D84S2",1,"Graminées indéterminées","Poaceae",20
+2017-05-16,"D2BS2",1,"Graminées","Poaceae",25
+2016-07-25,"D30S1",1,"Eperviere","Hieracium",5
+2016-04-04,"D26S1",1,"Graminées","Poaceae",90
+2016-04-04,"D26S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",90
+2016-04-04,"D26S1",1,"Dorycnie","Lotus dorycnium",90
+2017-05-19,"D2AS1",1,"brachypode","Brachypodium",50
+2017-05-19,"D2AS1",1,"Asphodele","Asphodelus",50

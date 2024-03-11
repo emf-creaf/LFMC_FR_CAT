@@ -1,5 +1,6 @@
 library(readxl)
 library(tidyverse)
+library(medfate)
 
 #CAT VEGETATION DATA####
 CAT_VEG_DATA <- read_excel("raw_data/CAT_DATA/SPIF_plotvegdata.xlsx", sheet = "vegetation_data")
@@ -210,21 +211,46 @@ herb_new_df_cov<-HERBS_COV_FR_VEG_DATA %>%
 MERGE_HERBS_FR_VEG_DATA<-herb_new_df_cov
 MERGE_HERBS_FR_VEG_DATA <- rename(MERGE_HERBS_FR_VEG_DATA, coverage = taux_total_herbacee)
 
-##MERGE TREES SHRUBS####
+##PROCESSING FINAL DATA####
 
-str(MERGE_TREES_FR_VEG_DATA)
-str(MERGE_SHRUBS_FR_VEG_DATA)
+# 1.REMOVE NA SPECIES ROWS, If "sp" colum is "NA" remove the row
+# 2.REMOVE THE "CATEGORY COLUMNS"
 
-MERGE_SHRUBS_FR_VEG_DATA$coverage<-as.character(MERGE_SHRUBS_FR_VEG_DATA$coverage)
+MERGE_TREES_FR_VEG_DATA <- MERGE_TREES_FR_VEG_DATA %>%
+  filter(!is.na(sp)) %>%
+  select(-contains("category"))
+MERGE_SHRUBS_FR_VEG_DATA <- MERGE_SHRUBS_FR_VEG_DATA %>%
+  filter(!is.na(sp)) %>%
+  select(-contains("category"))
+MERGE_HERBS_FR_VEG_DATA <- MERGE_HERBS_FR_VEG_DATA %>%
+  filter(!is.na(sp)) %>%
+  select(-contains("category"))
 
-FR_VEG_DATA_ALL<-MERGE_TREES_FR_VEG_DATA %>% 
-  full_join(MERGE_SHRUBS_FR_VEG_DATA, by = c("Date","Code_Site.x","sp","Placette","sp_category","cov_category","coverage")) %>%
-  arrange(Code_Site.x)
+#ADD THE ACCEPTED SP NAME
+data("SpParamsFR")
 
-#If "sp" colum is "NA" all the other values are "NA"
+#MEDFATE SP FRENCH ACCEPTED NAMES
+accepted_names<-data.frame(AcceptedName=SpParamsFR$AcceptedName)
 
-FR_VEG_DATA_ALL <- FR_VEG_DATA_ALL %>%
-  mutate(across(c(coverage, height, coverage_0_50, coverage_50_100,coverage_100_200,height_0_50,height_50_100,height_100_200), ~ifelse(is.na(sp), NA_character_, .)))
+#CONVERSION TABLE
+CONVERSION_SP<-read.csv("raw_data/FR_DATA/species_list_conversion.csv")
+
+#ADD ACCEPTED NAME TO "MERGE" DATA FRAMES
+
+MERGE_TREES_FR_VEG_DATA <- MERGE_TREES_FR_VEG_DATA %>% 
+  inner_join(CONVERSION_SP, by = c("sp" = "FR_NAME")) %>% 
+  relocate(CONVERSION_NAME, .after = "sp") %>% 
+  rename(sp_accepted_name = CONVERSION_NAME)
+
+MERGE_SHRUBS_FR_VEG_DATA <- MERGE_SHRUBS_FR_VEG_DATA %>% 
+  inner_join(CONVERSION_SP, by = c("sp" = "FR_NAME")) %>% 
+  relocate(CONVERSION_NAME, .after = "sp") %>% 
+  rename(sp_accepted_name = CONVERSION_NAME)
+
+MERGE_HERBS_FR_VEG_DATA <- MERGE_HERBS_FR_VEG_DATA %>% 
+  inner_join(CONVERSION_SP, by = c("sp" = "FR_NAME")) %>% 
+  relocate(CONVERSION_NAME, .after = "sp") %>% 
+  rename(sp_accepted_name = CONVERSION_NAME)
 
 ##EXPORT .CSV####
 
@@ -234,5 +260,20 @@ write.csv(MERGE_TREES_FR_VEG_DATA, "data/TREES_FR_VEG_DATA.csv", row.names=FALSE
 write.csv(MERGE_SHRUBS_FR_VEG_DATA, "data/SHRUBS_FR_VEG_DATA.csv", row.names=FALSE)
 #HERBS
 write.csv(MERGE_HERBS_FR_VEG_DATA, "data/HERBS_FR_VEG_DATA.csv", row.names=FALSE)
-#TREES + SHRUBS
-write.csv(FR_VEG_DATA_ALL, "data/FR_VEG_DATA_ALL.csv", row.names=FALSE)
+
+
+#rm(list=setdiff(ls(), c("MERGE_HERBS_FR_VEG_DATA","MERGE_SHRUBS_FR_VEG_DATA","MERGE_TREES_FR_VEG_DATA", "")))
+
+
+
+
+# ##MERGE TREES SHRUBS####
+# 
+# str(MERGE_TREES_FR_VEG_DATA)
+# str(MERGE_SHRUBS_FR_VEG_DATA)
+# 
+# MERGE_SHRUBS_FR_VEG_DATA$coverage<-as.character(MERGE_SHRUBS_FR_VEG_DATA$coverage)
+# 
+# FR_VEG_DATA_ALL<-MERGE_TREES_FR_VEG_DATA %>%
+#   full_join(MERGE_SHRUBS_FR_VEG_DATA, by = c("Date","Code_Site.x","sp","Placette","sp_category","cov_category","coverage")) %>%
+#   arrange(Code_Site.x)
