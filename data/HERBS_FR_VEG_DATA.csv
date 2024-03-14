@@ -1,4 +1,4 @@
-"Date","Code_Site.x","Placette","sp","sp_accepted_name","coverage"
+"Date","Code_Site.x","Placette","sp","sp_correct_name","coverage"
 2016-06-02,"D06S2",1,"Graminées","Poaceae",30
 2016-05-17,"D05S1",1,"Graminées","Poaceae",95
 2016-05-17,"D05S1",1,"Vesce","Vicia",95
@@ -8,12 +8,14 @@
 2017-05-15,"D2BS3",1,"Graminées","Poaceae",15
 2017-05-15,"D2BS3",1,"Asphodele","Asphodelus",15
 2017-05-15,"D2BS3",1,"genre fenouil","Apiaceae",15
+2017-05-15,"D2BS3",1,"autres",NA,15
 2016-06-08,"D11S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",35
 2016-06-08,"D11S1",1,"Brachypode","Brachypodium",35
 2016-06-08,"D11S1",1,"Euphorbe","Euphorbia",35
 2016-06-08,"D11S1",1,"Lys","Lilium",35
 2017-05-18,"D2AS2",1,"brachypode","Brachypodium",80
 2017-05-18,"D2AS2",1,"Asphodele","Asphodelus",80
+2017-05-18,"D2AS2",1,"autres",NA,80
 2016-05-31,"D83S3",1,"Brachypode rameux","Brachypodium retusum",40
 2016-05-31,"D83S3",1,"Graminées indéterminées","Poaceae",40
 2016-04-03,"D13S2",1,"Brachypode rameux","Brachypodium retusum",60
@@ -33,20 +35,22 @@ NA,"D11S2",2,"Fétuque","Festuca",50
 2016-06-06,"D34S2",1,"Brachypode rameux","Brachypodium retusum",60
 2016-06-06,"D34S2",1,"Graminées indéterminées","Poaceae",60
 2016-07-26,"D30S2",1,"Fétuque","Festuca",70
+2016-07-26,"D30S2",1,"Autres",NA,70
 2016-07-26,"D30S2",1,"Asperge sauvage","Asparagus acutifolius",70
 2016-06-09,"D66S2",1,"Brachypode rameux","Brachypodium retusum",80
 2016-06-09,"D66S2",1,"Trèfle","Trifolium",80
 2016-06-09,"D66S2",1,"Millepertuis","Hypericum",80
 2017-05-17,"D2AS3",1,"brachypode","Brachypodium",80
 2017-05-17,"D2AS3",1,"Asphodele","Asphodelus",80
+2017-05-17,"D2AS3",1,"autres",NA,80
 2016-05-18,"D04S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",70
 2016-05-18,"D04S1",1,"Fetuque ovine","Festuca ovina",70
 2016-05-18,"D04S1",1,"Graminées indéterminées","Poaceae",70
 2016-06-01,"D06S3",1,"Graminées","Poaceae",75
-2016-06-01,"D06S3",1,"Liseron","Convolvulus",75
+2016-06-01,"D06S3",1,"Liseron","Convolvulaceae",75
 2016-05-18,"D04S2",1,"Graminées","Poaceae",10
 2016-05-18,"D04S2",1,"Fetuque ovine","Festuca ovina",10
-2016-05-18,"D04S2",1,"Saponaire","Saponaria officinalis",10
+2016-05-18,"D04S2",1,"Saponaire","Caryophyllaceae",10
 2016-06-02,"D06S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",1
 2016-04-28,"D84S1",1,"Brachypode rameux","Brachypodium retusum",20
 2016-04-28,"D84S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",20
@@ -54,9 +58,12 @@ NA,"D11S2",2,"Fétuque","Festuca",50
 2016-05-26,"D84S2",1,"Brachypode rameux","Brachypodium retusum",20
 2016-05-26,"D84S2",1,"Graminées indéterminées","Poaceae",20
 2017-05-16,"D2BS2",1,"Graminées","Poaceae",25
+2017-05-16,"D2BS2",1,"autres",NA,25
 2016-07-25,"D30S1",1,"Eperviere","Hieracium",5
+2016-07-25,"D30S1",1,"Autres",NA,5
 2016-04-04,"D26S1",1,"Graminées","Poaceae",90
 2016-04-04,"D26S1",1,"Aphyllante de Montpellier","Aphyllanthes monspeliensis",90
 2016-04-04,"D26S1",1,"Dorycnie","Lotus dorycnium",90
 2017-05-19,"D2AS1",1,"brachypode","Brachypodium",50
 2017-05-19,"D2AS1",1,"Asphodele","Asphodelus",50
+2017-05-19,"D2AS1",1,"autres",NA,50

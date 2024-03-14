@@ -1,4 +1,4 @@
-"Date","Code_Site.x","Placette","sp","sp_accepted_name","coverage","coverage_0_50","coverage_50_100","coverage_100_200","height_0_50","height_50_100","height_100_200"
+"Date","Code_Site.x","Placette","sp","sp_correct_name","coverage","coverage_0_50","coverage_50_100","coverage_100_200","height_0_50","height_50_100","height_100_200"
 2016-06-02,"D06S2",1,"Ciste de Montpellier","Cistus monspeliensis",65,0,0,100,NA,NA,"180"
 2016-06-02,"D06S2",1,"Myrthe","Myrtus communis",15,0,0,100,NA,NA,"180"
 2016-05-17,"D05S1",1,"Cytise à feuille sessile","Cytisophyllum sessilifolium",15,0,0,100,NA,NA,"150"
@@ -29,13 +29,13 @@
 2016-04-03,"D13S2",1,"Chene kermes","Quercus coccifera",70,0,100,0,NA,"70",NA
 2016-04-03,"D13S2",1,"Romarin","Rosmarinus officinalis",25,0,5,95,NA,NA,"120"
 2016-06-06,"D34S1",1,"Romarin","Rosmarinus officinalis",30,70,30,0,"40","65",NA
-2016-06-06,"D34S1",1,"Genevrier cade","Juniperus oxycedrus",15,0,10,90,NA,"70","200"
+2016-06-06,"D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",15,0,10,90,NA,"70","200"
 2016-06-07,"D34S1",2,"Genet scorpion","Genista scorpius",60,0,0,100,NA,NA,"220"
 2016-06-07,"D34S1",2,"Prunellier","Prunus spinosa",30,NA,NA,NA,NA,NA,NA
 2016-07-07,"D83S1",1,"Chene kermes","Quercus coccifera",65,25,75,0,"35","80",NA
 2016-07-07,"D83S1",1,"Bruyere arborescente","Erica arborea",20,0,0,100,NA,NA,"140"
 2016-07-07,"D83S1",1,"Ciste de Montpellier","Cistus monspeliensis",15,0,100,0,NA,"75",NA
-2016-06-08,"D11S2",1,"Bruyere à balai","Erica scoparia",80,0,0,100,NA,NA,"150"
+2016-06-08,"D11S2",1,"Bruyere à balai","Erica scoparia subsp. scoparia",80,0,0,100,NA,NA,"150"
 NA,"D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",15,40,60,0,"40","80",NA
 NA,"D11S2",2,"Chene kermes","Quercus coccifera",5,NA,NA,NA,NA,NA,NA
 2016-05-31,"D83S2",1,"Ciste cotonneux","Cistus albidus",25,0,100,0,NA,"80",NA
@@ -53,7 +53,7 @@ NA,"D11S2",2,"Chene kermes","Quercus coccifera",5,NA,NA,NA,NA,NA,NA
 2016-06-09,"D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",55,0,20,80,NA,"85","120"
 2016-06-09,"D66S2",1,"Chene kermes","Quercus coccifera",20,0,10,90,NA,"90","160"
 2016-06-09,"D66S2",1,"Genet d'Espagne","Spartium junceum",15,0,10,90,NA,"80","190"
-2016-06-09,"D66S2",1,"Genevrier cade","Juniperus oxycedrus",5,NA,NA,NA,NA,NA,NA
+2016-06-09,"D66S2",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",5,NA,NA,NA,NA,NA,NA
 2017-05-17,"D2AS3",1,"Bruyere arborescente","Erica arborea",25,0,0,100,NA,NA,"180"
 2017-05-17,"D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia",25,0,0,100,NA,NA,"170"
 2017-05-17,"D2AS3",1,"Lavande stéchade","Lavandula stoechas",8,NA,NA,NA,NA,NA,NA
@@ -68,7 +68,7 @@ NA,"D11S2",2,"Chene kermes","Quercus coccifera",5,NA,NA,NA,NA,NA,NA
 2016-05-18,"D04S2",1,"Genet cendre","Genista cinerea",30,0,90,10,NA,"80","130"
 2016-05-18,"D04S2",1,"Thym","Thymus vulgaris",20,100,0,0,"20",NA,NA
 2016-06-02,"D06S1",1,"Romarin","Rosmarinus officinalis",15,70,30,0,"40","70",NA
-2016-06-02,"D06S1",1,"Genevrier cade","Juniperus oxycedrus",10,0,100,0,NA,"90",NA
+2016-06-02,"D06S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",10,0,100,0,NA,"90",NA
 2016-04-28,"D84S1",1,"Chene vert","Quercus ilex",50,0,10,90,NA,NA,NA
 2016-04-28,"D84S1",1,"Chene kermes","Quercus coccifera",30,0,100,0,NA,NA,NA
 2016-04-28,"D84S1",1,"Buis","Buxus sempervirens",10,50,50,0,NA,NA,NA
@@ -78,7 +78,7 @@ NA,"D11S2",2,"Chene kermes","Quercus coccifera",5,NA,NA,NA,NA,NA,NA
 2017-05-16,"D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",45,20,80,0,"40","80",NA
 2017-05-16,"D2BS2",1,"Bruyere arborescente","Erica arborea",10,0,50,50,NA,"80","200"
 2017-05-16,"D2BS2",1,"Lavande stéchade","Lavandula stoechas",10,100,0,0,"40",NA,NA
-2016-07-25,"D30S1",1,"Bruyere à balai","Erica scoparia",45,0,70,30,NA,"80","120"
+2016-07-25,"D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",45,0,70,30,NA,"80","120"
 2016-07-25,"D30S1",1,"Bruyere cendree","Erica cinerea",15,90,10,0,"40","60",NA
 2016-07-25,"D30S1",1,"Bruyere arborescente","Erica arborea",10,0,0,90,NA,NA,"200"
 2016-04-04,"D26S1",1,"Genet scorpion","Genista scorpius",40,10,90,0,"40","80",NA
