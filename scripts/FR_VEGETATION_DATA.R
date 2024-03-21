@@ -252,12 +252,15 @@ MERGE_HERBS_FR_VEG_DATA <- rename(MERGE_HERBS_FR_VEG_DATA, coverage = taux_total
 MERGE_TREES_FR_VEG_DATA <- MERGE_TREES_FR_VEG_DATA %>%
   filter(!is.na(sp)) %>%
   select(-contains("category"))
+
 MERGE_SHRUBS_FR_VEG_DATA <- MERGE_SHRUBS_FR_VEG_DATA %>%
   filter(!is.na(sp)) %>%
   select(-contains("category"))
+
 MERGE_HERBS_FR_VEG_DATA <- MERGE_HERBS_FR_VEG_DATA %>%
   filter(!is.na(sp)) %>%
   select(-contains("category"))
+
 
 #REMOVE ALL THE NOT USEFUL DATAFRAMES
 #rm(list=setdiff(ls(), c("MERGE_HERBS_FR_VEG_DATA","MERGE_SHRUBS_FR_VEG_DATA","MERGE_TREES_FR_VEG_DATA")))
@@ -339,11 +342,18 @@ MERGE_TREES_FR_VEG_DATA$sp_correct_name %in% SpParamsFR$Name
 MERGE_SHRUBS_FR_VEG_DATA$sp_correct_name %in% SpParamsFR$Name
 MERGE_HERBS_FR_VEG_DATA$sp_correct_name %in% SpParamsFR$Name #not all sp are in SpParamsFR, not important in herbs?
 
+
+
+##SHRUBS NEED MORE STEPS! TRNSFORM COVERAGE % TO "TOTAL COVERAGE"################################################################
+
+MERGE_SHRUBS_FR_VEG_DATA <- MERGE_SHRUBS_FR_VEG_DATA %>%
+  mutate(across(starts_with("coverage_"), ~ . * coverage / 100))
+
 ##EXPORT FINAL .CSV################################################################################################
 
 #TREES
-write.csv(MERGE_TREES_FR_VEG_DATA, "data/TREES_FR_VEG_DATA.csv", row.names=FALSE)
+write.csv(MERGE_TREES_FR_VEG_DATA, "data/FR_TREES_VEG_DATA.csv", row.names=FALSE)
 #SHRUBS
-write.csv(MERGE_SHRUBS_FR_VEG_DATA, "data/SHRUBS_FR_VEG_DATA.csv", row.names=FALSE)
+write.csv(MERGE_SHRUBS_FR_VEG_DATA, "data/FR_SHRUBS_VEG_DATA.csv", row.names=FALSE)
 #HERBS
-write.csv(MERGE_HERBS_FR_VEG_DATA, "data/HERBS_FR_VEG_DATA.csv", row.names=FALSE)
+write.csv(MERGE_HERBS_FR_VEG_DATA, "data/FR_HERBS_VEG_DATA.csv", row.names=FALSE)
