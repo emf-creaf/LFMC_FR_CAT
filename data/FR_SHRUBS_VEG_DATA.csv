@@ -1,89 +1,105 @@
-"Date","Code_Site.x","Placette","sp","sp_correct_name","coverage","coverage_0_50","coverage_50_100","coverage_100_200","height_0_50","height_50_100","height_100_200"
-2016-06-02,"D06S2",1,"Ciste de Montpellier","Cistus monspeliensis",65,0,0,100,NA,NA,"180"
-2016-06-02,"D06S2",1,"Myrthe","Myrtus communis",15,0,0,100,NA,NA,"180"
-2016-05-17,"D05S1",1,"Cytise à feuille sessile","Cytisophyllum sessilifolium",15,0,0,100,NA,NA,"150"
-2016-05-17,"D05S1",1,"Genet cendre","Genista cinerea",10,0,0,100,NA,NA,"170"
-2016-05-09,"D07S1",1,"Arbousier","Arbutus unedo",20,0,0,100,NA,NA,"190"
-2016-05-09,"D07S1",1,"Chene vert","Quercus ilex",10,0,0,100,NA,NA,"180"
-2016-05-09,"D07S1",1,"Coronille","Coronilla",8,0,40,60,NA,"80","130"
-2017-05-15,"D2BS3",1,"Ciste de Crête","Cistus creticus",15,0,100,0,NA,"80",NA
-2017-05-15,"D2BS3",1,"Ciste de Montpellier","Cistus monspeliensis",10,0,100,0,NA,"70",NA
-2017-05-15,"D2BS3",1,"Bruyere arborescente","Erica arborea",10,0,0,100,NA,NA,"160"
-2016-07-25,"D48S1",1,"Genet purgatif","Cytisus oromediterraneus",90,0,40,60,NA,"80","110"
-2016-07-25,"D48S1",1,"Bruyere cendree","Erica cinerea",10,100,0,0,"45",NA,NA
-2016-06-08,"D11S1",1,"Romarin","Rosmarinus officinalis",40,0,100,0,NA,"90",NA
-2016-06-08,"D11S1",1,"Chene kermes","Quercus coccifera",25,0,100,0,NA,"95",NA
-2016-06-08,"D11S1",1,"Ciste cotonneux","Cistus albidus",15,NA,NA,NA,NA,NA,NA
-2017-05-18,"D2AS2",1,"Bruyere arborescente","Erica arborea",35,0,0,100,NA,NA,"125"
-2017-05-18,"D2AS2",1,"Ciste a feuilles de sauge","Cistus salviifolius",25,0,100,0,NA,"70",NA
-2017-05-18,"D2AS2",1,"Arbousier","Arbutus unedo",15,0,0,100,NA,NA,"145"
-2016-05-31,"D83S3",1,"Ciste de Montpellier","Cistus monspeliensis",20,0,100,0,NA,"95",NA
-2016-05-31,"D83S3",1,"Ciste cotonneux","Cistus albidus",15,50,50,0,"40","95",NA
-2016-05-31,"D83S3",1,"Thym","Thymus vulgaris",20,100,0,0,"20",NA,NA
-2016-04-27,"D13S1",1,"Chene kermes","Quercus coccifera",40,90,10,0,"30",NA,NA
-2016-04-27,"D13S1",1,"Chene vert","Quercus ilex",35,50,40,10,NA,NA,NA
-2016-04-27,"D13S1",1,"Romarin","Rosmarinus officinalis",2,100,0,0,NA,NA,NA
-2016-04-27,"D13S1",1,"Chene kermes","Quercus coccifera",55,0,100,0,NA,"100",NA
-2016-04-27,"D13S1",1,"Chene vert","Quercus ilex",30,0,0,100,NA,NA,"200"
-2016-04-27,"D13S1",1,"Romarin","Rosmarinus officinalis",2,0,100,0,NA,NA,NA
-2016-04-03,"D13S2",1,"Chene kermes","Quercus coccifera",70,0,100,0,NA,"70",NA
-2016-04-03,"D13S2",1,"Romarin","Rosmarinus officinalis",25,0,5,95,NA,NA,"120"
-2016-06-06,"D34S1",1,"Romarin","Rosmarinus officinalis",30,70,30,0,"40","65",NA
-2016-06-06,"D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",15,0,10,90,NA,"70","200"
-2016-06-07,"D34S1",2,"Genet scorpion","Genista scorpius",60,0,0,100,NA,NA,"220"
-2016-06-07,"D34S1",2,"Prunellier","Prunus spinosa",30,NA,NA,NA,NA,NA,NA
-2016-07-07,"D83S1",1,"Chene kermes","Quercus coccifera",65,25,75,0,"35","80",NA
-2016-07-07,"D83S1",1,"Bruyere arborescente","Erica arborea",20,0,0,100,NA,NA,"140"
-2016-07-07,"D83S1",1,"Ciste de Montpellier","Cistus monspeliensis",15,0,100,0,NA,"75",NA
-2016-06-08,"D11S2",1,"Bruyere à balai","Erica scoparia subsp. scoparia",80,0,0,100,NA,NA,"150"
-NA,"D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",15,40,60,0,"40","80",NA
-NA,"D11S2",2,"Chene kermes","Quercus coccifera",5,NA,NA,NA,NA,NA,NA
-2016-05-31,"D83S2",1,"Ciste cotonneux","Cistus albidus",25,0,100,0,NA,"80",NA
-2016-05-31,"D83S2",1,"Thym","Thymus vulgaris",25,100,0,0,"25",NA,NA
-2016-05-31,"D83S2",1,"Chene vert","Quercus ilex",5,NA,NA,NA,NA,NA,NA
-2016-06-08,"D66S1",1,"Ciste de Montpellier","Cistus monspeliensis",30,0,100,0,NA,"90",NA
-2016-06-08,"D66S1",1,"Genet scorpion","Genista scorpius",25,0,100,0,NA,"80",NA
-2016-06-08,"D66S1",1,"Bruyere arborescente","Erica arborea",10,0,0,100,NA,NA,"180"
-2016-06-06,"D34S2",1,"Chene kermes","Quercus coccifera",90,0,20,80,NA,"80","140"
-2016-06-06,"D34S2",1,"Ciste cotonneux","Cistus albidus",5,0,30,70,NA,"80","120"
-2016-07-26,"D30S2",1,"Chene kermes","Quercus coccifera",20,70,30,0,"30","70",NA
-2016-07-26,"D30S2",1,"Ciste cotonneux","Cistus albidus",15,0,100,0,NA,"70",NA
-2016-07-26,"D30S2",1,"Buis","Buxus sempervirens",10,0,100,0,NA,"90",NA
-2016-07-26,"D30S2",1,"Chene vert","Quercus ilex",30,NA,NA,NA,NA,NA,NA
-2016-06-09,"D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",55,0,20,80,NA,"85","120"
-2016-06-09,"D66S2",1,"Chene kermes","Quercus coccifera",20,0,10,90,NA,"90","160"
-2016-06-09,"D66S2",1,"Genet d'Espagne","Spartium junceum",15,0,10,90,NA,"80","190"
-2016-06-09,"D66S2",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",5,NA,NA,NA,NA,NA,NA
-2017-05-17,"D2AS3",1,"Bruyere arborescente","Erica arborea",25,0,0,100,NA,NA,"180"
-2017-05-17,"D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia",25,0,0,100,NA,NA,"170"
-2017-05-17,"D2AS3",1,"Lavande stéchade","Lavandula stoechas",8,NA,NA,NA,NA,NA,NA
-2017-05-17,"D2AS3",1,"Ciste de Montpellier","Cistus monspeliensis",7,0,80,20,NA,"85","140"
-2016-05-18,"D04S1",1,"Romarin","Rosmarinus officinalis",30,5,90,5,"40","90","130"
-2016-05-18,"D04S1",1,"Genet cendre","Genista cinerea",20,20,30,50,"40","80","140"
-2016-06-01,"D06S3",1,"Calycotome","Calicotome",20,0,0,100,NA,NA,"180"
-2016-06-01,"D06S3",1,"Pistachier lentisque","Pistacia lentiscus",15,0,80,20,NA,"70","110"
-2016-06-01,"D06S3",1,"Thym","Thymus vulgaris",15,NA,NA,NA,NA,NA,NA
-2016-06-01,"D06S3",1,"Ciste cotonneux","Cistus albidus",20,0,40,60,NA,"80","140"
-2016-05-18,"D04S2",1,"Buis","Buxus sempervirens",40,0,25,70,NA,"100","140"
-2016-05-18,"D04S2",1,"Genet cendre","Genista cinerea",30,0,90,10,NA,"80","130"
-2016-05-18,"D04S2",1,"Thym","Thymus vulgaris",20,100,0,0,"20",NA,NA
-2016-06-02,"D06S1",1,"Romarin","Rosmarinus officinalis",15,70,30,0,"40","70",NA
-2016-06-02,"D06S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",10,0,100,0,NA,"90",NA
-2016-04-28,"D84S1",1,"Chene vert","Quercus ilex",50,0,10,90,NA,NA,NA
-2016-04-28,"D84S1",1,"Chene kermes","Quercus coccifera",30,0,100,0,NA,NA,NA
-2016-04-28,"D84S1",1,"Buis","Buxus sempervirens",10,50,50,0,NA,NA,NA
-2016-05-26,"D84S2",1,"Chene vert","Quercus ilex",25,0,2,98,NA,"60","180"
-2016-05-26,"D84S2",1,"Romarin","Rosmarinus officinalis",20,40,60,0,"40","80",NA
-2016-05-26,"D84S2",1,"Chene kermes","Quercus coccifera",15,30,70,0,"40","70",NA
-2017-05-16,"D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",45,20,80,0,"40","80",NA
-2017-05-16,"D2BS2",1,"Bruyere arborescente","Erica arborea",10,0,50,50,NA,"80","200"
-2017-05-16,"D2BS2",1,"Lavande stéchade","Lavandula stoechas",10,100,0,0,"40",NA,NA
-2016-07-25,"D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",45,0,70,30,NA,"80","120"
-2016-07-25,"D30S1",1,"Bruyere cendree","Erica cinerea",15,90,10,0,"40","60",NA
-2016-07-25,"D30S1",1,"Bruyere arborescente","Erica arborea",10,0,0,90,NA,NA,"200"
-2016-04-04,"D26S1",1,"Genet scorpion","Genista scorpius",40,10,90,0,"40","80",NA
-2016-04-04,"D26S1",1,"Chene blanc","Quercus pubescens",1,NA,NA,NA,NA,NA,NA
-2017-05-19,"D2AS1",1,"Arbousier","Arbutus unedo",25,0,0,100,NA,NA,"170"
-2017-05-19,"D2AS1",1,"Ciste de Montpellier","Cistus monspeliensis",20,0,50,50,NA,"80","120"
-2017-05-19,"D2AS1",1,"Lentisque","Pistacia lentiscus",15,NA,NA,NA,NA,NA,NA
-2017-05-19,"D2AS1",1,"Bruyere arborescente","Erica arborea",10,0,0,100,NA,NA,"130"
+"Date","Code_Site.x","Placette","sp","sp_correct_name","coverage","height"
+2016-06-02,"D06S2",1,"Ciste de Montpellier","Cistus monspeliensis",65,"180"
+2016-06-02,"D06S2",1,"Myrthe","Myrtus communis",15,"180"
+2016-05-17,"D05S1",1,"Cytise à feuille sessile","Cytisophyllum sessilifolium",15,"150"
+2016-05-17,"D05S1",1,"Genet cendre","Genista cinerea",10,"170"
+2016-05-09,"D07S1",1,"Arbousier","Arbutus unedo",20,"190"
+2016-05-09,"D07S1",1,"Chene vert","Quercus ilex",10,"180"
+2016-05-09,"D07S1",1,"Coronille","Coronilla",3.2,"80"
+2016-05-09,"D07S1",1,"Coronille","Coronilla",4.8,"130"
+2017-05-15,"D2BS3",1,"Ciste de Crête","Cistus creticus",15,"80"
+2017-05-15,"D2BS3",1,"Ciste de Montpellier","Cistus monspeliensis",10,"70"
+2017-05-15,"D2BS3",1,"Bruyere arborescente","Erica arborea",10,"160"
+2016-07-25,"D48S1",1,"Genet purgatif","Cytisus oromediterraneus",36,"80"
+2016-07-25,"D48S1",1,"Genet purgatif","Cytisus oromediterraneus",54,"110"
+2016-07-25,"D48S1",1,"Bruyere cendree","Erica cinerea",10,"45"
+2016-06-08,"D11S1",1,"Romarin","Rosmarinus officinalis",40,"90"
+2016-06-08,"D11S1",1,"Chene kermes","Quercus coccifera",25,"95"
+2017-05-18,"D2AS2",1,"Bruyere arborescente","Erica arborea",35,"125"
+2017-05-18,"D2AS2",1,"Ciste a feuilles de sauge","Cistus salviifolius",25,"70"
+2017-05-18,"D2AS2",1,"Arbousier","Arbutus unedo",15,"145"
+2016-05-31,"D83S3",1,"Ciste de Montpellier","Cistus monspeliensis",20,"95"
+2016-05-31,"D83S3",1,"Ciste cotonneux","Cistus albidus",7.5,"40"
+2016-05-31,"D83S3",1,"Ciste cotonneux","Cistus albidus",7.5,"95"
+2016-05-31,"D83S3",1,"Thym","Thymus vulgaris",20,"20"
+2016-04-27,"D13S1",1,"Chene kermes","Quercus coccifera",36,"30"
+2016-04-27,"D13S1",1,"Chene kermes","Quercus coccifera",55,"100"
+2016-04-27,"D13S1",1,"Chene vert","Quercus ilex",30,"200"
+2016-04-03,"D13S2",1,"Chene kermes","Quercus coccifera",70,"70"
+2016-04-03,"D13S2",1,"Romarin","Rosmarinus officinalis",23.75,"120"
+2016-06-06,"D34S1",1,"Romarin","Rosmarinus officinalis",21,"40"
+2016-06-06,"D34S1",1,"Romarin","Rosmarinus officinalis",9,"65"
+2016-06-06,"D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",1.5,"70"
+2016-06-06,"D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",13.5,"200"
+2016-06-07,"D34S1",2,"Genet scorpion","Genista scorpius",60,"220"
+2016-07-07,"D83S1",1,"Chene kermes","Quercus coccifera",16.25,"35"
+2016-07-07,"D83S1",1,"Chene kermes","Quercus coccifera",48.75,"80"
+2016-07-07,"D83S1",1,"Bruyere arborescente","Erica arborea",20,"140"
+2016-07-07,"D83S1",1,"Ciste de Montpellier","Cistus monspeliensis",15,"75"
+2016-06-08,"D11S2",1,"Bruyere à balai","Erica scoparia subsp. scoparia",80,"150"
+NA,"D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",6,"40"
+NA,"D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",9,"80"
+2016-05-31,"D83S2",1,"Ciste cotonneux","Cistus albidus",25,"80"
+2016-05-31,"D83S2",1,"Thym","Thymus vulgaris",25,"25"
+2016-06-08,"D66S1",1,"Ciste de Montpellier","Cistus monspeliensis",30,"90"
+2016-06-08,"D66S1",1,"Genet scorpion","Genista scorpius",25,"80"
+2016-06-08,"D66S1",1,"Bruyere arborescente","Erica arborea",10,"180"
+2016-06-06,"D34S2",1,"Chene kermes","Quercus coccifera",18,"80"
+2016-06-06,"D34S2",1,"Chene kermes","Quercus coccifera",72,"140"
+2016-06-06,"D34S2",1,"Ciste cotonneux","Cistus albidus",1.5,"80"
+2016-06-06,"D34S2",1,"Ciste cotonneux","Cistus albidus",3.5,"120"
+2016-07-26,"D30S2",1,"Chene kermes","Quercus coccifera",14,"30"
+2016-07-26,"D30S2",1,"Chene kermes","Quercus coccifera",6,"70"
+2016-07-26,"D30S2",1,"Ciste cotonneux","Cistus albidus",15,"70"
+2016-07-26,"D30S2",1,"Buis","Buxus sempervirens",10,"90"
+2016-06-09,"D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",11,"85"
+2016-06-09,"D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",44,"120"
+2016-06-09,"D66S2",1,"Chene kermes","Quercus coccifera",2,"90"
+2016-06-09,"D66S2",1,"Chene kermes","Quercus coccifera",18,"160"
+2016-06-09,"D66S2",1,"Genet d'Espagne","Spartium junceum",1.5,"80"
+2016-06-09,"D66S2",1,"Genet d'Espagne","Spartium junceum",13.5,"190"
+2017-05-17,"D2AS3",1,"Bruyere arborescente","Erica arborea",25,"180"
+2017-05-17,"D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia",25,"170"
+2017-05-17,"D2AS3",1,"Ciste de Montpellier","Cistus monspeliensis",5.6,"85"
+2017-05-17,"D2AS3",1,"Ciste de Montpellier","Cistus monspeliensis",1.4,"140"
+2016-05-18,"D04S1",1,"Romarin","Rosmarinus officinalis",1.5,"40"
+2016-05-18,"D04S1",1,"Romarin","Rosmarinus officinalis",27,"90"
+2016-05-18,"D04S1",1,"Romarin","Rosmarinus officinalis",1.5,"130"
+2016-05-18,"D04S1",1,"Genet cendre","Genista cinerea",4,"40"
+2016-05-18,"D04S1",1,"Genet cendre","Genista cinerea",6,"80"
+2016-05-18,"D04S1",1,"Genet cendre","Genista cinerea",10,"140"
+2016-06-01,"D06S3",1,"Calycotome","Calicotome",20,"180"
+2016-06-01,"D06S3",1,"Pistachier lentisque","Pistacia lentiscus",12,"70"
+2016-06-01,"D06S3",1,"Pistachier lentisque","Pistacia lentiscus",3,"110"
+2016-06-01,"D06S3",1,"Ciste cotonneux","Cistus albidus",8,"80"
+2016-06-01,"D06S3",1,"Ciste cotonneux","Cistus albidus",12,"140"
+2016-05-18,"D04S2",1,"Buis","Buxus sempervirens",10,"100"
+2016-05-18,"D04S2",1,"Buis","Buxus sempervirens",28,"140"
+2016-05-18,"D04S2",1,"Genet cendre","Genista cinerea",27,"80"
+2016-05-18,"D04S2",1,"Genet cendre","Genista cinerea",3,"130"
+2016-05-18,"D04S2",1,"Thym","Thymus vulgaris",20,"20"
+2016-06-02,"D06S1",1,"Romarin","Rosmarinus officinalis",10.5,"40"
+2016-06-02,"D06S1",1,"Romarin","Rosmarinus officinalis",4.5,"70"
+2016-06-02,"D06S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",10,"90"
+2016-05-26,"D84S2",1,"Chene vert","Quercus ilex",0.5,"60"
+2016-05-26,"D84S2",1,"Chene vert","Quercus ilex",24.5,"180"
+2016-05-26,"D84S2",1,"Romarin","Rosmarinus officinalis",8,"40"
+2016-05-26,"D84S2",1,"Romarin","Rosmarinus officinalis",12,"80"
+2016-05-26,"D84S2",1,"Chene kermes","Quercus coccifera",4.5,"40"
+2016-05-26,"D84S2",1,"Chene kermes","Quercus coccifera",10.5,"70"
+2017-05-16,"D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",9,"40"
+2017-05-16,"D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",36,"80"
+2017-05-16,"D2BS2",1,"Bruyere arborescente","Erica arborea",5,"80"
+2017-05-16,"D2BS2",1,"Bruyere arborescente","Erica arborea",5,"200"
+2017-05-16,"D2BS2",1,"Lavande stéchade","Lavandula stoechas",10,"40"
+2016-07-25,"D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",31.5,"80"
+2016-07-25,"D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",13.5,"120"
+2016-07-25,"D30S1",1,"Bruyere cendree","Erica cinerea",13.5,"40"
+2016-07-25,"D30S1",1,"Bruyere cendree","Erica cinerea",1.5,"60"
+2016-07-25,"D30S1",1,"Bruyere arborescente","Erica arborea",9,"200"
+2016-04-04,"D26S1",1,"Genet scorpion","Genista scorpius",4,"40"
+2016-04-04,"D26S1",1,"Genet scorpion","Genista scorpius",36,"80"
+2017-05-19,"D2AS1",1,"Arbousier","Arbutus unedo",25,"170"
+2017-05-19,"D2AS1",1,"Ciste de Montpellier","Cistus monspeliensis",10,"80"
+2017-05-19,"D2AS1",1,"Ciste de Montpellier","Cistus monspeliensis",10,"120"
+2017-05-19,"D2AS1",1,"Bruyere arborescente","Erica arborea",10,"130"

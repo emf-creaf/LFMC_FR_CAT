@@ -244,7 +244,7 @@ herb_new_df_cov<-HERBS_COV_FR_VEG_DATA %>%
 MERGE_HERBS_FR_VEG_DATA<-herb_new_df_cov
 MERGE_HERBS_FR_VEG_DATA <- rename(MERGE_HERBS_FR_VEG_DATA, coverage = taux_total_herbacee)
 
-##PROCESSING FINAL DATA################################################################################################
+##PROCESSING THE DATA################################################################################################
 
 # 1.REMOVE NA SPECIES ROWS, If "sp" colum is "NA" remove the row
 # 2.REMOVE THE "CATEGORY COLUMNS"
@@ -344,12 +344,42 @@ MERGE_HERBS_FR_VEG_DATA$sp_correct_name %in% SpParamsFR$Name #not all sp are in 
 
 
 
-##SHRUBS NEED MORE STEPS! TRNSFORM COVERAGE % TO "TOTAL COVERAGE"################################################################
+##SHRUBS NEED MORE STEPS! TRNSFORM COVERAGE % TO "TOTAL COVERAGE", AND SEPARATE THE DIFERENT LEVELS (0,50)(50_100)(100_200)################################################################
 
 MERGE_SHRUBS_FR_VEG_DATA <- MERGE_SHRUBS_FR_VEG_DATA %>%
-  mutate(across(starts_with("coverage_"), ~ . * coverage / 100))
+  mutate(across(starts_with("coverage_"), ~ . * coverage / 100)) %>% 
+  select(-coverage)
 
-##EXPORT FINAL .CSV################################################################################################
+#rm(list=setdiff(ls(), c("MERGE_HERBS_FR_VEG_DATA","MERGE_SHRUBS_FR_VEG_DATA","MERGE_TREES_FR_VEG_DATA")))
+
+
+# SEPARATE THE COVER AND HEIGHT
+coverage_df <- MERGE_SHRUBS_FR_VEG_DATA %>%
+  pivot_longer(cols = starts_with("coverage"),
+               names_to = "level",
+               names_prefix = "coverage_",
+               values_to = "coverage") %>% 
+  mutate(ID = c(1:n())) %>%
+  select(-c(contains("height"))) %>% 
+  relocate("ID")
+
+height_df <- MERGE_SHRUBS_FR_VEG_DATA %>%
+  pivot_longer(cols = starts_with("height"),
+               names_to = "level",
+               names_prefix = "height_",
+               values_to = "height") %>% 
+  mutate(ID = c(1:n())) %>% 
+  select(-c(contains("coverage"))) %>%
+  relocate("ID")
+
+#FINAL SHRUB DATAFRAME
+
+MERGE_SHRUBS_FR_VEG_DATA <- coverage_df %>%
+  inner_join(height_df[,c(1,8)], by = "ID") %>%
+  select(-c(ID,level)) %>% 
+  filter(!is.na(height))         
+
+##EXPORT FINAL DATA (.CSV)################################################################################################
 
 #TREES
 write.csv(MERGE_TREES_FR_VEG_DATA, "data/FR_TREES_VEG_DATA.csv", row.names=FALSE)
