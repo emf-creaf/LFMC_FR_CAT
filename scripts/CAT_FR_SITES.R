@@ -40,6 +40,8 @@ CAT_SITES$Latitude<-as.numeric(CAT_SITES$Latitude)    #SET AS NUMERIC
 
 str(CAT_SITES)
 
+CAT_SITES$LocalityName[CAT_SITES$LocalityName == "Torà"] <- "Tora"
+
 ##FRENCH DATA####
 
 FR_SITES<-read.csv("raw_data/FR_DATA/RH_Sites_Coordinates.csv", sep = ";")
