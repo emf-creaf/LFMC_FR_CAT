@@ -6,8 +6,7 @@ library(tidyverse)
 
 sites<-read.csv("data/CAT_FR_SITES.csv")
 
-
-#Soil from SoilGrid Hengl_2017
+#Soil from SoilGrid Hengl_2017####
 
 for (i in (1:nrow(sites))) {
   site<-sites[i,]
@@ -24,18 +23,7 @@ for (i in (1:nrow(sites))) {
   all_soil<-full_join(all_soil,soil)
 }
 
+all_soil<-all_soil %>% 
+  mutate(site_name = ifelse(site_name == "Torà", "Tora", site_name))
+
 write.csv(all_soil, "data/SOIL_DATA.csv", row.names=FALSE)
-
-#all_sol data frame to list (medfate format)
-
-soil_data<-read.csv(file = "data/SOIL_DATA.csv")
-
-soil_list<-soil_data %>% 
-  group_split(site_name) %>% 
-  lapply(as.data.frame)
-
-#remove soil_data column
-
-soil_list<-lapply(soil_list, function(x) { x["site_name"] <- NULL; x })
-
-summary(soil_list)
