@@ -23,7 +23,6 @@ for(i in 1:length(LAIlistfiles)) {
   LAIrasters[[i]] <- rast(LAIlistfiles[[i]])
 }
 
-class(LAIrasters[[1]])
 
 #EXTRACT LAI DATA AT PLOTS COORDS
 
@@ -36,12 +35,15 @@ for(i in 1:length(LAIrasters)) {
   LAI_all <- cbind(LAI_all, LAI_data)
 }
 
-#export LAI DATA
+# Apply scale factor of 0,1
+LAI_all[25,-(1:6)]<-NA
+LAI_all[,-(1:6)] <- LAI_all[,-(1:6)] * 0.1
 
+
+#export LAI DATA
 write.csv(LAI_all, "data/LAI_DATA_MODIS.csv", row.names=FALSE)
 
-
-#AVERAGE 5 HIGHEST VALUES PER YEAR
+#AVERAGE 5 HIGHEST VALUES PER YEAR#####
 
 LAI_DATA_MODIS<-read.csv("data/LAI_DATA_MODIS.csv")
 
