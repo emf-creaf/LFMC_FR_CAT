@@ -14,8 +14,10 @@ FR_VEG_DATA_RAW[FR_VEG_DATA_RAW == "na"] <- NA
 
 FR_VEG_DATA_RAW$Date[16]<-"42529" #PLOT D11S2 DATE INCORRECT, CHANGE TO CORRECT NUMBER (in excel format)
 FR_VEG_DATA_RAW$Date<- FR_VEG_DATA_RAW$Date %>% as.numeric() %>% as.Date(origin = "1899-12-30")
-names(FR_VEG_DATA_RAW)
-summary(FR_VEG_DATA_RAW)
+
+#D13S1, change row 10 to plot 2
+FR_VEG_DATA_RAW$Placette[10]<-2
+#View(FR_VEG_DATA_RAW[FR_VEG_DATA_RAW$Code_Site.x=="D13S1",])
 
 #DELETE THE LAST COLUMN, WHICH IS REPEATED
 FR_VEG_DATA_RAW<-FR_VEG_DATA_RAW %>% select(-Code_Site.y)
