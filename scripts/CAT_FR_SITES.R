@@ -1,6 +1,9 @@
 library(DBI)
 library(RSQLite)
 library(tidyverse)
+library(sf)
+library(geodata)
+library(terra)
 
 #############PLOTS DATA###############
 
@@ -67,3 +70,68 @@ CAT_FR_SITES<-data.frame(ID = c(1:(nrow(CAT_SITES)+nrow(FR_SITES))),
 str(CAT_FR_SITES)
 
 write.csv(CAT_FR_SITES,"data/CAT_FR_SITES.csv", row.names = F)
+
+#####TOPO####
+
+SF_CAT_FR_SITES<-st_as_sf(CAT_FR_SITES, coords = c("LON", "LAT"), crs = 4326)
+
+vect_SF_CAT_FR_SITES <- terra::vect(SF_CAT_FR_SITES$geometry)
+
+
+#TOPOGRAPHIC DATA
+country_codes("Spain")
+country_codes("France")
+
+#SPAIN_elev_raster<-geodata::elevation_30s(country="ESP", path = "raw_data/TOPO_DATA/SPAIN/")
+#FRANCE_elev_raster<-geodata::elevation_30s(country="FR", path = "raw_data/TOPO_DATA/FRANCE/")
+
+SPAIN_elev_raster<-rast("raw_data/TOPO_DATA/SPAIN/ESP_elv_msk.tif")
+FRANCE_elev_raster<-rast("raw_data/TOPO_DATA/FRANCE/FRA_elv_msk.tif")
+
+names(SPAIN_elev_raster) <- "elevation"
+SPAIN_elev_raster
+
+names(FRANCE_elev_raster) <- "elevation"
+FRANCE_elev_raster
+
+SPAIN_slope_raster <- terra::terrain(SPAIN_elev_raster, v = "slope", unit="degrees")
+SPAIN_aspect_raster <- terra::terrain(SPAIN_elev_raster, v = "aspect", unit="degrees")
+
+FRANCE_slope_raster <- terra::terrain(FRANCE_elev_raster, v = "slope", unit="degrees")
+FRANCE_aspect_raster <- terra::terrain(FRANCE_elev_raster, v = "aspect", unit="degrees")
+
+
+#SPAIN_topo_raster <- c(SPAIN_elev_raster, SPAIN_slope_raster, SPAIN_aspect_raster)
+#plot(SPAIN_topo_raster)
+
+#EXTRACT TOPO
+SPAIN_elev<-terra::extract(SPAIN_elev_raster,vect_SF_CAT_FR_SITES)
+SPAIN_slope<-terra::extract(SPAIN_slope_raster,vect_SF_CAT_FR_SITES)
+SPAIN_aspect<-terra::extract(SPAIN_aspect_raster,vect_SF_CAT_FR_SITES)
+
+SPAIN_topo<-SPAIN_elev %>% 
+  full_join(SPAIN_slope) %>% 
+  full_join(SPAIN_aspect) %>% 
+  filter(!is.na(elevation))
+
+FRANCE_elev<-terra::extract(FRANCE_elev_raster,vect_SF_CAT_FR_SITES)
+FRANCE_slope<-terra::extract(FRANCE_slope_raster,vect_SF_CAT_FR_SITES)
+FRANCE_aspect<-terra::extract(FRANCE_aspect_raster,vect_SF_CAT_FR_SITES)
+
+FRANCE_topo<-FRANCE_elev %>% 
+  full_join(FRANCE_slope) %>% 
+  full_join(FRANCE_aspect) %>% 
+  filter(!is.na(elevation))
+
+CAT_FR_SITES_topo<-bind_rows(SPAIN_topo,FRANCE_topo)
+
+CAT_FR_SITES_2<-CAT_FR_SITES %>% 
+  full_join(CAT_FR_SITES_topo, by = "ID")
+
+####ARSENE METEO DATA IN CAT_FR_SITES######
+
+CAT_FR_SITES_climName<-read.csv("raw_data/ERA5_DATA/DATA ARSENE/CAT_FR_SITES_climName.csv")
+
+CAT_FR_SITES_2$ERA5_NAME_POINTS<-CAT_FR_SITES_climName$climPts
+
+write.csv(CAT_FR_SITES_2,"data/CAT_FR_SITES.csv", row.names = F)
