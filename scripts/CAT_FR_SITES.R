@@ -134,4 +134,12 @@ CAT_FR_SITES_climName<-read.csv("raw_data/ERA5_DATA/DATA ARSENE/CAT_FR_SITES_cli
 
 CAT_FR_SITES_2$ERA5_NAME_POINTS<-CAT_FR_SITES_climName$climPts
 
+
+####ADD FRENCH/CAT source COLUMN###
+
+CAT_FR_SITES_2$source<-NA
+CAT_FR_SITES_2$source <- replace(CAT_FR_SITES_2$source, 1:9, "CAT")
+CAT_FR_SITES_2$source <- replace(CAT_FR_SITES_2$source, 10:40, "FR")
+
+
 write.csv(CAT_FR_SITES_2,"data/CAT_FR_SITES.csv", row.names = F)
