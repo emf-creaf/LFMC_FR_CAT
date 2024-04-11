@@ -28,7 +28,7 @@ for(i in 1:length(LAIlistfiles)) {
 
 coords_sf<-st_as_sf(CAT_FR_SITES, coords = c("LON", "LAT"), crs = 4326)
 
-LAI_all<-CAT_FR_SITES
+LAI_all<-CAT_FR_SITES[1:2]
 for(i in 1:length(LAIrasters)) {
   LAI_data <- terra::extract(LAIrasters[[i]], coords_sf, ID=FALSE)
   LAI_all <- cbind(LAI_all, LAI_data)
@@ -37,7 +37,7 @@ for(i in 1:length(LAIrasters)) {
 #PLOT D66S2 have value 250 (urban) there is a road. extract the data from the pixel abvove
 
 coords <- st_coordinates(coords_sf[25,])
-LAI_25 <- CAT_FR_SITES[25,]
+LAI_25 <- CAT_FR_SITES[25,1:2]
 
 row_offset<--1 #THE ROW ABOVE
 col_offset<- 0 #THE SAME COL
@@ -60,11 +60,13 @@ LAI_all_correct<-LAI_all %>%
 
 
 # Apply scale factor of 0,1
-LAI_all_correct[,-(1:11)] <- LAI_all_correct[,-(1:11)] * 0.1
+LAI_all_correct[,-(1:2)] <- LAI_all_correct[,-(1:2)] * 0.1
 
 
 #export LAI DATA
 write.csv(LAI_all_correct, "data/LAI_DATA_MODIS.csv", row.names=FALSE)
+
+rm(list=ls())
 
 #AVERAGE 5 HIGHEST VALUES PER YEAR#####
 
@@ -81,4 +83,12 @@ for (i in years) {
     select(-c(contains(year_str) & !contains("mean")))
 }
 
-write.csv(LAI_DATA_MODIS_MEAN_TOP5, "data/LAI_DATA_MODIS_MEANS.csv", row.names=FALSE)
+LAI_DATA_MODIS_MEAN_TOP5_LONG<-LAI_DATA_MODIS_MEAN_TOP5 %>% 
+  pivot_longer(
+    cols=-c(1,2),
+    names_to = "YEAR",
+    names_prefix = "MCD15A2H_Lai_mean_top5_",
+    values_to = "MCD15A2H_Lai_mean_top5"
+  )
+
+write.csv(LAI_DATA_MODIS_MEAN_TOP5_LONG, "data/LAI_DATA_MODIS_MEANS.csv", row.names=FALSE)
