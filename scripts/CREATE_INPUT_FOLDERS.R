@@ -37,7 +37,7 @@ soil_data<-read.csv(file = "data/SOIL_DATA.csv")
 
 soil_list <- split(soil_data, soil_data$site_name)
 
-#remove soil_data column
+#remove site_name column
 soil_list<-lapply(soil_list, function(x) { x["site_name"] <- NULL; x })
 
 #save the soil dataframe in PLOT folders.
@@ -59,21 +59,27 @@ for (i in CAT_FR_SITES_NAMES) {
 
 CAT_VEG_DATA<-read.csv("data/CAT_VEG_DATA.csv")
 
-#ALL SP#################################################################
+#SP#################################################################
 
 cat_names<-unique(CAT_VEG_DATA$Site)
 
-cat_forests <- list()
+
+cat_forests<-list()
 mapping_cat<-c("Species.name" = "sp_correct_name", "Height" = "Height", "Cover" = "Cover")
 for (i in cat_names) {
   cat_forests[[i]] <- emptyforest()
+  # Store the "plot" info separately
+  plot_data <- CAT_VEG_DATA[CAT_VEG_DATA$Site==i, "Plot"]
+  # Apply the map function
   cat_forests[[i]]$shrubData <- forest_mapShrubTable(CAT_VEG_DATA[CAT_VEG_DATA$Site==i,], mapping_y = mapping_cat, SpParams = SpParamsES)
+  # Add the "plot" info to the shrubData
+  cat_forests[[i]]$shrubData$Plot <- plot_data
 }
 
 cat_forests[["Tivissa"]]$shrubData[20,1]<-"Asphodelus spp."
 
-#save the shrubData dataframe in plot directory.
 
+#save the shrubData dataframe in plot directory.
 for (i in cat_names) {
   df <- cat_forests[[i]]$shrubData
   dir <- file.path(getwd(), "data", "PLOTS", i)
@@ -84,61 +90,6 @@ for (i in cat_names) {
     warning(paste(" directory", dir, "not found","\n", i, "shrubData, not saved."))
   }
 }
-
-#MEASURED SP###################################################################################
-
-CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
-
-#Create a dataframe with unique combinations of species and sites
-
-CAT_list_sp_site <- split(CAT_LFMC$sp_correct_name, CAT_LFMC$LocalityName) %>%
-  lapply(unique) %>%
-  enframe(name = "Site", value = "Species") %>%
-  unnest(cols = c(Species))
-
-#DUPLICATED SP AND SITE MEASUREMENTS, BUT DIFERENT PLOTS (1-2)
-DUPLICATED_LFMC_SITE_SP<-CAT_VEG_DATA %>%
-  group_by(Site, Species) %>%
-  filter(n() > 1) %>% 
-  print(n=Inf)
-
-#IF WEE AD THE PLOT THERE IS NO DUPLICATED ROWS
-
-# CAT_VEG_DATA %>%
-#   group_by(Site, Species, Plot) %>%
-#   filter(n() > 1) %>% 
-#   print(n=Inf)
-
-#JOIN THE VEGETATION DATA WITH THE MEASURED SP
-CAT_MEASURED_VEG_DATA<-left_join(CAT_list_sp_site,CAT_VEG_DATA, by = c("Site" = "Site","Species" = "Species")) %>% 
-  filter(!is.na(Cover))
-
-cat_measured_names<-CAT_MEASURED_VEG_DATA$Site
-
-cat_measured_forests <- list()
-mapping_cat<-c("Species.name" = "sp_correct_name", "Height" = "Height", "Cover" = "Cover")
-for (i in 1:length(cat_measured_names)) {
-  cat_measured_forests[[i]] <- emptyforest()
-  cat_measured_forests[[i]]$shrubData <- forest_mapShrubTable(CAT_MEASURED_VEG_DATA[i,], mapping_y = mapping_cat, SpParams = SpParamsES)
-  #GET THE SP NAME OF EACH SITE
-  species_name <- cat_measured_forests[[i]]$shrubData$Species
-  #RENAME THE LIST WITH THE SP
-  names(cat_measured_forests)[i] <- paste0(cat_measured_names[i],"_",species_name,"_",i)
-}
-
-#save the "unique" shrubData dataframe in plot directory.
-
-# for (i in 1:length(cat_measured_names)) {
-#   df <- cat_measured_forests[[i]]$shrubData
-#   dir <- file.path(getwd(), "data", "PLOTS", cat_measured_names[[i]])
-#   if (dir.exists(dir)) {
-#     write.csv(df, paste0(dir,"/shrubData_",cat_measured_forests[[i]]$shrubData$Species,i,".csv"),row.names = F)
-#     print(paste("shrub", cat_measured_forests[[i]]$shrubData$Species,i, "saved."))
-#   } else {
-#     print(paste("directory", dir, "not found"))
-#     warning(paste(" directory", dir, "not found","\n","shrubData_",cat_measured_forests[[i]]$shrubData$Species,i,"not saved."))
-#   }
-# }
 
 ########################FRENCH DATA###################################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
@@ -155,7 +106,7 @@ FR_VEG_DATA<-bind_rows(FR_TREES_VEG_DATA, FR_SHRUBS_VEG_DATA) %>%
   arrange(Code_Site.x)
 
 
-#ALL SP###################################################################################
+#SP###################################################################################
 
 fr_names<-unique(FR_VEG_DATA$Code_Site.x)
 
@@ -169,8 +120,14 @@ fr_forests <- list()
 mapping_fr<-c("Species.name" = "sp_correct_name", "Height" = "height", "Cover" = "coverage")
 for (i in fr_names) {
   fr_forests[[i]] <- emptyforest()
+  # Store the "placette" info separately
+  plot_data <- FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i, "Placette"]
+  # Apply the map function
   fr_forests[[i]]$shrubData <- forest_mapShrubTable(FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i,], mapping_y = mapping_fr, SpParams = SpParamsFR)
+  # Add the "placette" info to the shrubData
+  fr_forests[[i]]$shrubData$Plot <- plot_data
 }
+
 
 for (i in fr_names) {
   df <- fr_forests[[i]]$shrubData
@@ -183,70 +140,51 @@ for (i in fr_names) {
   }
 }
 
-#MEASURED SP###################################################################################
-
-FR_LFMC<-read.csv("data/FR_LFMC.csv")
-
-#Create a dataframe with unique combinations of species and sites
-FR_list_sp_site <- split(FR_LFMC$sp_correct_name, FR_LFMC$SiteCode) %>%
-  lapply(unique) %>%
-  enframe(name = "Site", value = "Species") %>%
-  unnest(cols = c(Species))
-
-#Not all fr-sites have vegetation data! D07S2, D2BS1, don't have vegetation data but have LFMC measurements
-not_veg<-which((FR_list_sp_site$Site %in% FR_VEG_DATA$Code_Site.x)==F)
-FR_list_sp_site[not_veg,]
-
-#Not all LFMC sp measured have vegetation data  (Hippocrepis emerus, Cytisus scoparius, Calluna vulgaris, Cytisus scoparius).
-measured_sp<-which((FR_list_sp_site$Species %in% FR_VEG_DATA$sp_correct_name)==F)
-FR_list_sp_site[measured_sp,]
-
-
-#JOIN THE VEGETATION DATA WITH THE MEASURED SP
-FR_MEASURED_VEG_DATA<-left_join(FR_list_sp_site,FR_VEG_DATA, by = c("Site" = "Code_Site.x","Species" = "sp_correct_name")) %>% 
-  filter(!is.na(coverage)) %>% 
-  select(-c(sp))
-  
-
-fr_measured_names<-FR_MEASURED_VEG_DATA$Site
-
-fr_measured_forests <- list()
-mapping_fr<-c("Species.name" = "Species", "Height" = "height", "Cover" = "coverage")
-for (i in 1:length(fr_measured_names)) {
-  fr_measured_forests[[i]] <- emptyforest()
-  fr_measured_forests[[i]]$shrubData <- forest_mapShrubTable(FR_MEASURED_VEG_DATA[i,], mapping_y = mapping_fr, SpParams = SpParamsFR)
-  #GET THE SP NAME OF EACH SITE
-  species_name <- fr_measured_forests[[i]]$shrubData$Species
-  #RENAME THE LIST WITH THE SP
-  names(fr_measured_forests)[i] <- paste0(fr_measured_names[i],"_",species_name,"_",i)
-}
-
-#save the "unique" shrubData dataframe in plot directory.
-
-# for (i in 1:length(fr_measured_names)) {
-#   df <- fr_measured_forests[[i]]$shrubData
-#   dir <- file.path(getwd(), "data", "PLOTS", fr_measured_names[[i]])
-#   if (dir.exists(dir)) {
-#     write.csv(df, paste0(dir,"/shrubData_",fr_measured_forests[[i]]$shrubData$Species,i,".csv"),row.names = F)
-#     print(paste("shrub", fr_measured_forests[[i]]$shrubData$Species,i, "saved."))
-#   } else {
-#     print(paste("directory", dir, "not found"))
-#     warning(paste(" directory", dir, "not found","\n","shrubData_",fr_measured_forests[[i]]$shrubData$Species,i,"not saved."))
-#   }
-# }
-
 ###########################################METEO##################################
 #READ THE .CSV DATA
 #METEO
-METEO<-list.files("raw_data/ERA5_DATA/DATA ARSENE/CORRECT_CSV/",pattern = ".csv",full.names = TRUE)
+METEO<-list.files("raw_data/ERA5_DATA/DATA ARSENE",pattern = "^ERA_land.*\\.csv$",full.names = TRUE)
+
 METEO_list <- list()
-for(i in 1:length(METEO)) {
-  METEO_list[[i]] <- read.csv(METEO[i], stringsAsFactors = FALSE)
+
+# Read the CSV files
+for(i in seq_along(METEO)) {
+  METEO_list[[i]] <- read.csv(METEO[i], stringsAsFactors = FALSE, sep = ";")
 }
 
-#CAT_FR_SITES METEO TABLE
-CAT_FR_SITES_climName<-read.csv("DATA/CAT_FR_SITES_climName.csv")
-CAT_FR_SITES_climName$site_name[CAT_FR_SITES_climName$site_name=="Torà"]<-"Tora"
+str(METEO_list[[1]])
+
+#CHANGE VARIABLE NAMES
+mapping <- c(
+  "Dates" = "DATE",
+  "MinTemperature" = "Tair_min",
+  "MaxTemperature" = "Tair_max",
+  "MeanTemperature" = "Tair_mean",
+  "Precipitation" = "PPT_sum",
+  "MinRelativeHumidity" = "RHair_min",
+  "MaxRelativeHumidity" = "RHair_max",
+  "MeanRelativeHumidity" = "RHair_mean",
+  "Radiation" = "RG_sum",
+  "WindSpeed" = "WS_mean"
+)
+
+# METEO_list_copy<-METEO_list
+# METEO_list<-METEO_list_copy
+
+for(i in seq_along(METEO_list)) {
+  METEO_list[[i]] <- rename(METEO_list[[i]], all_of(mapping))
+  METEO_list[[i]]$Dates <- as.Date(METEO_list[[i]]$Dates,tryFormats = "%d/%m/%Y")
+}
+
+str(METEO_list[[1]])
+
+# # Save the data with a comma separator
+# for(i in seq_along(METEO_list)) {
+#   # Extract the original file name, remove the extension and add the new one
+#   file_name <- gsub("^.*/", "", METEO[i])
+#   file_name <- gsub("\\.csv$", "", file_name)
+#   write.csv(METEO_list[[i]], file = paste0("raw_data/ERA5_DATA/DATA ARSENE/CORRECT_CSV/", file_name, ".csv"), row.names = FALSE)
+# }
 
 #PUT THE NAME OF THE ARCHIVE IN THE LIST
 file_names <- gsub("\\.csv$", "", basename(METEO))
@@ -255,15 +193,16 @@ file_names <- gsub("ERA_land_", "", file_names)
 names(METEO_list)<-file_names
 
 #CHANGE THE NAME WITH THE CORRECT SITE NAME
-for (i in 1:nrow(CAT_FR_SITES_climName)) {
-  row <- CAT_FR_SITES_climName[i, ]
+for (i in 1:nrow(CAT_FR_SITES)) {
+  row <- CAT_FR_SITES[i, ]
   
-  if (row$climPts %in% names(METEO_list)) {
-    names(METEO_list)[names(METEO_list) == row$climPts] <- row$site_name
+  if (row$ERA5_NAME_POINTS %in% names(METEO_list)) {
+    names(METEO_list)[names(METEO_list) == row$ERA5_NAME_POINTS] <- row$site_name
   }
 }
 
-METEO_list <- METEO_list[names(METEO_list) %in% CAT_FR_SITES_climName$site_name]
+#REMOVE THE NON MACHING NAMES
+METEO_list <- METEO_list[names(METEO_list) %in% CAT_FR_SITES$site_name]
 
 
 #SAVE THE METEO DATA TO CORRECT PLOT FOLDER
@@ -281,47 +220,80 @@ for (i in CAT_FR_SITES_NAMES) {
   }
 }
 
+###########################################LAI##################################
+
+#export LAI_data to the correct plot directory, with medfate format
+
+LAI_data<-read.csv(file = "data/LAI_DATA_MODIS_MEANS.csv")
+
+LAI_list <- split(LAI_data, LAI_data$site_name)
+
+#remove site_name an ID column
+LAI_list<-lapply(LAI_list, function(x) { x[c("site_name","ID")] <- NULL; x })
+
+#save the soil dataframe in PLOT folders.
+
+for (i in CAT_FR_SITES_NAMES) {
+  df <- LAI_list[[i]]
+  dir <- file.path(getwd(), "data", "PLOTS", i)
+  if (dir.exists(dir)) {
+    write.csv(df, file.path(dir, "MODIS_LAI.csv"),row.names = F)
+    print(paste("LAI", i, "saved."))
+  } else {
+    warning(paste(" directory", dir, "not found","\n", i, "LAI, not saved."))
+  }
+}
+
 ##########################################LIST OBJECTS, AND FUNCTIONS######################
 
-rm(list= names(Filter(function(x) !any(class(x) == "list"), mget(ls(),envir = .GlobalEnv))))
-
-#EXTRACT PLOT DATA FUNCTION
-PLOT_data <- function(site_name){
-  result_list <- list()
+# rm(list= names(Filter(function(x) !any(class(x) == "list"), mget(ls(),envir = .GlobalEnv))))
+# 
+# #EXTRACT PLOT DATA FUNCTION
+# PLOT_data <- function(site_name){
+#   result_list <- list()
+#   
+#   if (site_name %in% names(cat_forests)){
+#     result_list$cat_forests <- cat_forests[[site_name]][["shrubData"]]
+#   } else {
+#     warning(paste("Site name", site_name, "not found in cat_forests"))
+#   }
+#   
+#   if (site_name %in% names(fr_forests)){
+#     result_list$fr_forests <- fr_forests[[site_name]][["shrubData"]]
+#   } else {
+#     warning(paste("Site name", site_name, "not found in fr_forests"))
+#   }
+#   
+#   if (site_name %in% names(METEO_list)){
+#     result_list$METEO_list <- METEO_list[[site_name]]
+#   } else {
+#     warning(paste("Site name", site_name, "not found in METEO_list"))
+#     print(names(METEO_list))
+#   }
+#   
+#   if (site_name %in% names(soil_list)){
+#     result_list$soil_list <- soil_list[[site_name]]
+#   } else {
+#     warning(paste("Site name", site_name, "not found in soil_list"))
+#   }
   
-  if (site_name %in% names(cat_forests)){
-    result_list$cat_forests <- cat_forests[[site_name]][["shrubData"]]
+  if (site_name %in% names(LAI_list)){
+    result_list$LAI_list <- LAI_list[[site_name]]
   } else {
-    warning(paste("Site name", site_name, "not found in cat_forests"))
-  }
-  
-  if (site_name %in% names(fr_forests)){
-    result_list$fr_forests <- fr_forests[[site_name]][["shrubData"]]
-  } else {
-    warning(paste("Site name", site_name, "not found in fr_forests"))
-  }
-  
-  if (site_name %in% names(METEO_list)){
-    result_list$METEO_list <- METEO_list[[site_name]]
-  } else {
-    warning(paste("Site name", site_name, "not found in METEO_list"))
-    print(names(METEO_list))
-  }
-  
-  if (site_name %in% names(soil_list)){
-    result_list$soil_list <- soil_list[[site_name]]
-  } else {
-    warning(paste("Site name", site_name, "not found in soil_list"))
+    warning(paste("Site name", site_name, "not found in LAI_list"))
   }
   
   return(result_list)
 }
 
 
-
+CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
+CAT_FR_SITES_NAMES<-CAT_FR_SITES$site_name
 for (i in CAT_FR_SITES_NAMES){
   assign(i, PLOT_data(i))
 }
+
+
 
 
 
