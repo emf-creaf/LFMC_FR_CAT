@@ -1,7 +1,9 @@
+library(sf)
+library(tidyverse)
 library(medfate)
 library(medfateutils)
 library(meteoland)
-library(tidyverse)
+library(medfateland)
 
 ############################################CREATE FOLDERS#######################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
@@ -140,7 +142,7 @@ for (i in fr_names) {
   }
 }
 
-###########################################METEO##################################
+###########################################METEO ERA_5##################################
 #READ THE .CSV DATA
 #METEO
 METEO<-list.files("raw_data/ERA5_DATA/DATA ARSENE",pattern = "^ERA_land.*\\.csv$",full.names = TRUE)
@@ -215,6 +217,56 @@ for (i in CAT_FR_SITES_NAMES) {
   if (dir.exists(dir)) {
     write.csv(df, file.path(dir,"meteo.csv"),row.names = F)
     print(paste("meteo", i, "saved."))
+  } else {
+    warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
+  }
+}
+
+###################CAT METEO INTERPOLATORS#####################################
+
+CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
+
+#CAT SITES
+CAT_SITES<-CAT_FR_SITES[1:9,]
+
+#SF OBJECT
+SF_CAT_SITES<-st_as_sf(CAT_SITES, coords = c("LON", "LAT"), crs = 4326)
+
+#LOAD INTERPOLATORS (SEPARATE YEARS)
+files<-list.files("raw_data/interpoladores_meteo_cat/Meteo/", pattern = ".nc", full.names = T)
+
+#INTERPOLATE METEO DATA
+meteo<-list()
+for (i in 1:length(files)){
+  m<-read_interpolator(files[i])
+  meteo[[i]]<-interpolate_data(SF_CAT_SITES, m)
+}
+
+#MERGE INTERPOLATED DATA
+meteo_interpolators<-list()
+for (i in 1:nrow(meteo[[1]])) {
+  temp <- list()  # Temporary list to store data frames for each row
+  for(j in 1:length(meteo)) {
+    temp[[j]] <- meteo[[j]]$interpolated_data[[i]]
+  }
+  meteo_interpolators[[i]] <- do.call(rbind, temp)  # Concatenate data frames in temp
+}
+
+#CHANGE NAMES
+
+new_names<-meteo[[1]]$site_name
+names(meteo_interpolators) <- new_names
+
+
+#SAVE INTERPOLATED METEO TO CAT PLOTS
+CAT_SITES_NAMES<-CAT_FR_SITES$site_name[1:9]
+
+for (i in CAT_SITES_NAMES) {
+  df <- meteo_interpolators[[i]]
+  dir <- file.path(getwd(), "data", "PLOTS", i)
+  if (dir.exists(dir)) {
+    write.csv(df, file.path(dir,"meteo_interpolator.csv"),row.names = F)
+    print(paste("meteo interpolator", i, "saved."))
   } else {
     warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
   }
