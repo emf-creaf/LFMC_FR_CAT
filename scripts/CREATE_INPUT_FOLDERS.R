@@ -70,12 +70,14 @@ cat_forests<-list()
 mapping_cat<-c("Species.name" = "sp_correct_name", "Height" = "Height", "Cover" = "Cover")
 for (i in cat_names) {
   cat_forests[[i]] <- emptyforest()
-  # Store the "plot" info separately
+  # Store the "plot" and "Date" info separately
   plot_data <- CAT_VEG_DATA[CAT_VEG_DATA$Site==i, "Plot"]
+  Date_data <- CAT_VEG_DATA[CAT_VEG_DATA$Site==i, "Date"]
   # Apply the map function
   cat_forests[[i]]$shrubData <- forest_mapShrubTable(CAT_VEG_DATA[CAT_VEG_DATA$Site==i,], mapping_y = mapping_cat, SpParams = SpParamsES)
   # Add the "plot" info to the shrubData
   cat_forests[[i]]$shrubData$Plot <- plot_data
+  cat_forests[[i]]$shrubData$Date <- Date_data
 }
 
 cat_forests[["Tivissa"]]$shrubData[20,1]<-"Asphodelus spp."
@@ -124,10 +126,12 @@ for (i in fr_names) {
   fr_forests[[i]] <- emptyforest()
   # Store the "placette" info separately
   plot_data <- FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i, "Placette"]
+  Date_data <- FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i, "Date"]
   # Apply the map function
   fr_forests[[i]]$shrubData <- forest_mapShrubTable(FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i,], mapping_y = mapping_fr, SpParams = SpParamsFR)
   # Add the "placette" info to the shrubData
   fr_forests[[i]]$shrubData$Plot <- plot_data
+  fr_forests[[i]]$shrubData$Date <- Date_data
 }
 
 
@@ -215,7 +219,18 @@ for (i in CAT_FR_SITES_NAMES) {
   df <- METEO_list[[i]]
   dir <- file.path(getwd(), "data", "PLOTS", i)
   if (dir.exists(dir)) {
-    write.csv(df, file.path(dir,"meteo.csv"),row.names = F)
+    write.csv(df, file.path(dir,"meteo_ERA5.csv"),row.names = F)
+    print(paste("meteo", i, "saved."))
+  } else {
+    warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
+  }
+}
+
+for (i in CAT_FR_SITES_NAMES) {
+  df <- METEO_list[[i]]
+  dir <- file.path(getwd(), "data", "PLOTS", i)
+  if (dir.exists(dir)) {
+    write.csv(df, file.path(dir,"meteo_ERA5.csv"),row.names = F)
     print(paste("meteo", i, "saved."))
   } else {
     warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
@@ -328,23 +343,6 @@ for (i in CAT_FR_SITES_NAMES) {
 #   } else {
 #     warning(paste("Site name", site_name, "not found in soil_list"))
 #   }
-  
-  if (site_name %in% names(LAI_list)){
-    result_list$LAI_list <- LAI_list[[site_name]]
-  } else {
-    warning(paste("Site name", site_name, "not found in LAI_list"))
-  }
-  
-  return(result_list)
-}
-
-
-CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
-CAT_FR_SITES_NAMES<-CAT_FR_SITES$site_name
-for (i in CAT_FR_SITES_NAMES){
-  assign(i, PLOT_data(i))
-}
-
 
 
 
