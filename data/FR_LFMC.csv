@@ -1,4 +1,4 @@
-"SiteCode","SiteName","Species","sp_correct_name","SiteXSpecies","Date","Year","Month","Doy","RobustLFMC","RobustStandErrLFMC","RobustNval"
+"SiteCode","SiteName","Species","sp_correct_name","SiteXSpecies","date","Year","Month","Doy","RobustLFMC","RobustStandErrLFMC","RobustNval"
 "D04S1","Les Adrechs","Genista cinerea","Genista cinerea","D04S1XGencin","11/07/1996",1996,7,193,99.74505,2.0490663,3
 "D04S1","Les Adrechs","Genista cinerea","Genista cinerea","D04S1XGencin","15/07/1996",1996,7,197,86.08737,1.5871999,5
 "D04S1","Les Adrechs","Genista cinerea","Genista cinerea","D04S1XGencin","18/07/1996",1996,7,200,90.68795,1.5871999,5

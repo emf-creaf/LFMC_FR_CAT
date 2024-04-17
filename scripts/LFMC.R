@@ -71,7 +71,8 @@ for (i in 1:nrow(CAT_LFMC)) {
 
 CAT_LFMC<-CAT_LFMC %>% 
   relocate(sp_correct_name, .after = "SpeciesName") %>% 
-  select(-IS_CORRECT)
+  select(-IS_CORRECT) %>% 
+  rename(date = Date)
 
 write.csv(CAT_LFMC,"data/CAT_LFMC.csv", row.names = F)
 
@@ -116,14 +117,10 @@ for (i in 1:nrow(FR_LFMC)) {
 
 FR_LFMC<-FR_LFMC %>% 
   relocate(sp_correct_name, .after = "Species") %>% 
-  select(-IS_CORRECT)
+  select(-IS_CORRECT) %>% 
+  rename(date = Date)
 
 write.csv(FR_LFMC,"data/FR_LFMC.csv", row.names = F)
-
-#UNIQUE SP IN SITES:
-
-FR_list_sp_site <- split(FR_LFMC$Species, FR_LFMC$SiteCode)
-FR_list_sp_site <- lapply(FR_list_sp_site, unique)
 
 
 
