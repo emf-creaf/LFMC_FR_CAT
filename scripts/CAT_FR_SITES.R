@@ -125,21 +125,26 @@ FRANCE_topo<-FRANCE_elev %>%
 
 CAT_FR_SITES_topo<-bind_rows(SPAIN_topo,FRANCE_topo)
 
-CAT_FR_SITES_2<-CAT_FR_SITES %>% 
+CAT_FR_SITES<-CAT_FR_SITES %>% 
   full_join(CAT_FR_SITES_topo, by = "ID")
 
 ####ARSENE METEO DATA IN CAT_FR_SITES######
 
 CAT_FR_SITES_climName<-read.csv("raw_data/ERA5_DATA/DATA ARSENE/CAT_FR_SITES_climName.csv")
 
-CAT_FR_SITES_2$ERA5_NAME_POINTS<-CAT_FR_SITES_climName$climPts
+CAT_FR_SITES$ERA5_NAME_POINTS<-CAT_FR_SITES_climName$climPts
 
 
 ####ADD FRENCH/CAT source COLUMN###
 
-CAT_FR_SITES_2$source<-NA
-CAT_FR_SITES_2$source <- replace(CAT_FR_SITES_2$source, 1:9, "CAT")
-CAT_FR_SITES_2$source <- replace(CAT_FR_SITES_2$source, 10:40, "FR")
+CAT_FR_SITES$source<-NA
+CAT_FR_SITES$source <- replace(CAT_FR_SITES$source, 1:9, "CAT")
+CAT_FR_SITES$source <- replace(CAT_FR_SITES$source, 10:40, "FR")
 
 
-write.csv(CAT_FR_SITES_2,"data/CAT_FR_SITES.csv", row.names = F)
+
+#####REMOVE D2BS1 AND D07S2 PLOT WE DON'T HAVE VEGETATION DATA IN THIS PLOTS ####
+
+CAT_FR_SITES<-CAT_FR_SITES[!CAT_FR_SITES$site_name %in% c("D2BS1", "D07S2"),]
+
+write.csv(CAT_FR_SITES,"data/CAT_FR_SITES.csv", row.names = F)

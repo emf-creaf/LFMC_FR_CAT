@@ -226,17 +226,6 @@ for (i in CAT_FR_SITES_NAMES) {
   }
 }
 
-for (i in CAT_FR_SITES_NAMES) {
-  df <- METEO_list[[i]]
-  dir <- file.path(getwd(), "data", "PLOTS", i)
-  if (dir.exists(dir)) {
-    write.csv(df, file.path(dir,"meteo_ERA5.csv"),row.names = F)
-    print(paste("meteo", i, "saved."))
-  } else {
-    warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
-  }
-}
-
 ###################CAT METEO INTERPOLATORS#####################################
 
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
