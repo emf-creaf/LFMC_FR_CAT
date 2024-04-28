@@ -80,7 +80,8 @@ for (i in cat_names) {
   cat_forests[[i]]$shrubData$Date <- Date_data
 }
 
-cat_forests[["Tivissa"]]$shrubData[20,1]<-"Asphodelus spp."
+#cat_forests[["Tivissa"]]$shrubData[20,1]<-"Asphodelus spp."
+cat_forests[["Tivissa"]]$shrubData<-filter(cat_forests[["Tivissa"]]$shrubData, Species != "Asphodelus spp.")
 
 
 #save the shrubData dataframe in plot directory.
