@@ -288,7 +288,7 @@ LAI_list <- split(LAI_data, LAI_data$site_name)
 #remove site_name an ID column
 LAI_list<-lapply(LAI_list, function(x) { x[c("site_name","ID")] <- NULL; x })
 
-#save the soil dataframe in PLOT folders.
+#save the LAI dataframe in PLOT folders.
 
 for (i in CAT_FR_SITES_NAMES) {
   df <- LAI_list[[i]]
@@ -300,40 +300,3 @@ for (i in CAT_FR_SITES_NAMES) {
     warning(paste(" directory", dir, "not found","\n", i, "LAI, not saved."))
   }
 }
-
-##########################################LIST OBJECTS, AND FUNCTIONS######################
-
-# rm(list= names(Filter(function(x) !any(class(x) == "list"), mget(ls(),envir = .GlobalEnv))))
-# 
-# #EXTRACT PLOT DATA FUNCTION
-# PLOT_data <- function(site_name){
-#   result_list <- list()
-#   
-#   if (site_name %in% names(cat_forests)){
-#     result_list$cat_forests <- cat_forests[[site_name]][["shrubData"]]
-#   } else {
-#     warning(paste("Site name", site_name, "not found in cat_forests"))
-#   }
-#   
-#   if (site_name %in% names(fr_forests)){
-#     result_list$fr_forests <- fr_forests[[site_name]][["shrubData"]]
-#   } else {
-#     warning(paste("Site name", site_name, "not found in fr_forests"))
-#   }
-#   
-#   if (site_name %in% names(METEO_list)){
-#     result_list$METEO_list <- METEO_list[[site_name]]
-#   } else {
-#     warning(paste("Site name", site_name, "not found in METEO_list"))
-#     print(names(METEO_list))
-#   }
-#   
-#   if (site_name %in% names(soil_list)){
-#     result_list$soil_list <- soil_list[[site_name]]
-#   } else {
-#     warning(paste("Site name", site_name, "not found in soil_list"))
-#   }
-
-
-
-
