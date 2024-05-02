@@ -10,6 +10,9 @@ MEASURED_SP<- unique(c(unique(CAT_LFMC$sp_correct_name),unique(FR_LFMC$sp_correc
 
 Params<-c("Name",
           "SLA",
+          "Nleaf",
+          "Vmax298",
+          "Jmax298",
           "r635",
           "maxFMC",
           "LeafPI0",
