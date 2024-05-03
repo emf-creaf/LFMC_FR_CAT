@@ -9,6 +9,8 @@ FR_LFMC<-read.csv("data/FR_LFMC.csv")
 MEASURED_SP<- unique(c(unique(CAT_LFMC$sp_correct_name),unique(FR_LFMC$sp_correct_name)))
 
 Params<-c("Name",
+          "Z50",
+          "Z95",
           "SLA",
           "Nleaf",
           "Vmax298",
