@@ -10,6 +10,9 @@ MEASURED_SP<- unique(c(unique(CAT_LFMC$sp_correct_name),unique(FR_LFMC$sp_correc
 
 Params<-c("Name",
           "SLA",
+          "Nleaf",
+          "Vmax298",
+          "Jmax298",
           "r635",
           "maxFMC",
           "LeafPI0",
@@ -42,4 +45,21 @@ SpParamsAlbert<-SpParamsFR %>%
 #   select(all_of(Params))
 
 
-write.csv(SpParamsAlbert, "data/SpParamsAlbert.csv")
+#95 % quatile LFMC by SP
+
+CAT_DATA<-CAT_LFMC[,c(4,5)]
+FR_DATA<-FR_LFMC[,c(4,10)]
+names(FR_DATA)[names(FR_DATA) == "RobustLFMC"] <- "LFMC"
+
+LFMC_DATA<-rbind(CAT_DATA,FR_DATA)
+
+LFMC_95Q<-LFMC_DATA %>%
+  group_by(sp_correct_name) %>%
+  summarise(maxLFMC_95Q = quantile(LFMC, probs = 0.95))
+
+
+SpParamsAlbert2 <- SpParamsAlbert %>% 
+  inner_join(LFMC_95Q, by = c("Name" = "sp_correct_name")) %>% 
+  relocate(maxLFMC_95Q, .after = maxFMC)
+
+write.csv(SpParamsAlbert2, "data/SpParamsAlbert.csv")
