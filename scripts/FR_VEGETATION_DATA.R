@@ -295,7 +295,7 @@ print(count(WRONG_FR_VEG_DATA,FR_NAME,CONVERSION_NAME), n=nrow(WRONG_FR_VEG_DATA
 old_names <- pull(distinct(WRONG_FR_VEG_DATA,CONVERSION_NAME))
 new_names <- c("Pinus sylvestris","Acer opalus subsp. opalus","Juniperus oxycedrus subsp. oxycedrus",
                "Cytisophyllum sessilifolium","Cytisus oromediterraneus","Erica scoparia subsp. scoparia",
-               "Calicotome","Cistus salviifolius","Poaceae","Aphyllanthes monspeliensis",NA,"Convolvulaceae",
+               "Calicotome spinosa","Cistus salviifolius","Poaceae","Aphyllanthes monspeliensis",NA,"Convolvulaceae",
                "Apiaceae","Caryophyllaceae","Lotus dorycnium","Sorbus aria","Pinus nigra subsp. salzmanni",
                "Rhamnus alaternus","Lavandula angustifolia","Cistus umbellatus subsp. umbellatus")
 
