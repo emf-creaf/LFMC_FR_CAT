@@ -183,8 +183,6 @@ for(i in seq_along(METEO_list)) {
   METEO_list[[i]]$Dates <- as.Date(METEO_list[[i]]$Dates,tryFormats = "%d/%m/%Y")
 }
 
-str(METEO_list[[1]])
-
 # # Save the data with a comma separator
 # for(i in seq_along(METEO_list)) {
 #   # Extract the original file name, remove the extension and add the new one
@@ -214,14 +212,14 @@ METEO_list <- METEO_list[names(METEO_list) %in% CAT_FR_SITES$site_name]
 #ADD SITE COLUMN TO THE DF OF EACH LIST:
 
 for (i in 1:length(METEO_list)) {
-  METEO_list[[i]]$Site<-names(METEO_list_prueva[i])
+  METEO_list[[i]]$Site<-names(METEO_list[i])
 }
 
 #MERGE THE LIST DF IN A SINGLE DF AND SAVE
 
 METEO_df<-bind_rows(METEO_list)
 
-write.csv(METEO_df, "data/METEO_ERA5_DATA.csv")
+write.csv(METEO_df, "raw_data/ERA5_DATA/METEO_ERA5_DATA/METEO_ERA5_DATA.csv", row.names = F)
 
 #SAVE THE METEO DATA TO CORRECT PLOT FOLDER
 
