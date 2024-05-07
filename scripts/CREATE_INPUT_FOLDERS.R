@@ -211,6 +211,17 @@ for (i in 1:nrow(CAT_FR_SITES)) {
 #REMOVE THE NON MACHING NAMES
 METEO_list <- METEO_list[names(METEO_list) %in% CAT_FR_SITES$site_name]
 
+#ADD SITE COLUMN TO THE DF OF EACH LIST:
+
+for (i in 1:length(METEO_list)) {
+  METEO_list[[i]]$Site<-names(METEO_list_prueva[i])
+}
+
+#MERGE THE LIST DF IN A SINGLE DF AND SAVE
+
+METEO_df<-bind_rows(METEO_list)
+
+write.csv(METEO_df, "data/METEO_ERA5_DATA.csv")
 
 #SAVE THE METEO DATA TO CORRECT PLOT FOLDER
 
@@ -250,11 +261,11 @@ for (i in 1:length(files)){
 #MERGE INTERPOLATED DATA
 meteo_interpolators<-list()
 for (i in 1:nrow(meteo[[1]])) {
-  temp <- list()  # Temporary list to store data frames for each row
+  temp <- list()
   for(j in 1:length(meteo)) {
     temp[[j]] <- meteo[[j]]$interpolated_data[[i]]
   }
-  meteo_interpolators[[i]] <- do.call(rbind, temp)  # Concatenate data frames in temp
+  meteo_interpolators[[i]] <- do.call(rbind, temp)
 }
 
 #CHANGE NAMES
