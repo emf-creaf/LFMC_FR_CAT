@@ -1,3 +1,8 @@
+library(tidyverse)
+library(gridExtra)
+library(ggpubr)
+library(patchwork)
+
 #################################CAT_FR_SITES###################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 sites<-CAT_FR_SITES$site_name
@@ -77,37 +82,18 @@ ggplotRegression <- function (fit, abline=F, caption = NULL) {
 
 
 #################################STATISTICS#####################################
-
-#####################READ SIM_FILES#############################################
-
-#PATTERNS :
-
-#"ALL_FILTERED.*MODIS.*\\.RDS$"### 
-#"SINGLE.*MODIS.*\\.RDS$"###
-#"SINGLE.*MEDFATE.*\\.RDS$"
-
-PATTERN1<-"SINGLE.*MODIS.*\\.RDS$" 
-
-files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = PATTERN1, full.names = TRUE)
-files_name1<-list.files(paste0("data/PLOTS/", sites), pattern = PATTERN1)
-
-sim_list<-list()
-for (i in 1:length(files_path1)) {
-  sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
-}
-
 #####################READ DATA_FILES############################################
 
 #PATTERNS :
 
-#"ALL_FILTERED.*MODIS.*\\.csv$"### 
-#"SINGLE.*MODIS.*\\.csv$"###
-#"SINGLE.*MEDFATE.*\\.csv$"
+#"ALL_FILTERED.*MODIS.*"
+#"SINGLE.*MODIS.*"
+#"SINGLE.*MEDFATE.*"
 
-PATTERN2<-"SINGLE.*MODIS.*\\.csv$" 
+PATTERN<-"SINGLE.*MEDFATE.*"
 
-files_path2<-list.files(paste0("data/PLOTS/", sites), pattern = PATTERN2, full.names = TRUE)
-files_name2<-list.files(paste0("data/PLOTS/", sites), pattern = PATTERN2)
+files_path2<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.csv$"), recursive = TRUE, full.names = TRUE)
+files_name2<-basename(files_path2)
 
 simulations<-list()
 for (i in 1:length(files_path2)) {
@@ -117,12 +103,12 @@ for (i in 1:length(files_path2)) {
 
 #####################EVALUATION STATISTICS######################################
 
-df<-data.frame()
+stats_df_MEASURED_MODELED<-data.frame()
+stats_df_MEASURED_RODRIGO<-data.frame()
 data_list<-list()
 for (i in 1:length(simulations)) {
   
-  SIM<-simulations[[i]]
-  SIM$date<-as.Date(SIM$date)
+  simulations[[i]]$date<-as.Date(simulations[[i]]$date)
   
   #EXTRACT SIMULATION PARAMETERS INFO####
   
@@ -173,9 +159,7 @@ for (i in 1:length(simulations)) {
       filter(if(type == "SINGLE") specie == sp else TRUE) %>% 
       filter(site == site_name,
              date >= paste0(years[1], "-01-01")) %>% 
-      select(date,LFMC)
-    
-    MERGED_LFMC_ALL<-merge(SIM,FILTERED_LFMC, by = "date", suffixes = c(".MODELED",".MEASURED"), all = T)
+      select(date,LFMC,specie)
   }
   
   if (source == "FR")  {
@@ -188,33 +172,80 @@ for (i in 1:length(simulations)) {
       filter(if(type == "SINGLE") specie == sp else TRUE) %>% 
       filter(site == site_name,
              date >= paste0(years[1], "-01-01")) %>% 
-      select(date,LFMC)
-    
-    MERGED_LFMC_ALL<-merge(SIM,FILTERED_LFMC, by = "date", suffixes = c(".MODELED",".MEASURED"), all = T)
+      select(date,LFMC,specie)
   }
+  
+  #MERGE LFMC####
+  
+  MERGED_LFMC_ALL <- simulations[[i]] %>%
+    full_join(FILTERED_LFMC, by = c("date" = "date", "species" = "specie"), suffix = c(".MODELED", ".MEASURED"))
+  
   
   #SIMULATION DATA LIST####
   
   data_list[[i]]<-MERGED_LFMC_ALL
   names(data_list)[i]<- filename
   
-  #EVALUTATION STATISTICS DATA.FRAME####
-  result <- as.data.frame(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED,MERGED_LFMC_ALL$LFMC.MODELED))
-  result$SITE_NAME <- site_name
-  result$YEARS <- paste0(years[1],"-",years[length(years)])
-  result$TYPE <- type
-  result$SP <- sp
-  result$CONTROL <- default_control
-  result$LAI <- lai
-  result$METEO <- meteo
-  
-  df <- rbind(df, result)
+  if (!type == "SINGLE") {
+    
+    a<-split(MERGED_LFMC_ALL,MERGED_LFMC_ALL$species)
+    
+    for (j in 1:length(a)) {
+      result <- as.data.frame(evalstats(a[[j]]$LFMC.MEASURED,a[[j]]$LFMC.MODELED))
+      result$SITE_NAME <- site_name
+      result$YEARS <- paste0(years[1],"-",years[length(years)])
+      result$TYPE <- type
+      result$SP <- names(a)[j]
+      result$CONTROL <- default_control
+      result$LAI <- lai
+      result$METEO <- meteo
+      
+      stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
+      
+      result2 <- as.data.frame(evalstats(a[[j]]$LFMC.MEASURED,a[[j]]$LFMC_rodrigo))
+      result2$SITE_NAME <- site_name
+      result2$YEARS <- paste0(years[1],"-",years[length(years)])
+      result2$TYPE <- type
+      result2$SP <- names(a)[j]
+      result2$CONTROL <- default_control
+      result2$LAI <- lai
+      result2$METEO <- meteo
+      
+      stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
+      
+    }
+    
+  } else if (type == "SINGLE"){
+    #EVALUTATION STATISTICS DATA.FRAME####
+    result <- as.data.frame(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED,MERGED_LFMC_ALL$LFMC.MODELED))
+    result$SITE_NAME <- site_name
+    result$YEARS <- paste0(years[1],"-",years[length(years)])
+    result$TYPE <- type
+    result$SP <- sp
+    result$CONTROL <- default_control
+    result$LAI <- lai
+    result$METEO <- meteo
+    
+    stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
+    
+    result2 <- as.data.frame(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED,MERGED_LFMC_ALL$LFMC_rodrigo))
+    result2$SITE_NAME <- site_name
+    result2$YEARS <- paste0(years[1],"-",years[length(years)])
+    result2$TYPE <- type
+    result2$SP <- sp
+    result2$CONTROL <- default_control
+    result2$LAI <- lai
+    result2$METEO <- meteo
+    
+    stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
+  }
 }
 
 #####################PLOTS######################################################
 
 time_plot<-list()
 scatter_plot<-list()
+scatter_plotR<-list()
 for (i in 1:length(data_list)) {
   
   #TIME SERIES PLOT
@@ -230,7 +261,11 @@ for (i in 1:length(data_list)) {
     xlab("DATE")+
     ylab("LFMC")+
     labs(title = names(data_list[i]))+
-    scale_x_date(date_breaks = "1 year", date_labels = "%Y") 
+    scale_x_date(date_breaks = "1 year", date_labels = "%Y")
+  
+  if (!type == "SINGLE") {
+    time_p<-time_p+facet_wrap(~species)
+  }
   
   time_plot[[i]]<-time_p
   names(time_plot)[i]<-names(data_list[i])
@@ -238,9 +273,8 @@ for (i in 1:length(data_list)) {
   #SCATTER PLOT
   
   scatter_p<-ggplot(data = data_list[[i]], aes(x = LFMC.MODELED, y = LFMC.MEASURED)) +
-    geom_point(aes(colour = " "))+
+    geom_point()+
     stat_smooth(method = "lm") +
-    scale_color_manual(values = c(" " = "black"))+
     theme_classic()+
     theme(legend.position = "bottom",legend.title = element_blank())+
     xlim(c(0, max(max(data_list[[i]]$LFMC.MODELED, na.rm = T),max(data_list[[i]]$LFMC.MEASURED, na.rm = T), na.rm = T)))+
@@ -248,45 +282,46 @@ for (i in 1:length(data_list)) {
     geom_abline(intercept = 0, slope = 1, linetype= "dashed")+
     labs(title = names(data_list[i]))
   
+  if (!type == "SINGLE") {
+    scatter_p<-scatter_p+facet_wrap(~species)
+  }
+  
   scatter_plot[[i]]<-scatter_p
   names(scatter_plot)[i]<-names(data_list[i])
-}
-
-# subtitle = paste0("n = ",signif(df[i,"n"],3),
-#                   " Bias = ",signif(df[i,"Bias"],3),
-#                   " Bias.rel = ",signif(df[i,"Bias.rel"],3),
-#                   " MAE = ",signif(df[i,"MAE"],3),
-#                   " MAE.rel = ",signif(df[i,"MAE.rel"],3),
-#                   " r = ",signif(df[i,"r"],3),
-#                   " r2 = ",signif(df[i,"r2"],3),
-#                   " NSE = ",signif(df[i,"NSE"],3),
-#                   " NSE.abs = ",signif(df[i,"NSE.abs"],3)), width = 5
-
-#################################SAVE ALL THE SIMULATIONS STATISTICS AS .RData##
-
-if (type == "SINGLE"){
-  name<-paste(paste0(years[1],"-",years[length(years)]),type,"MEASURED",default_control,lai,meteo, sep = "_")
   
-} else {
-  name<-paste(paste0(years[1],"-",years[length(years)]),type,default_control,lai,meteo, sep = "_")
+  #SCATTER PLOT RODRIGO
+  
+  scatter_pR<-ggplot(data = data_list[[i]], aes(x = LFMC_rodrigo, y = LFMC.MEASURED)) +
+    geom_point()+
+    stat_smooth(method = "lm") +
+    theme_classic()+
+    theme(legend.position = "bottom",legend.title = element_blank())+
+    xlim(c(0, max(max(data_list[[i]]$LFMC_rodrigo, na.rm = T),max(data_list[[i]]$LFMC.MEASURED, na.rm = T), na.rm = T)))+
+    ylim(c(0, max(max(data_list[[i]]$LFMC_rodrigo, na.rm = T),max(data_list[[i]]$LFMC.MEASURED, na.rm = T), na.rm = T)))+
+    geom_abline(intercept = 0, slope = 1, linetype= "dashed")+
+    labs(title = names(data_list[i]))
+  
+  if (!type == "SINGLE") {
+    scatter_pR<-scatter_pR+facet_wrap(~species)
+  }
+  
+  scatter_plotR[[i]]<-scatter_pR
+  names(scatter_plotR)[i]<-names(data_list[i])
 }
 
-save(df,data_list,sim_list, scatter_plot, time_plot, file = paste0("data/SIMULATIONS/",name,".RData"))
+# subtitle = paste0("n = ",signif(stats_df_MEASURED_MODELED[i,"n"],3),
+#                   " Bias = ",signif(stats_df_MEASURED_MODELED[i,"Bias"],3),
+#                   " Bias.rel = ",signif(stats_df_MEASURED_MODELED[i,"Bias.rel"],3),
+#                   " MAE = ",signif(stats_df_MEASURED_MODELED[i,"MAE"],3),
+#                   " MAE.rel = ",signif(stats_df_MEASURED_MODELED[i,"MAE.rel"],3),
+#                   " r = ",signif(stats_df_MEASURED_MODELED[i,"r"],3),
+#                   " r2 = ",signif(stats_df_MEASURED_MODELED[i,"r2"],3),
+#                   " NSE = ",signif(stats_df_MEASURED_MODELED[i,"NSE"],3),
+#                   " NSE.abs = ",signif(stats_df_MEASURED_MODELED[i,"NSE.abs"],3)), width = 5
 
-rm(list = setdiff(ls(),c("df","data_list","sim_list", "scatter_plot", "time_plot")))
+#################################SAVE ALL THE SIMULATIONS STATISTICS AS .RData####
 
-#####################DISPLAY PLOTS##############################################
-
-i<-75
-
-grid.arrange(
-  time_plot[[i]] + labs(title = NULL),
-  scatter_plot[[i]] + labs(title = NULL),
-  ggtexttable(round(df[i, 1:11],3), rows = NULL, theme = ttheme("light")),
-  layout_matrix = rbind(c(1, 2), c(1, 2), c(1, 2), c(3, 3)),
-  top = textGrob(gsub(".csv", "", names(scatter_plot)[i]), gp = gpar(fontsize = 15))
-)
-
+#rm(list = setdiff(ls(),c("stats_df_MEASURED_MODELED","data_list","sim_list", "scatter_plot", "time_plot")))
 
 #####################FIT########################################################
 
@@ -294,3 +329,46 @@ grid.arrange(
 # model <- lm(LFMC.MEASURED ~ LFMC.MODELED, data = data_list[[i]])
 # summary(model)
 # ggplotRegression(model,abline = T, caption = names(data_list[i]))
+
+
+#####################READ SIM_FILES#############################################
+
+# files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
+# files_name1<-basename(files_path1)
+# 
+# sim_list<-list()
+# for (i in 1:length(files_path1)) {
+#   sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
+# }
+
+# #####################SAVE ALL THE SIMULATION DATA###############################
+# 
+# if (type == "SINGLE"){
+#   name<-paste(paste0(years[1],"-",years[length(years)]),type,"MEASURED",default_control,lai,meteo, sep = "_")
+#   
+# } else {
+#   name<-paste(paste0(years[1],"-",years[length(years)]),type,default_control,lai,meteo, sep = "_")
+# }
+# 
+# #save(stats_df_MEASURED_MODELED,data_list,sim_list, scatter_plot, time_plot, file = paste0("data/SIMULATIONS/",name,".RData"))
+
+#####################DISPLAY PLOTS##############################################
+
+
+plots_site_sp<-function(index){
+  
+  p1 <- time_plot[[index]] + labs(title = NULL)
+  p2 <- scatter_plot[[index]] + labs(title = NULL)
+  p3 <- scatter_plotR[[index]] + labs(title = NULL)
+  
+  t1 <- ggtexttable(round(stats_df_MEASURED_MODELED[index, 1:11],3), rows = NULL, theme = ttheme("light"))
+  t2 <- ggtexttable(round(stats_df_MEASURED_RODRIGO[index, 1:11],3), rows = NULL, theme = ttheme("light"))
+  
+  plot_design <- p1 / (p2 | p3) / (t1 | t2) +
+    plot_layout(heights = c(0.35, 0.55, 0.1)) +
+    plot_annotation(title = gsub(".csv", "", names(scatter_plot)[index]))
+}
+
+print(plots_site_sp(35))
+
+
