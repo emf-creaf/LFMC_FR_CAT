@@ -158,7 +158,7 @@ for (i in 1:length(simulations)) {
              LFMC = LFMC) %>%
       filter(if(type == "SINGLE") specie == sp else TRUE) %>% 
       filter(site == site_name,
-             date >= paste0(years[1], "-01-01")) %>% 
+             year(date) >= years[1]) %>% 
       select(date,LFMC,specie)
   }
   
@@ -171,7 +171,7 @@ for (i in 1:length(simulations)) {
              LFMC = RobustLFMC) %>%
       filter(if(type == "SINGLE") specie == sp else TRUE) %>% 
       filter(site == site_name,
-             date >= paste0(years[1], "-01-01")) %>% 
+             year(date) >= years[1]) %>% 
       select(date,LFMC,specie)
   }
   
