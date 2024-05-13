@@ -9,15 +9,15 @@ library(tidyverse)
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 
 #################################FUNCTIONS######################################
-# site_name<-"Badalona"
-# 
-# SITE_NAME <-site_name
-# YEARS<-years
-# TYPE<-type
-# SP<-sp
-# CONTROL<-control
-# LAI<-lai
-# METEO<-meteo
+site_name<-"D26S1"
+
+SITE_NAME <-site_name
+YEARS<-years
+TYPE<-type
+SP<-sp
+CONTROL<-control
+LAI<-lai
+METEO<-meteo
 
 
 run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO) {
@@ -97,30 +97,6 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO) 
     
   }
   
-  # if (TYPE == "ALL_MEAN")  {
-  #   
-  #   #Calculate mean for repeated species
-  #   df_mean <- shrubData %>%
-  #     group_by(Species) %>%
-  #     summarise(across(c(Height, Cover, Z50, Z95), \(x) mean(x)))
-  #   
-  #   forest$shrubData <- df_mean
-  #   
-  #   # Prepare the input for the SPWB model
-  #   x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
-  #   
-  #   # Run the SPWB
-  #   simulation <- spwb(x, 
-  #                      meteo, 
-  #                      latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
-  #                      elevation = elevation, 
-  #                      slope = slope, 
-  #                      aspect = aspect)
-  #   
-  #   return(simulation)
-  #   
-  #   }
-  
   if (TYPE == "ALL_SINGLE")  {
       
     results <- list()  # Create an empty list to store the results
@@ -156,12 +132,20 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO) 
       
       if (SOURCE == "CAT") {
         CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
-        SP<-unique(CAT_LFMC$sp_correct_name[CAT_LFMC$LocalityName==SITE_NAME])
+        CAT_LFMC$date<-as.Date(CAT_LFMC$date)
+        SP <- CAT_LFMC %>%
+          filter(year(date) >= YEARS[1], LocalityName == SITE_NAME) %>%
+          pull(sp_correct_name) %>%
+          unique()
       }
       
       if (SOURCE == "FR")  {
         FR_LFMC<-read.csv("data/FR_LFMC.csv")
-        SP<-unique(FR_LFMC$sp_correct_name[FR_LFMC$SiteCode==SITE_NAME])
+        FR_LFMC$date<-as.Date(FR_LFMC$date,format = "%d/%m/%Y")
+        SP <- FR_LFMC %>%
+          filter(year(date) >= YEARS[1], SiteCode == SITE_NAME) %>%
+          pull(sp_correct_name) %>%
+          unique()
       }
     }
     
@@ -313,7 +297,7 @@ for (site_name in sites) {
   
   #SIMULATION PARAMETERS
   years<-c(2012:2022) #VECTOR OF YEARS
-  type<-"SINGLE" #ALL_FILTERED, #ALL_MEAN, #ALL_SINGLE #SINGLE
+  type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
   sp<-"MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   control<-defaultControl(transpirationMode)
