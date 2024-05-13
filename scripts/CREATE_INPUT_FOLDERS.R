@@ -57,7 +57,7 @@ for (i in CAT_FR_SITES_NAMES) {
 
 ########################CAT DATA######################################################
 
-#data("SpParamsES")
+SpParamsAlbert<-read.csv("data/SpParamsAlbert.csv")
 
 CAT_VEG_DATA<-read.csv("data/CAT_VEG_DATA.csv")
 
@@ -74,14 +74,14 @@ for (i in cat_names) {
   plot_data <- CAT_VEG_DATA[CAT_VEG_DATA$Site==i, "Plot"]
   Date_data <- CAT_VEG_DATA[CAT_VEG_DATA$Site==i, "Date"]
   # Apply the map function
-  cat_forests[[i]]$shrubData <- forest_mapShrubTable(CAT_VEG_DATA[CAT_VEG_DATA$Site==i,], mapping_y = mapping_cat, SpParams = SpParamsES)
+  cat_forests[[i]]$shrubData <- forest_mapShrubTable(CAT_VEG_DATA[CAT_VEG_DATA$Site==i,], mapping_y = mapping_cat, SpParams = SpParamsAlbert)
   # Add the "plot" info to the shrubData
   cat_forests[[i]]$shrubData$Plot <- plot_data
   cat_forests[[i]]$shrubData$Date <- Date_data
 }
 
 #cat_forests[["Tivissa"]]$shrubData[20,1]<-"Asphodelus spp."
-cat_forests[["Tivissa"]]$shrubData<-filter(cat_forests[["Tivissa"]]$shrubData, Species != "Asphodelus spp.")
+cat_forests[["Tivissa"]]$shrubData<-filter(cat_forests[["Tivissa"]]$shrubData, Species != "Cistus clusii")
 
 
 #save the shrubData dataframe in plot directory.
@@ -129,7 +129,7 @@ for (i in fr_names) {
   plot_data <- FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i, "Placette"]
   Date_data <- FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i, "Date"]
   # Apply the map function
-  fr_forests[[i]]$shrubData <- forest_mapShrubTable(FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i,], mapping_y = mapping_fr, SpParams = SpParamsFR)
+  fr_forests[[i]]$shrubData <- forest_mapShrubTable(FR_VEG_DATA[FR_VEG_DATA$Code_Site.x==i,], mapping_y = mapping_fr, SpParams = SpParamsAlbert)
   # Add the "placette" info to the shrubData
   fr_forests[[i]]$shrubData$Plot <- plot_data
   fr_forests[[i]]$shrubData$Date <- Date_data

@@ -333,13 +333,13 @@ for (i in 1:length(data_list)) {
 
 #####################READ SIM_FILES#############################################
 
-# files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
-# files_name1<-basename(files_path1)
-# 
-# sim_list<-list()
-# for (i in 1:length(files_path1)) {
-#   sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
-# }
+files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
+files_name1<-basename(files_path1)
+
+sim_list<-list()
+for (i in 1:length(files_path1)) {
+  sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
+}
 
 # #####################SAVE ALL THE SIMULATION DATA###############################
 # 
@@ -369,6 +369,13 @@ plots_site_sp<-function(index){
     plot_annotation(title = gsub(".csv", "", names(scatter_plot)[index]))
 }
 
-print(plots_site_sp(35))
+dir<-paste0("data/SIMULATIONS_PLOTS/",years[1],"-",years[length(years)],"_",type,"_",lai,"/")
+
+for (i in 1:length(time_plot)) {
+  plot<-plots_site_sp(i)
+  plotname<-gsub(".csv", "", names(time_plot[i]))
+  ggsave(filename = paste0(dir,"/",plotname,".jpg"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
 
 

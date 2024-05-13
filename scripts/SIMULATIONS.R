@@ -9,23 +9,30 @@ library(tidyverse)
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 
 #################################FUNCTIONS######################################
-site_name<-"D26S1"
+# site_name<-CAT_FR_SITES$site_name[1]
+# 
+# SITE_NAME <-site_name
+# YEARS<-years
+# TYPE<-type
+# SP<-sp
+# CONTROL<-control
+# LAI<-lai
+# METEO<-meteo
+# SPPARAMS<-spparams
 
-SITE_NAME <-site_name
-YEARS<-years
-TYPE<-type
-SP<-sp
-CONTROL<-control
-LAI<-lai
-METEO<-meteo
 
-
-run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO) {
+run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, SPPARAMS = NULL) {
   
   CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
   SOURCE<-CAT_FR_SITES[CAT_FR_SITES$site_name == SITE_NAME,]$source
     
-  SpParams<-SpParamsFR
+  if (SPPARAMS == "Albert" ) {
+  
+    SpParams<-read.csv("data/SpParamsAlbert.csv")
+    
+  }else {
+    SpParams<-SpParamsFR
+  }
   
   #Read the shrub data for the site
   shrubData<-read.csv(paste0("data/PLOTS/", SITE_NAME, "/shrubData_ALL.csv"))
@@ -304,7 +311,7 @@ for (site_name in sites) {
   control$segmentedXylemVulnerability=F
   lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) #NULL = MEDFATE
   meteo<-"ERA5" #INTERPOLATORS, ERA5
-  spparams<-"SpParamsAlbert"
+  spparams<-"Albert"
   
   #RUN SIMULATION
   
@@ -315,7 +322,8 @@ for (site_name in sites) {
     SP = sp,
     CONTROL = control,
     LAI = lai,
-    METEO = meteo
+    METEO = meteo,
+    SPPARAMS = spparams
   )
   
   #EXTRACT SIMULATION DATA
@@ -334,7 +342,7 @@ for (site_name in sites) {
     name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,spparams, sep = "_")
     
   } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams, sep = "_")
   }
   
   path<-file.path("data","PLOTS",site_name,name)
@@ -346,14 +354,14 @@ for (site_name in sites) {
   
   if (class(SIM_data)=="list") {
     for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo, sep = "_")
+      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,spparams, sep = "_")
       write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
       print(paste0(site_name,"    ",names(SIM_data)[j],"    simulation data    SAVED ✓✓"))
     }
   }
   
   if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo, sep = "_")
+    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams, sep = "_")
     write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
     print(paste0(site_name,"    simulation data    SAVED ✓✓"))
   }
