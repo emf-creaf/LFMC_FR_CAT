@@ -31,7 +31,8 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, 
     SpParams<-read.csv("data/SpParamsAlbert.csv")
     
   }else {
-    SpParams<-SpParamsFR
+    SpParams<-SpParamsFR %>% 
+      mutate(Name = ifelse(Name == "Calicotome", "Calicotome spinosa", Name))
   }
   
   #Read the shrub data for the site
@@ -309,9 +310,9 @@ for (site_name in sites) {
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
-  lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) #NULL = MEDFATE
+  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) #NULL = MEDFATE
   meteo<-"ERA5" #INTERPOLATORS, ERA5
-  spparams<-"Albert"
+  spparams<-"Albert" #Albert or SpParamsFR
   
   #RUN SIMULATION
   
