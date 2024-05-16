@@ -19,9 +19,9 @@ CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 # LAI<-lai
 # METEO<-meteo
 # SPPARAMS<-spparams
+# SOIL_RFC<-soil_rfc
 
-
-run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, SPPARAMS = NULL) {
+run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SPPARAMS = NULL,SOIL_RFC = NULL) {
   
   CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
   SOURCE<-CAT_FR_SITES[CAT_FR_SITES$site_name == SITE_NAME,]$source
@@ -53,22 +53,30 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, 
   soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
   soil <- soil(soil_table)
   
+  #CHANGE THE RFC CONTENT OF THE LAST SOIL LAYER
+  if (!is.null(SOIL_RFC)) {
+    if (!is.numeric(SOIL_RFC) || SOIL_RFC < 0 || SOIL_RFC > 100) {
+      stop("Error: SOIL_RFC must be a numeric value between 0 and 100")
+    }
+    soil$rfc[length(soil$rfc)]<-SOIL_RFC
+  }
+  
   # Read the meteorological data for the site
   
   if (METEO == "ERA5") {
-    meteo <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_ERA5.csv"))
-    meteo$Dates <- as.Date(meteo$Dates)
-    meteo <- meteo[meteo$YEAR %in% YEARS, ]
+    met <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_ERA5.csv"))
+    met$Dates <- as.Date(met$Dates)
+    met <- met[met$YEAR %in% YEARS, ]
   }
   
-  if (METEO == "INTERPOLATORS" && SOURCE == "CAT")  {
-    meteo <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_interpolator.csv"))
-    meteo$dates <- as.Date(meteo$dates)
-    meteo$YEAR <- format(meteo$dates, "%Y")
-    meteo <- meteo[meteo$YEAR %in% YEARS, ]
+  if (METEO == "INTER" && SOURCE == "CAT")  {
+    met <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_interpolator.csv"))
+    met$dates <- as.Date(met$dates)
+    met$YEAR <- format(met$dates, "%Y")
+    met <- met[met$YEAR %in% YEARS, ]
   }
   
-  if (METEO == "INTERPOLATORS" && SOURCE == "FR") {
+  if (METEO == "INTER" && SOURCE == "FR") {
     stop("No interpolators meteo data in FR plots, \nMETEO = INTERPOLATORS only in CAT plots. ")
   }
   
@@ -95,7 +103,7 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, 
     
     # Run the SPWB
     simulation <- spwb(x, 
-                       meteo, 
+                       met, 
                        latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
                        elevation = elevation, 
                        slope = slope, 
@@ -118,7 +126,7 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, 
       
       # Run the simulation for this species
       simulation <- spwb(x, 
-                         meteo, 
+                         met, 
                          latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
                          elevation = elevation, 
                          slope = slope, 
@@ -192,7 +200,7 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO, 
         # Run the simulation for this species
         simulation <- spwb(
           x,
-          meteo,
+          met,
           latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME],
           elevation = elevation,
           slope = slope,
@@ -300,7 +308,7 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #################################SIMULATIONS####################################
 
-sites<-CAT_FR_SITES$site_name
+sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
 for (site_name in sites) {
   
   #SIMULATION PARAMETERS
@@ -310,9 +318,10 @@ for (site_name in sites) {
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
-  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) #NULL = MEDFATE
-  meteo<-"ERA5" #INTERPOLATORS, ERA5
+  lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
+  meteo<-"INTER" #INTER, ERA5
   spparams<-"Albert" #Albert or SpParamsFR
+  soil_rfc<-80 #numeric value between 0 and 100
   
   #RUN SIMULATION
   
@@ -340,10 +349,10 @@ for (site_name in sites) {
   #SAVE SIMULATION OBJECT AS .RDS
   
   if (type == "SINGLE"){
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,spparams, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
     
   } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
   }
   
   path<-file.path("data","PLOTS",site_name,name)
@@ -355,15 +364,15 @@ for (site_name in sites) {
   
   if (class(SIM_data)=="list") {
     for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,spparams, sep = "_")
+      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
       write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
-      print(paste0(site_name,"    ",names(SIM_data)[j],"    simulation data    SAVED ✓✓"))
+      cat(paste0(site_name," ",names(SIM_data)[j]," SIMULATION DATA SAVED"),"\n\n")
     }
   }
   
   if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams, sep = "_")
+    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
     write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
-    print(paste0(site_name,"    simulation data    SAVED ✓✓"))
+    cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
   }
 }
