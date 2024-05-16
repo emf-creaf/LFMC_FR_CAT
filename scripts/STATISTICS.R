@@ -2,6 +2,7 @@ library(tidyverse)
 library(gridExtra)
 library(ggpubr)
 library(patchwork)
+library(plotly)
 
 #################################CAT_FR_SITES###################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
@@ -89,11 +90,17 @@ ggplotRegression <- function (fit, abline=F, caption = NULL) {
 #"ALL_FILTERED.*MODIS.*"
 #"SINGLE.*MODIS.*"
 #"SINGLE.*MEDFATE.*"
+#"SINGLE.*MODIS.*Albert.*"
 
-PATTERN<-"SINGLE.*MEDFATE.*"
+PATTERN<-"Albert.*"
 
 files_path2<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.csv$"), recursive = TRUE, full.names = TRUE)
 files_name2<-basename(files_path2)
+
+# files_pathrm<-dir(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
+# files_pathrm <- files_pathrm[!grepl("Albert", basename(files_pathrm))]
+# files_pathrm <- unique(dirname(files_pathrm))
+# unlink(files_pathrm, recursive = T)
 
 simulations<-list()
 for (i in 1:length(files_path2)) {
@@ -131,6 +138,8 @@ for (i in 1:length(simulations)) {
   default_control <- split[5]
   lai <- split[6]
   meteo <- gsub(".csv", "", split[7])
+  spparams <- gsub(".csv", "",split[8])
+  soil_rfc <- gsub(".csv", "",split[9])
   
   #PRINT THE VARIABLES NAMES
   cat(" #######################################", "\n",
@@ -141,6 +150,8 @@ for (i in 1:length(simulations)) {
       "default_control:", default_control, "\n",
       "lai:", lai, "\n",
       "meteo:", meteo, "\n",
+      "spparams:", spparams, "\n",
+      "soil_rfc:", soil_rfc, "\n",
       "#######################################"
   )
   
@@ -225,6 +236,7 @@ for (i in 1:length(simulations)) {
     result$CONTROL <- default_control
     result$LAI <- lai
     result$METEO <- meteo
+    result$SPPARAMS <- spparams
     
     stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
     
@@ -236,10 +248,14 @@ for (i in 1:length(simulations)) {
     result2$CONTROL <- default_control
     result2$LAI <- lai
     result2$METEO <- meteo
+    result2$SPPARAMS <- spparams
     
     stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
   }
 }
+
+write.csv(stats_df_MEASURED_MODELED, "data/SIMULATIONS_DF/MEASURED_MODELED_LFMC.csv", row.names = F)
+write.csv(stats_df_MEASURED_RODRIGO, "data/SIMULATIONS_DF/MEASURED_MODELED_LFMC_RODRIGO.csv", row.names = F)
 
 #####################PLOTS######################################################
 
@@ -309,51 +325,21 @@ for (i in 1:length(data_list)) {
   names(scatter_plotR)[i]<-names(data_list[i])
 }
 
-# subtitle = paste0("n = ",signif(stats_df_MEASURED_MODELED[i,"n"],3),
-#                   " Bias = ",signif(stats_df_MEASURED_MODELED[i,"Bias"],3),
-#                   " Bias.rel = ",signif(stats_df_MEASURED_MODELED[i,"Bias.rel"],3),
-#                   " MAE = ",signif(stats_df_MEASURED_MODELED[i,"MAE"],3),
-#                   " MAE.rel = ",signif(stats_df_MEASURED_MODELED[i,"MAE.rel"],3),
-#                   " r = ",signif(stats_df_MEASURED_MODELED[i,"r"],3),
-#                   " r2 = ",signif(stats_df_MEASURED_MODELED[i,"r2"],3),
-#                   " NSE = ",signif(stats_df_MEASURED_MODELED[i,"NSE"],3),
-#                   " NSE.abs = ",signif(stats_df_MEASURED_MODELED[i,"NSE.abs"],3)), width = 5
-
 #################################SAVE ALL THE SIMULATIONS STATISTICS AS .RData####
 
 #rm(list = setdiff(ls(),c("stats_df_MEASURED_MODELED","data_list","sim_list", "scatter_plot", "time_plot")))
 
-#####################FIT########################################################
-
-# # Fit the linear regression model
-# model <- lm(LFMC.MEASURED ~ LFMC.MODELED, data = data_list[[i]])
-# summary(model)
-# ggplotRegression(model,abline = T, caption = names(data_list[i]))
-
-
 #####################READ SIM_FILES#############################################
 
-files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
-files_name1<-basename(files_path1)
-
-sim_list<-list()
-for (i in 1:length(files_path1)) {
-  sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
-}
-
-# #####################SAVE ALL THE SIMULATION DATA###############################
+# files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
+# files_name1<-basename(files_path1)
 # 
-# if (type == "SINGLE"){
-#   name<-paste(paste0(years[1],"-",years[length(years)]),type,"MEASURED",default_control,lai,meteo, sep = "_")
-#   
-# } else {
-#   name<-paste(paste0(years[1],"-",years[length(years)]),type,default_control,lai,meteo, sep = "_")
+# sim_list<-list()
+# for (i in 1:length(files_path1)) {
+#   sim_list[[files_name1[i]]]<-readRDS(files_path1[i])
 # }
-# 
-# #save(stats_df_MEASURED_MODELED,data_list,sim_list, scatter_plot, time_plot, file = paste0("data/SIMULATIONS/",name,".RData"))
 
 #####################DISPLAY PLOTS##############################################
-
 
 plots_site_sp<-function(index){
   
@@ -369,13 +355,11 @@ plots_site_sp<-function(index){
     plot_annotation(title = gsub(".csv", "", names(scatter_plot)[index]))
 }
 
-dir<-paste0("data/SIMULATIONS_PLOTS/",years[1],"-",years[length(years)],"_",type,"_",lai,"/")
+#dir<-paste0("data/SIMULATIONS_PLOTS/",years[1],"-",years[length(years)],"_",type,"_",lai,"/")
+dir<-c("data/SIMULATIONS_PLOTS")
 
 for (i in 1:length(time_plot)) {
   plot<-plots_site_sp(i)
   plotname<-gsub(".csv", "", names(time_plot[i]))
-  ggsave(filename = paste0(dir,"/",plotname,".jpg"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+  ggsave(filename = paste0(dir,"/",plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
-
-
-
