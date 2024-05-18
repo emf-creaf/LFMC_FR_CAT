@@ -14,7 +14,7 @@ for (i in (1:nrow(sites))) {
   LAT<-site$LAT
   site_name<-site$site_name
   coords_sf <- st_sfc(st_point(c(LON, LAT)), crs = 4326)
-  soil<-soilgridsParams(coords_sf, widths = c(300,1000,2000))
+  soil<-soilgridsParams(coords_sf, widths = c(50, 150, 300, 600, 1000, 2000))
   soil$site_name<-site_name
   soil<-relocate(soil,site_name)
     if(i==1){
