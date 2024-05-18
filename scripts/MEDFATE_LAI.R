@@ -2,7 +2,7 @@
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 sites<-CAT_FR_SITES$site_name
 
-PATTERN<-"SINGLE.*MEDFATE.*"
+PATTERN<-"SINGLE.*MEDFATE.*ERA5.*Albert.*80"
 
 files_path1<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
 files_name1<-basename(files_path1)
