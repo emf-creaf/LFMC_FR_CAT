@@ -1,9 +1,7 @@
 library(tidyverse)
 library(gridExtra)
-library(ggpubr)
 library(patchwork)
-library(plotly)
-
+library(ggh4x)
 #################################CAT_FR_SITES###################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 sites<-CAT_FR_SITES$site_name
@@ -110,8 +108,7 @@ for (i in 1:length(files_path2)) {
 
 #####################EVALUATION STATISTICS######################################
 
-stats_df_MEASURED_MODELED<-data.frame()
-stats_df_MEASURED_RODRIGO<-data.frame()
+stats_df<-data.frame()
 data_list<-list()
 for (i in 1:length(simulations)) {
   
@@ -152,7 +149,7 @@ for (i in 1:length(simulations)) {
       "meteo:", meteo, "\n",
       "spparams:", spparams, "\n",
       "soil_rfc:", soil_rfc, "\n",
-      "#######################################"
+      "#######################################\n"
   )
   
   #STATISTICS####
@@ -189,8 +186,9 @@ for (i in 1:length(simulations)) {
   #MERGE LFMC####
   
   MERGED_LFMC_ALL <- simulations[[i]] %>%
-    full_join(FILTERED_LFMC, by = c("date" = "date", "species" = "specie"), suffix = c(".MODELED", ".MEASURED"))
-  
+    full_join(FILTERED_LFMC, 
+              by = c("date" = "date", "species" = "specie"), 
+              suffix = c(".MODELED", ".MEASURED"))
   
   #SIMULATION DATA LIST####
   
@@ -210,6 +208,8 @@ for (i in 1:length(simulations)) {
       result$CONTROL <- default_control
       result$LAI <- lai
       result$METEO <- meteo
+      result$SOIL_RFC<- soil_rfc
+      #result$SOIL_RFC <- ifelse(is.na(result$SOIL_RFC), 0, result$SOIL_RFC)
       
       stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
       
@@ -221,6 +221,8 @@ for (i in 1:length(simulations)) {
       result2$CONTROL <- default_control
       result2$LAI <- lai
       result2$METEO <- meteo
+      result2$SOIL_RFC<- soil_rfc
+      #result2$SOIL_RFC <- ifelse(is.na(result2$SOIL_RFC), 0, result2$SOIL_RFC)
       
       stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
       
@@ -228,34 +230,43 @@ for (i in 1:length(simulations)) {
     
   } else if (type == "SINGLE"){
     #EVALUTATION STATISTICS DATA.FRAME####
-    result <- as.data.frame(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED,MERGED_LFMC_ALL$LFMC.MODELED))
-    result$SITE_NAME <- site_name
-    result$YEARS <- paste0(years[1],"-",years[length(years)])
-    result$TYPE <- type
-    result$SP <- sp
-    result$CONTROL <- default_control
-    result$LAI <- lai
-    result$METEO <- meteo
-    result$SPPARAMS <- spparams
+    result_M <- data.frame(
+      SITE_NAME = site_name,
+      YEARS = paste0(years[1],"-",years[length(years)]),
+      TYPE = type,
+      SP = sp,
+      CONTROL = default_control,
+      LAI = lai,
+      METEO = meteo,
+      SPPARAMS = spparams,
+      SOIL_RFC = soil_rfc,
+      LFMC_TYPE = "MEASURED") %>%
+      mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC.MODELED))) 
     
-    stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
+    #stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
     
-    result2 <- as.data.frame(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED,MERGED_LFMC_ALL$LFMC_rodrigo))
-    result2$SITE_NAME <- site_name
-    result2$YEARS <- paste0(years[1],"-",years[length(years)])
-    result2$TYPE <- type
-    result2$SP <- sp
-    result2$CONTROL <- default_control
-    result2$LAI <- lai
-    result2$METEO <- meteo
-    result2$SPPARAMS <- spparams
+    result_R <- data.frame(
+      SITE_NAME = site_name,
+      YEARS = paste0(years[1],"-",years[length(years)]),
+      TYPE = type,
+      SP = sp,
+      CONTROL = default_control,
+      LAI = lai,
+      METEO = meteo,
+      SPPARAMS = spparams,
+      SOIL_RFC = soil_rfc,
+      LFMC_TYPE = "RODRIGO") %>%
+      mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC_rodrigo)))
     
-    stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
+    result<-rbind(result_M,result_R)
+    stats_df <- rbind(stats_df, result)
+    
+    
   }
 }
 
-write.csv(stats_df_MEASURED_MODELED, "data/SIMULATIONS_DF/MEASURED_MODELED_LFMC.csv", row.names = F)
-write.csv(stats_df_MEASURED_RODRIGO, "data/SIMULATIONS_DF/MEASURED_MODELED_LFMC_RODRIGO.csv", row.names = F)
+write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
+
 
 #####################PLOTS######################################################
 
@@ -347,8 +358,8 @@ plots_site_sp<-function(index){
   p2 <- scatter_plot[[index]] + labs(title = NULL)
   p3 <- scatter_plotR[[index]] + labs(title = NULL)
   
-  t1 <- ggtexttable(round(stats_df_MEASURED_MODELED[index, 1:11],3), rows = NULL, theme = ttheme("light"))
-  t2 <- ggtexttable(round(stats_df_MEASURED_RODRIGO[index, 1:11],3), rows = NULL, theme = ttheme("light"))
+  t1 <- ggtexttable(round(stats_df[index, 11:21],3), rows = NULL, theme = ttheme("light"))
+  t2 <- ggtexttable(round(stats_df[index, 11:21],3), rows = NULL, theme = ttheme("light"))
   
   plot_design <- p1 / (p2 | p3) / (t1 | t2) +
     plot_layout(heights = c(0.35, 0.55, 0.1)) +
@@ -363,3 +374,5 @@ for (i in 1:length(time_plot)) {
   plotname<-gsub(".csv", "", names(time_plot[i]))
   ggsave(filename = paste0(dir,"/",plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
+
+  
