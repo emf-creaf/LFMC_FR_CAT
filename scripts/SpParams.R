@@ -1,6 +1,7 @@
 library(medfate)
 library(medfateutils)
 library(tidyverse)
+library(readxl)
 
 # CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
 # FR_LFMC<-read.csv("data/FR_LFMC.csv")
@@ -62,12 +63,9 @@ library(tidyverse)
 #SpParamsAlbert FINAL CORRECT PARAMS
 
 SpParamsAlbert <- read_excel("data/SpParamsAlbert.xlsx", sheet = "SpParams_final") %>% 
-  select(-c("maxLFMC_95Q","LDMC" ,"TLP")) %>% 
+  #select(-c("maxLFMC_95Q","LDMC" ,"TLP")) %>% 
   mutate(Name = ifelse(Name == "Calicotome spinosa", "Calicotome", Name))
 
+SpParams<-modifySpParams(SpParamsFR,SpParamsAlbert)
 
-SpParams<-left_join(SpParamsFR,SpParamsAlbert, by = names(SpParamsAlbert)) %>% 
-  mutate(Name = ifelse(Name == "Calicotome", "Calicotome spinosa", Name))
-
-
-write.csv(SpParams, "data/SpParamsAlbert.csv")
+write.csv(SpParams2, "data/SpParamsAlbert.csv")
