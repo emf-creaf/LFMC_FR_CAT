@@ -20,7 +20,7 @@ CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 # METEO<-meteo
 # SOIL_RFC<-soil_rfc
 
-run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SPPARAMS = NULL,SOIL_RFC = NULL) {
+run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SOIL_RFC = NULL) {
   
   CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
   SOURCE<-CAT_FR_SITES[CAT_FR_SITES$site_name == SITE_NAME,]$source
@@ -339,10 +339,10 @@ for (site_name in sites) {
   #SAVE SIMULATION OBJECT AS .RDS
   
   if (type == "SINGLE"){
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),sp,lai,meteo,soil_rfc, sep = "_")
     
   } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_rfc, sep = "_")
   }
   
   path<-file.path("data","PLOTS",site_name,name)
@@ -354,14 +354,14 @@ for (site_name in sites) {
   
   if (class(SIM_data)=="list") {
     for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,soil_rfc, sep = "_")
+      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),names(SIM_data)[j],lai,meteo,soil_rfc, sep = "_")
       write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
       cat(paste0(site_name," ",names(SIM_data)[j]," SIMULATION DATA SAVED"),"\n\n")
     }
   }
   
   if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,soil_rfc, sep = "_")
+    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_rfc, sep = "_")
     write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
     cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
   }
