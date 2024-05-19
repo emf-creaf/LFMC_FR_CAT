@@ -2,7 +2,8 @@ raw_data/
 scripts/raw_scripts/
 data/PLOTS
 data/SIMULATIONS
-
+data/SIMULATIONS_DF
+data/SIMULATIONS_PLOTS
 # History files
 .Rhistory
 .Rapp.history
