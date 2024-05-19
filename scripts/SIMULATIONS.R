@@ -18,7 +18,6 @@ CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 # CONTROL<-control
 # LAI<-lai
 # METEO<-meteo
-# SPPARAMS<-spparams
 # SOIL_RFC<-soil_rfc
 
 run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SPPARAMS = NULL,SOIL_RFC = NULL) {
@@ -26,19 +25,11 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
   SOURCE<-CAT_FR_SITES[CAT_FR_SITES$site_name == SITE_NAME,]$source
     
-  if (SPPARAMS == "Albert" ) {
-  
-    SpParams<-read.csv("data/SpParamsAlbert.csv")
-    
-  }else {
-    SpParams<-SpParamsFR %>% 
-      mutate(Name = ifelse(Name == "Calicotome", "Calicotome spinosa", Name))
-  }
+  SpParams<-read.csv("data/SpParamsAlbert.csv")
   
   #Read the shrub data for the site
   shrubData<-read.csv(paste0("data/PLOTS/", SITE_NAME, "/shrubData_ALL.csv"))
   shrubData$Date<-as.Date(shrubData$Date)
-  
   
   #LAI from MODIS
   if (!is.null(LAI) && LAI == "MODIS") {
@@ -308,7 +299,8 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #################################SIMULATIONS####################################
 
-sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
+#sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
+sites<-CAT_FR_SITES$site_name
 for (site_name in sites) {
   
   #SIMULATION PARAMETERS
@@ -319,8 +311,7 @@ for (site_name in sites) {
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
   lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
-  meteo<-"INTER" #INTER, ERA5
-  spparams<-"Albert" #Albert or SpParamsFR
+  meteo<-"ERA5" #INTER, ERA5
   soil_rfc<-80 #numeric value between 0 and 100
   
   #RUN SIMULATION
@@ -333,7 +324,6 @@ for (site_name in sites) {
     CONTROL = control,
     LAI = lai,
     METEO = meteo,
-    SPPARAMS = spparams
   )
   
   #EXTRACT SIMULATION DATA
@@ -349,10 +339,10 @@ for (site_name in sites) {
   #SAVE SIMULATION OBJECT AS .RDS
   
   if (type == "SINGLE"){
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,sp,transpirationMode,lai,meteo,soil_rfc, sep = "_")
     
   } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,soil_rfc, sep = "_")
   }
   
   path<-file.path("data","PLOTS",site_name,name)
@@ -364,15 +354,16 @@ for (site_name in sites) {
   
   if (class(SIM_data)=="list") {
     for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
+      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,names(SIM_data)[j],transpirationMode,lai,meteo,soil_rfc, sep = "_")
       write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
       cat(paste0(site_name," ",names(SIM_data)[j]," SIMULATION DATA SAVED"),"\n\n")
     }
   }
   
   if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,spparams,soil_rfc, sep = "_")
+    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),type,transpirationMode,lai,meteo,soil_rfc, sep = "_")
     write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
     cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
   }
 }
+

@@ -135,7 +135,6 @@ for (i in 1:length(simulations)) {
   default_control <- split[5]
   lai <- split[6]
   meteo <- gsub(".csv", "", split[7])
-  spparams <- gsub(".csv", "",split[8])
   soil_rfc <- gsub(".csv", "",split[9])
   
   #PRINT THE VARIABLES NAMES
@@ -147,7 +146,6 @@ for (i in 1:length(simulations)) {
       "default_control:", default_control, "\n",
       "lai:", lai, "\n",
       "meteo:", meteo, "\n",
-      "spparams:", spparams, "\n",
       "soil_rfc:", soil_rfc, "\n",
       "#######################################\n"
   )
@@ -238,7 +236,6 @@ for (i in 1:length(simulations)) {
       CONTROL = default_control,
       LAI = lai,
       METEO = meteo,
-      SPPARAMS = spparams,
       SOIL_RFC = soil_rfc,
       LFMC_TYPE = "MEASURED") %>%
       mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC.MODELED))) 
@@ -253,7 +250,6 @@ for (i in 1:length(simulations)) {
       CONTROL = default_control,
       LAI = lai,
       METEO = meteo,
-      SPPARAMS = spparams,
       SOIL_RFC = soil_rfc,
       LFMC_TYPE = "RODRIGO") %>%
       mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC_rodrigo)))
