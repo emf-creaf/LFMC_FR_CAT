@@ -40,7 +40,7 @@ soil_data<-read.csv(file = "data/SOIL_DATA.csv")
 soil_list <- split(soil_data, soil_data$site_name)
 
 #remove site_name column
-soil_list<-lapply(soil_list, function(x) { x["site_name"] <- NULL; x })
+#soil_list<-lapply(soil_list, function(x) { x["site_name"] <- NULL; x })
 
 #save the soil dataframe in PLOT folders.
 
