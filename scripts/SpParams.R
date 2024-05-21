@@ -66,6 +66,7 @@ SpParamsAlbert <- read_excel("data/SpParamsAlbert.xlsx", sheet = "SpParams_final
   #select(-c("maxLFMC_95Q","LDMC" ,"TLP")) %>% 
   mutate(Name = ifelse(Name == "Calicotome spinosa", "Calicotome", Name))
 
-SpParams<-modifySpParams(SpParamsFR,SpParamsAlbert)
+SpParams<-modifySpParams(SpParamsFR,SpParamsAlbert) %>% 
+  mutate(Name = ifelse(Name == "Calicotome", "Calicotome spinosa", Name))
 
-write.csv(SpParams2, "data/SpParamsAlbert.csv")
+write.csv(SpParams, "data/SpParamsAlbert.csv")
