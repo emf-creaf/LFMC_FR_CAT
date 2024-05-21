@@ -4,6 +4,7 @@ data/PLOTS
 data/SIMULATIONS
 data/SIMULATIONS_DF
 data/SIMULATIONS_PLOTS
+data/STATS_PLOTS
 # History files
 .Rhistory
 .Rapp.history
