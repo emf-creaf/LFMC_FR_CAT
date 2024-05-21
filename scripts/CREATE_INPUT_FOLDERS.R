@@ -36,8 +36,10 @@ for (i in CAT_FR_SITES_NAMES) {
 #export soil_data to the correct plot directory, with medfate format
 
 soil_data<-read.csv(file = "data/SOIL_DATA.csv")
+soil_data_mod<-read.csv(file = "data/SOIL_DATA_MOD.csv")
 
 soil_list <- split(soil_data, soil_data$site_name)
+soil_list_mod <- split(soil_data_mod, soil_data_mod$site_name)
 
 #remove site_name column
 #soil_list<-lapply(soil_list, function(x) { x["site_name"] <- NULL; x })
@@ -50,6 +52,19 @@ for (i in CAT_FR_SITES_NAMES) {
   if (dir.exists(dir)) {
     write.csv(df, file.path(dir, "soil.csv"),row.names = F)
     print(paste("soil", i, "saved."))
+  } else {
+    warning(paste(" directory", dir, "not found","\n", i, "soil, not saved."))
+  }
+}
+
+#save the modified soil dataframe in PLOT folders.
+
+for (i in CAT_FR_SITES_NAMES) {
+  df <- soil_list_mod[[i]]
+  dir <- file.path(getwd(), "data", "PLOTS", i)
+  if (dir.exists(dir)) {
+    write.csv(df, file.path(dir, "soil_mod.csv"),row.names = F)
+    print(paste("modified soil", i, "saved."))
   } else {
     warning(paste(" directory", dir, "not found","\n", i, "soil, not saved."))
   }

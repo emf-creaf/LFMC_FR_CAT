@@ -34,32 +34,25 @@ saveRDS(all_soil, file = "data/SOIL_DATA.rds")
 
 #####SOIL ROCK CONTENT MODIFICATION#####################
 
-#all_soil<-readRDS("data/SOIL_DATA.rds")
+all_soil<-readRDS("data/SOIL_DATA.rds")
 
 # Censored soil depth (cm)
-bdricm <- terra::rast("tif")
+bdricm <- terra::rast("raw_data/SOIL MOD/BDRICM_M_250m_ll.tif")
 # Probability of bedrock within first 2m [0-100]
-bdrlog <- terra::rast("tif")
+bdrlog <- terra::rast("raw_data/SOIL MOD/BDRLOG_M_250m_ll.tif")
 # Absolute depth to bedrock (cm)
-bdticm <- terra::rast("tif")
-
 
 x_vect <- terra::vect(sf::st_transform(sf::st_geometry(sites), terra::crs(bdricm)))
-
-
 x_ext <- terra::ext(x_vect)
 
 bdricm <- terra::crop(bdricm, x_ext, snap = "out")
 bdrlog <- terra::crop(bdrlog, x_ext, snap = "out")
-bdticm <- terra::crop(bdticm, x_ext, snap = "out")
 
 soil_depth_mm <- (bdricm$BDRICM_M_250m_ll*10)*(1 - (bdrlog$BDRLOG_M_250m_ll/100))
 
-depth_to_bedrock_mm <- bdticm*10
 
 all_soil_modify<- modify_soils(all_soil, 
-                    soil_depth_map = soil_depth_mm, 
-                    depth_to_bedrock_map = depth_to_bedrock_mm)
+                    soil_depth_map = soil_depth_mm)
 
 soil_df_modify<-data.frame()
 for (i in 1:nrow(all_soil)){

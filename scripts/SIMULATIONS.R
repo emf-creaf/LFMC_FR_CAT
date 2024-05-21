@@ -9,18 +9,17 @@ library(tidyverse)
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 
 #################################FUNCTIONS######################################
-# site_name<-CAT_FR_SITES$site_name[1]
-# 
-# SITE_NAME <-site_name
-# YEARS<-years
-# TYPE<-type
-# SP<-sp
-# CONTROL<-control
-# LAI<-lai
-# METEO<-meteo
-# SOIL_RFC<-soil_rfc
 
-run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SOIL_RFC = NULL) {
+SITE_NAME <-site_name
+YEARS<-years
+TYPE<-type
+SP<-sp
+CONTROL<-control
+LAI<-lai
+METEO<-meteo
+SOIL_MOD<-soil_mod
+
+run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SOIL_MOD = F) {
   
   CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
   SOURCE<-CAT_FR_SITES[CAT_FR_SITES$site_name == SITE_NAME,]$source
@@ -41,16 +40,17 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   }
   
   # Read the soil data for the site
-  soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
-  soil <- soil(soil_table)
   
-  #CHANGE THE RFC CONTENT OF THE LAST SOIL LAYER
-  if (!is.null(SOIL_RFC)) {
-    if (!is.numeric(SOIL_RFC) || SOIL_RFC < 0 || SOIL_RFC > 100) {
-      stop("Error: SOIL_RFC must be a numeric value between 0 and 100")
-    }
-    soil$rfc[length(soil$rfc)]<-SOIL_RFC
+  
+  if (SOIL_MOD == TRUE) {
+    #LOAD THE MODIFIED ROCK SOIL
+    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
+  }else {
+    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
   }
+  
+  #CREATE SOIL OBJECT
+  soil <- soil(soil_table)
   
   # Read the meteorological data for the site
   
@@ -79,59 +79,59 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   # Create an empty forest object
   forest <- emptyforest()
   
-  if (TYPE == "ALL_FILTERED") {
-    
-    #keep only one of the repeated species
-    df_filtered <- shrubData %>%
-      group_by(Species) %>%
-      slice(which.max(Cover)) #if there are repeated measurement of one sp. choose the one with higher coverage
-    
-    
-    forest$shrubData <- df_filtered
-    
-    # Prepare the input for the SPWB model
-    x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
-    
-    # Run the SPWB
-    simulation <- spwb(x, 
-                       met, 
-                       latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
-                       elevation = elevation, 
-                       slope = slope, 
-                       aspect = aspect)
-    
-    return(simulation)
-    
-  }
-  
-  if (TYPE == "ALL_SINGLE")  {
-      
-    results <- list()  # Create an empty list to store the results
-    for (i in 1:nrow(shrubData)) {
-      
-      df_species <- shrubData[i,]
-      forest$shrubData <- df_species
-      
-      # Prepare the input for the SPWB model
-      x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
-      
-      # Run the simulation for this species
-      simulation <- spwb(x, 
-                         met, 
-                         latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
-                         elevation = elevation, 
-                         slope = slope, 
-                         aspect = aspect)
-      
-      # Create a unique identifier combining Species and Plot
-      id <- paste(i,df_species$Species, sep="_")
-      # Store the result in the list
-      results[[id]] <- simulation
-    }
-    
-    return(results)
-    
-    }
+  # if (TYPE == "ALL_FILTERED") {
+  #   
+  #   #keep only one of the repeated species
+  #   df_filtered <- shrubData %>%
+  #     group_by(Species) %>%
+  #     slice(which.max(Cover)) #if there are repeated measurement of one sp. choose the one with higher coverage
+  #   
+  #   
+  #   forest$shrubData <- df_filtered
+  #   
+  #   # Prepare the input for the SPWB model
+  #   x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
+  #   
+  #   # Run the SPWB
+  #   simulation <- spwb(x, 
+  #                      met, 
+  #                      latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
+  #                      elevation = elevation, 
+  #                      slope = slope, 
+  #                      aspect = aspect)
+  #   
+  #   return(simulation)
+  #   
+  # }
+  # 
+  # if (TYPE == "ALL_SINGLE")  {
+  #     
+  #   results <- list()  # Create an empty list to store the results
+  #   for (i in 1:nrow(shrubData)) {
+  #     
+  #     df_species <- shrubData[i,]
+  #     forest$shrubData <- df_species
+  #     
+  #     # Prepare the input for the SPWB model
+  #     x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
+  #     
+  #     # Run the simulation for this species
+  #     simulation <- spwb(x, 
+  #                        met, 
+  #                        latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
+  #                        elevation = elevation, 
+  #                        slope = slope, 
+  #                        aspect = aspect)
+  #     
+  #     # Create a unique identifier combining Species and Plot
+  #     id <- paste(i,df_species$Species, sep="_")
+  #     # Store the result in the list
+  #     results[[id]] <- simulation
+  #   }
+  #   
+  #   return(results)
+  #   
+  #   }
   
   if (TYPE == "SINGLE") {
     
@@ -171,7 +171,11 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
       # Update SP to remove species not found
       SP <- SP[!SP %in% not_found]
       forest$shrubData<-shrubData
-      lai_total_medfate <- stand_LAI(forest, SpParams)
+      
+      if (LAI == "MEDFATE"){
+        lai_total_medfate <- stand_LAI(forest, SpParams)
+      }
+      
       #choose the desired sp. from shrubdata
       df_sp <- shrubData %>%
         filter(Species %in% SP) %>%
@@ -182,7 +186,11 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
       for (i in 1:nrow(df_sp)) {
         
         df_species <- df_sp[i,]
-        df_species$LAI <- lai_total_medfate
+        
+        if (LAI == "MEDFATE"){
+          df_species$LAI <- lai_total_medfate
+        }
+        
         forest$shrubData <- df_species
         
         # Prepare the input for the SPWB model
@@ -301,6 +309,9 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
 sites<-CAT_FR_SITES$site_name
+
+#site_name<-"Badalona"
+
 for (site_name in sites) {
   
   #SIMULATION PARAMETERS
@@ -310,9 +321,9 @@ for (site_name in sites) {
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
-  lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
+  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
   meteo<-"ERA5" #INTER, ERA5
-  soil_rfc<-80 #numeric value between 0 and 100
+  soil_mod<-F #T or F
   
   #RUN SIMULATION
   
@@ -324,6 +335,7 @@ for (site_name in sites) {
     CONTROL = control,
     LAI = lai,
     METEO = meteo,
+    SOIL_MOD = soil_mod
   )
   
   #EXTRACT SIMULATION DATA
@@ -339,10 +351,10 @@ for (site_name in sites) {
   #SAVE SIMULATION OBJECT AS .RDS
   
   if (type == "SINGLE"){
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),sp,lai,meteo,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),sp,lai,meteo,soil_mod, sep = "_")
     
   } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_rfc, sep = "_")
+    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_mod, sep = "_")
   }
   
   path<-file.path("data","PLOTS",site_name,name)
@@ -354,16 +366,15 @@ for (site_name in sites) {
   
   if (class(SIM_data)=="list") {
     for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),names(SIM_data)[j],lai,meteo,soil_rfc, sep = "_")
+      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),names(SIM_data)[j],lai,meteo,soil_mod, sep = "_")
       write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
       cat(paste0(site_name," ",names(SIM_data)[j]," SIMULATION DATA SAVED"),"\n\n")
     }
   }
   
   if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_rfc, sep = "_")
+    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_mod, sep = "_")
     write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
     cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
   }
 }
-

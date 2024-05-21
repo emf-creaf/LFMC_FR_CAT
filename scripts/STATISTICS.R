@@ -1,7 +1,7 @@
 library(tidyverse)
-library(gridExtra)
 library(patchwork)
 library(ggh4x)
+library(ggpubr)
 #################################CAT_FR_SITES###################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 sites<-CAT_FR_SITES$site_name
@@ -85,12 +85,13 @@ ggplotRegression <- function (fit, abline=F, caption = NULL) {
 
 #PATTERNS :
 
-#"ALL_FILTERED.*MODIS.*"
-#"SINGLE.*MODIS.*"
-#"SINGLE.*MEDFATE.*"
-#"SINGLE.*MODIS.*Albert.*"
+#PATTERN<-"SINGLE.*MODIS.*"
+#PATTERN<-SINGLE.*MEDFATE.*"
+#PATTERN<-"SINGLE.*MODIS.*Albert.*"
 
-PATTERN<-"Albert.*"
+PATTERN<- ".*(TRUE|FALSE)"
+
+#PATTERN<-"Albert.*"
 
 files_path2<-list.files(paste0("data/PLOTS/", sites), pattern = paste0(PATTERN,"\\.csv$"), recursive = TRUE, full.names = TRUE)
 files_name2<-basename(files_path2)
@@ -124,29 +125,39 @@ for (i in 1:length(simulations)) {
   #ASSIGN THE SPLIT TO THE VARIABLES
   site_name <- split[1]
   years <- as.numeric(strsplit(split[2], "-")[[1]][1]):as.numeric(strsplit(split[2], "-")[[1]][2])
-  if (split[3]=="SINGLE"){
+  
+  if (split[6]=="TRUE.csv" || split[6]=="FALSE.csv"){
+    sp <-  split[3]
+    lai <- split[4]
+    meteo <- split[5]
+    soil_mod <- gsub(".csv", "",split[6])
+    type <- "SINGLE"
+  }else if (split[3]=="SINGLE"){
     type <- split[3]
     sp <-  split[4]
+    default_control <- split[5]
+    lai <- split[6]
+    meteo <- gsub(".csv", "", split[7])
+    soil_mod <- gsub(".csv", "",split[9])
     
   } else {
     type <- paste0(split[3],"_",split[4])
     sp <- "ALL"
+    default_control <- split[5]
+    lai <- split[6]
+    meteo <- gsub(".csv", "", split[7])
+    soil_mod <- gsub(".csv", "",split[9])
   }
-  default_control <- split[5]
-  lai <- split[6]
-  meteo <- gsub(".csv", "", split[7])
-  soil_rfc <- gsub(".csv", "",split[9])
+  
   
   #PRINT THE VARIABLES NAMES
   cat(" #######################################", "\n",
       "site_name:", site_name, "\n",
       "years:", years, "\n",
-      "type:", type, "\n",
       "sp:", sp, "\n",
-      "default_control:", default_control, "\n",
-      "lai:", lai, "\n",
+      "LAI:", lai, "\n",
       "meteo:", meteo, "\n",
-      "soil_rfc:", soil_rfc, "\n",
+      "soil_mod:", soil_mod, "\n",
       "#######################################\n"
   )
   
@@ -187,57 +198,33 @@ for (i in 1:length(simulations)) {
     full_join(FILTERED_LFMC, 
               by = c("date" = "date", "species" = "specie"), 
               suffix = c(".MODELED", ".MEASURED"))
+    # mutate(SITE_NAME = site_name,
+    #        YEARS = paste0(years[1],"-",years[length(years)]),
+    #        TYPE = type,
+    #        SP = sp,
+    #        CONTROL = default_control,
+    #        LAI = lai,
+    #        METEO = meteo,
+    #        SOIL_RFC = soil_rfc,
+    #        LFMC_TYPE = "MEASURED",
+    #        SOURCE = source)
   
   #SIMULATION DATA LIST####
   
   data_list[[i]]<-MERGED_LFMC_ALL
   names(data_list)[i]<- filename
   
-  if (!type == "SINGLE") {
-    
-    a<-split(MERGED_LFMC_ALL,MERGED_LFMC_ALL$species)
-    
-    for (j in 1:length(a)) {
-      result <- as.data.frame(evalstats(a[[j]]$LFMC.MEASURED,a[[j]]$LFMC.MODELED))
-      result$SITE_NAME <- site_name
-      result$YEARS <- paste0(years[1],"-",years[length(years)])
-      result$TYPE <- type
-      result$SP <- names(a)[j]
-      result$CONTROL <- default_control
-      result$LAI <- lai
-      result$METEO <- meteo
-      result$SOIL_RFC<- soil_rfc
-      #result$SOIL_RFC <- ifelse(is.na(result$SOIL_RFC), 0, result$SOIL_RFC)
-      
-      stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
-      
-      result2 <- as.data.frame(evalstats(a[[j]]$LFMC.MEASURED,a[[j]]$LFMC_rodrigo))
-      result2$SITE_NAME <- site_name
-      result2$YEARS <- paste0(years[1],"-",years[length(years)])
-      result2$TYPE <- type
-      result2$SP <- names(a)[j]
-      result2$CONTROL <- default_control
-      result2$LAI <- lai
-      result2$METEO <- meteo
-      result2$SOIL_RFC<- soil_rfc
-      #result2$SOIL_RFC <- ifelse(is.na(result2$SOIL_RFC), 0, result2$SOIL_RFC)
-      
-      stats_df_MEASURED_RODRIGO <- rbind(stats_df_MEASURED_RODRIGO, result2)
-      
-    }
-    
-  } else if (type == "SINGLE"){
-    #EVALUTATION STATISTICS DATA.FRAME####
+  
     result_M <- data.frame(
       SITE_NAME = site_name,
       YEARS = paste0(years[1],"-",years[length(years)]),
       TYPE = type,
       SP = sp,
-      CONTROL = default_control,
       LAI = lai,
       METEO = meteo,
-      SOIL_RFC = soil_rfc,
-      LFMC_TYPE = "MEASURED") %>%
+      SOIL_MOD = soil_mod,
+      LFMC_TYPE = "MEASURED",
+      SOURCE = source) %>%
       mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC.MODELED))) 
     
     #stats_df_MEASURED_MODELED <- rbind(stats_df_MEASURED_MODELED, result)
@@ -247,21 +234,18 @@ for (i in 1:length(simulations)) {
       YEARS = paste0(years[1],"-",years[length(years)]),
       TYPE = type,
       SP = sp,
-      CONTROL = default_control,
       LAI = lai,
       METEO = meteo,
-      SOIL_RFC = soil_rfc,
-      LFMC_TYPE = "RODRIGO") %>%
+      SOIL_MOD = soil_mod,
+      LFMC_TYPE = "RODRIGO",
+      SOURCE = source) %>%
       mutate(!!!c(evalstats(MERGED_LFMC_ALL$LFMC.MEASURED, MERGED_LFMC_ALL$LFMC_rodrigo)))
     
     result<-rbind(result_M,result_R)
     stats_df <- rbind(stats_df, result)
-    
-    
-  }
 }
 
-write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
+#write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
 
 
 #####################PLOTS######################################################
@@ -354,8 +338,8 @@ plots_site_sp<-function(index){
   p2 <- scatter_plot[[index]] + labs(title = NULL)
   p3 <- scatter_plotR[[index]] + labs(title = NULL)
   
-  t1 <- ggtexttable(round(stats_df[index, 11:21],3), rows = NULL, theme = ttheme("light"))
-  t2 <- ggtexttable(round(stats_df[index, 11:21],3), rows = NULL, theme = ttheme("light"))
+  t1 <- ggtexttable(round(stats_df[index, 10:20],3), rows = NULL, theme = ttheme("light"))
+  t2 <- ggtexttable(round(stats_df[index, 10:20],3), rows = NULL, theme = ttheme("light"))
   
   plot_design <- p1 / (p2 | p3) / (t1 | t2) +
     plot_layout(heights = c(0.35, 0.55, 0.1)) +
@@ -371,4 +355,106 @@ for (i in 1:length(time_plot)) {
   ggsave(filename = paste0(dir,"/",plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-  
+#################SECOND LEVEL ANALISIS #################################################################  
+
+stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+
+plot<-stats_df %>%
+  mutate(death = n_pred < 4000) %>% 
+  ggplot(aes(x = interaction(SOURCE,LAI,METEO,SP), y = n_pred, color = death)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  coord_flip() +
+  geom_jitter(alpha = 0.1)+
+  scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
+  theme(legend.position = "none",
+        text = element_text(size = 15))
+
+death<-stats_df %>%
+  mutate(death = n_pred < 4000) %>% 
+  filter(death) %>% 
+  ggplot(aes(x = interaction(SOURCE,LAI,METEO,SP), y = n_pred, color = death)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  coord_flip() +
+  geom_jitter(alpha = 0.1)+
+  scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
+  theme(legend.position = "none",
+        text = element_text(size =15))
+
+################################################################################
+
+r2<-stats_df %>% 
+  filter(n_pred > 4000) %>% 
+  ggplot(aes(x= LFMC_TYPE , y = r2, color=LFMC_TYPE))+
+  geom_boxplot()+
+  geom_jitter(alpha = 0.1)+
+  facet_nested(~ LAI+METEO+SOIL_RFC)+
+  theme_classic()+
+  theme(legend.position = "none",
+        panel.spacing = unit(0,"lines"),
+        strip.background = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        panel.border = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        axis.title.x = element_blank())
+
+Bias<- stats_df %>% 
+  filter(n_pred > 4000) %>% 
+  ggplot(aes(x= LFMC_TYPE , y = Bias, color=LFMC_TYPE))+
+  geom_boxplot()+
+  geom_jitter(alpha = 0.1)+
+  facet_nested(~ LAI+METEO+SOIL_RFC)+
+  theme_classic()+
+  theme(legend.position = "none",
+        panel.spacing = unit(0,"lines"),
+        strip.background = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        panel.border = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        axis.title.x = element_blank())
+
+MAE<-stats_df %>% 
+  filter(n_pred > 4000) %>% 
+  ggplot(aes(x= LFMC_TYPE , y = MAE, color=LFMC_TYPE))+
+  geom_boxplot()+
+  geom_jitter(alpha = 0.1)+
+  facet_nested(~ LAI+METEO+SOIL_RFC)+
+  theme_classic()+
+  theme(legend.position = "none",
+        panel.spacing = unit(0,"lines"),
+        strip.background = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        panel.border = element_rect(fill= NA, colour = "black",linewidth = 0.5),
+        axis.title.x = element_blank())
+
+r2_bias_MAE<-(
+  (r2 + 
+     theme(axis.text.x = element_blank(),
+           axis.ticks.x = element_blank()))
+  /
+    (Bias + 
+       theme(strip.background = element_blank(),
+             strip.text = element_blank(),
+             axis.text.x = element_blank(),
+             axis.ticks.x = element_blank()))
+  /
+    (MAE + 
+       theme(strip.background = element_blank(), 
+             strip.text = element_blank()))
+)
+
+# ggsave(filename = "data/STATS_PLOTS/plot.png", plot = plot, device = "png", width = 1920/96, height = 1080, units = "px", dpi = 96)
+# ggsave(filename = "data/STATS_PLOTS/death.png", plot = death, device = "png", width = 1920, height = 1080, units = "px", dpi = 96)
+# ggsave(filename = "data/STATS_PLOTS/r2.png", plot = r2, device = "png", width = 1920, height = 1080, units = "px", dpi = 96)
+# ggsave(filename = "data/STATS_PLOTS/Bias.png", plot = Bias, device = "png", width = 1920, height = 1080, units = "px", dpi = 96)
+# ggsave(filename = "data/STATS_PLOTS/MAE.png", plot = MAE, device = "png", width = 1920, height = 1080, units = "px", dpi = 96)
+# ggsave(filename = "data/STATS_PLOTS/r2_bias_MAE.png", plot = r2_bias_MAE, device = "png", width = 1920, height = 1080, units = "px", dpi = 96)
+
+plots <- list(
+  plot = plot,
+  death = death,
+  r2 = r2,
+  Bias = Bias,
+  MAE = MAE,
+  r2_bias_MAE = r2_bias_MAE
+)
+
+for (i in names(plots)) {
+  ggsave(filename = paste0("data/STATS_PLOTS/", i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
