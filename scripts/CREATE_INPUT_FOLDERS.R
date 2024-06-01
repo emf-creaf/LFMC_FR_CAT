@@ -253,39 +253,39 @@ for (i in CAT_FR_SITES_NAMES) {
 
 ###################CAT METEO INTERPOLATORS#####################################
 
-CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
-
-#CAT SITES
-CAT_SITES<-CAT_FR_SITES[1:9,]
-
-#SF OBJECT
-SF_CAT_SITES<-st_as_sf(CAT_SITES, coords = c("LON", "LAT"), crs = 4326)
-
-#LOAD INTERPOLATORS (SEPARATE YEARS)
-files<-list.files("raw_data/interpoladores_meteo_cat/Meteo/", pattern = ".nc", full.names = T)
-
-#INTERPOLATE METEO DATA
-meteo<-list()
-for (i in 1:length(files)){
-  m<-read_interpolator(files[i])
-  meteo[[i]]<-interpolate_data(SF_CAT_SITES, m)
-}
-
-#MERGE INTERPOLATED DATA
-meteo_interpolators<-list()
-for (i in 1:nrow(meteo[[1]])) {
-  temp <- list()
-  for(j in 1:length(meteo)) {
-    temp[[j]] <- meteo[[j]]$interpolated_data[[i]]
-  }
-  meteo_interpolators[[i]] <- do.call(rbind, temp)
-}
-
-#CHANGE NAMES
-
-new_names<-meteo[[1]]$site_name
-names(meteo_interpolators) <- new_names
-
+# CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
+# 
+# #CAT SITES
+# CAT_SITES<-CAT_FR_SITES[1:9,]
+# 
+# #SF OBJECT
+# SF_CAT_SITES<-st_as_sf(CAT_SITES, coords = c("LON", "LAT"), crs = 4326)
+# 
+# #LOAD INTERPOLATORS (SEPARATE YEARS)
+# files<-list.files("raw_data/interpoladores_meteo_cat/Meteo/", pattern = ".nc", full.names = T)
+# 
+# #INTERPOLATE METEO DATA
+# meteo<-list()
+# for (i in 1:length(files)){
+#   m<-read_interpolator(files[i])
+#   meteo[[i]]<-interpolate_data(SF_CAT_SITES, m)
+# }
+# 
+# #MERGE INTERPOLATED DATA
+# meteo_interpolators<-list()
+# for (i in 1:nrow(meteo[[1]])) {
+#   temp <- list()
+#   for(j in 1:length(meteo)) {
+#     temp[[j]] <- meteo[[j]]$interpolated_data[[i]]
+#   }
+#   meteo_interpolators[[i]] <- do.call(rbind, temp)
+# }
+# 
+# #CHANGE NAMES
+# 
+# new_names<-meteo[[1]]$site_name
+# names(meteo_interpolators) <- new_names
+meteo_interpolators<-readRDS("raw_data/interpoladores_meteo_cat/meteo_interpolators_list.RDS")
 
 #SAVE INTERPOLATED METEO TO CAT PLOTS
 CAT_SITES_NAMES<-CAT_FR_SITES$site_name[1:9]
