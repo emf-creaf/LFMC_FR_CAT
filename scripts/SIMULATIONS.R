@@ -1,23 +1,40 @@
 library(medfate)
 library(medfateutils)
-library(meteoland)
-library(medfateland)
-
 library(tidyverse)
+
 
 #####################CAT_FR_SITES###################################
 CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 
 #################################FUNCTIONS######################################
 
-SITE_NAME <-site_name
-YEARS<-years
-TYPE<-type
-SP<-sp
-CONTROL<-control
-LAI<-lai
-METEO<-meteo
-SOIL_MOD<-soil_mod
+# #SIMULATION PARAMETERS
+# site_name<- "D13S2"
+# years<-c(2012:2022) #VECTOR OF YEARS
+# type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
+# sp<-"Quercus coccifera" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
+# transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
+# lfmcomp<-"leaf" #"leaf" or "fine"
+# 
+# control<-defaultControl(transpirationMode)
+# control$segmentedXylemVulnerability=F
+# 
+# control$lfmcComponent = lfmcomp
+# 
+# lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
+# meteo<-"ERA5" #INTER, ERA5
+# soil_mod<-T #T or F
+# 
+# 
+# 
+# SITE_NAME <- site_name
+# YEARS<-years
+# TYPE<-type
+# SP<-sp
+# CONTROL<-control
+# LAI<-lai
+# METEO<-meteo
+# SOIL_MOD<-soil_mod
 
 run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,SOIL_MOD = F) {
   
@@ -29,6 +46,15 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   #Read the shrub data for the site
   shrubData<-read.csv(paste0("data/PLOTS/", SITE_NAME, "/shrubData_ALL.csv"))
   shrubData$Date<-as.Date(shrubData$Date)
+  
+  # if ("Quercus coccifera" %in% shrubData$Species) {
+  #     shrubData$Z95[shrubData$Species == "Quercus coccifera"]<-1500
+  #     shrubData$z50[shrubData$Species == "Quercus coccifera"]<-400
+  # }
+  # if ("Arbutus unedo" %in% shrubData$Species) {
+  #   shrubData$Z95[shrubData$Species == "Arbutus unedo"]<-1500
+  #   shrubData$Z95[shrubData$Species == "Arbutus unedo"]<-400
+  # }
   
   #LAI from MODIS
   if (!is.null(LAI) && LAI == "MODIS") {
@@ -46,7 +72,8 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
     #LOAD THE MODIFIED ROCK SOIL
     soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
   }else {
-    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
+    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME[1], "/soil.csv"))
+    #soil_table <- soil_table[-1,]
   }
   
   #CREATE SOIL OBJECT
@@ -191,7 +218,7 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
           df_species$LAI <- lai_total_medfate
         }
         
-        forest$shrubData <- df_species
+        forest$shrubData <- as.data.frame(df_species)
         
         # Prepare the input for the SPWB model
         x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
@@ -308,9 +335,9 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 #################################SIMULATIONS####################################
 
 #sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
-sites<-CAT_FR_SITES$site_name
+#sites<-CAT_FR_SITES$site_name
 
-#site_name<-"Badalona"
+#sites<- c("Badalona","Port de la Selva")
 
 for (site_name in sites) {
   
@@ -319,10 +346,15 @@ for (site_name in sites) {
   type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
   sp<-"MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
+  lfmcomp<-"leaf" #"leaf" or "fine"
+  
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
-  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
-  meteo<-"ERA5" #INTER, ERA5
+  
+  control$lfmcComponent = lfmcomp
+  
+  lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
+  meteo<-"INTER" #INTER, ERA5
   soil_mod<-F #T or F
   
   #RUN SIMULATION
@@ -357,8 +389,8 @@ for (site_name in sites) {
     name<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_mod, sep = "_")
   }
   
-  path<-file.path("data","PLOTS",site_name,name)
-  dir.create(path, showWarnings = FALSE)
+  path<-file.path("data","PLOTS_SIMULATIONS",site_name,name)
+  dir.create(path, showWarnings = FALSE, recursive = T)
   
   saveRDS(SIM, file.path(path, paste0(name, ".RDS")))
   
@@ -378,3 +410,21 @@ for (site_name in sites) {
     cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
   }
 }
+
+###########################
+# lai_options <- c("MODIS", "MEDFATE")
+# meteo_options <- c("ERA5", "INTER")
+# soil_options <- c(TRUE, FALSE)
+# 
+# parameter_combinations <- expand.grid(LAI = lai_options, 
+#                                       METEO = meteo_options, 
+#                                       SOIL_MOD = soil_options)
+#
+# write.csv(parameter_combinations, "data/aaaaaaaaaaaaaaaaa.csv", row.names = F)
+
+
+###############################
+
+# save<-list(forest = forest, forest2spwbInput = x, sim = results[[1]])
+# 
+# saveRDS(save, paste0("enviar/",SP,"_",SITE_NAME,"_",LAI,"_",METEO,"_",SOIL_MOD,".RDS"))
