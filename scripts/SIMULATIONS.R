@@ -70,14 +70,12 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   
   if (SOIL_MOD == TRUE) {
     #LOAD THE MODIFIED ROCK SOIL
-    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
+    soil_table2 <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
   }else {
-    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME[1], "/soil.csv"))
-    #soil_table <- soil_table[-1,]
+    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
   }
   
-  #CREATE SOIL OBJECT
-  soil <- soil(soil_table)
+  soil <- redefineSoilLayers(soil_table, widths = c(200, 300, 600, 1000, 2000))
   
   # Read the meteorological data for the site
   
