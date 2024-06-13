@@ -339,12 +339,14 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #sites<- c("Badalona","Port de la Selva")
 
+#sites<-"Badalona"
+
 for (site_name in sites) {
   
   #SIMULATION PARAMETERS
   years<-c(2012:2022) #VECTOR OF YEARS
   type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
-  sp<-"MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
+  sp<-"Cistus monspeliensis" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   lfmcomp<-"leaf" #"leaf" or "fine"
   
@@ -354,7 +356,7 @@ for (site_name in sites) {
   control$lfmcComponent = lfmcomp
   
   lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
-  meteo<-"INTER" #INTER, ERA5
+  meteo<-"ERA5" #INTER, ERA5
   soil_mod<-F #T or F
   
   #RUN SIMULATION

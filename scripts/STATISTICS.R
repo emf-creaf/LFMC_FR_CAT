@@ -56,6 +56,11 @@ for (i in 1:length(files_path2)) {
   simulations[[files_name2[i]]]<-read.csv(files_path2[i])
 }
 
+##SINGLE FILE#########
+
+file<-read.csv("data/PLOTS_SIMULATIONS/Badalona/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE.csv")
+simulations<-list("Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE" = file)
+
 ######EVALSTATS########
 
 evalstats <- function(obs, pred) {
@@ -228,9 +233,9 @@ data_list<-data$data_list
 summer_data_list<-summer_data$data_list
 outlie_data_list<-outlier_data$data_list
 
-saveRDS(data_list, "data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
-saveRDS(summer_data_list, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
-saveRDS(outlie_data_list, "data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_DATA_LIST.rds")
+#saveRDS(data_list, "data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
+#saveRDS(summer_data_list, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
+#saveRDS(outlie_data_list, "data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_DATA_LIST.rds")
 #####################PLOTS######################################################
 
 func_time_plot <- function(DATA_LIST) {
@@ -401,10 +406,8 @@ for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
 
-################################################################################
+##########BOXPLOTS######################################################################
 stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
-#stats_df<-read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
-outlier_stats_df<-read.csv("data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_STATS.csv")
 
 df<- stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -413,15 +416,8 @@ df<- stats_df %>%
          LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
   filter(n_pred > 4000 & n > 20)
 
-# df<-stats_df %>% 
-#   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
-#          METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
-#          SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
-#          LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
-#   filter(n_pred > 1300 & n > 20)
-
-boxplot <- function(df, yy, nest_levels = c("LAI","METEO","SOIL")) {
-  ggplot(df, aes(x = LFMC_TYPE, y = .data[[yy]], color = LFMC_TYPE)) +
+boxplot <- function(DF, yy, nest_levels = c("LAI","METEO","SOIL")) {
+  ggplot(DF, aes(x = LFMC_TYPE, y = .data[[yy]], color = LFMC_TYPE)) +
     geom_boxplot() +
     geom_jitter(alpha = 0.3) +
     #facet_nested(~ LAI + METEO + SOIL, labeller=label_both) +
@@ -436,30 +432,23 @@ boxplot <- function(df, yy, nest_levels = c("LAI","METEO","SOIL")) {
       axis.title.x = element_blank(),
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank()
+    ) + 
+    stat_summary(
+      fun.data = function(y) {
+        return(data.frame(y = median(y), label = round(median(y), 2)))
+      },
+      geom = "text",
+      vjust = -0.5,
+      color = "black"
     )
 }
 
-#ALL####
+#ALL DATA####
 
 r2<-df %>%
   boxplot(., "r2") +
   labs(title = "r2") +
-  ylim(0,1)
-
-# r2_all_LAI<-df %>%
-#   boxplot(., "r2", c("LAI")) +
-#   labs(title = "r2") +
-#   ylim(0,1)
-# 
-# r2_all_METEO<-df %>%
-#   boxplot(., "r2", c("METEO")) +
-#   labs(title = "r2") +
-#   ylim(0,1)
-# 
-# r2_all_SOIL<-df %>%
-#   boxplot(., "r2", c("SOIL")) +
-#   labs(title = "r2") +
-#   ylim(0,1)
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
 Bias<- df %>%
   boxplot(., "Bias") +
@@ -477,7 +466,7 @@ CAT_r2<-df %>%
   filter(SOURCE == "CAT") %>% 
   boxplot(., "r2") +
   labs(title = "CAT_r2") +
-  ylim(0,1)
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
 CAT_Bias<- df %>%
   filter(SOURCE == "CAT") %>% 
@@ -497,7 +486,7 @@ FR_r2<-df %>%
   filter(SOURCE == "FR") %>% 
   boxplot(., "r2") +
   labs(title = "FR_r2") +
-  ylim(0,1)
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
 FR_Bias<- df %>%
   filter(SOURCE == "FR") %>% 
@@ -511,256 +500,318 @@ FR_MAE<-df %>%
   labs(title = "FR_MAE") +
   ylim(0,60)
 
-######COMBINED PLOTS####
+#SUMMER DATA####
 
-# r2_bias_MAE<-(
-#   (r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank()))
-#   /
-#     (MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank())) 
-# ) + plot_annotation(title = "r2_bias_MAE")
-# 
-# CAT_r2_bias_MAE<-(
-#   (CAT_r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (CAT_Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank()))
-#   /
-#     (CAT_MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank()))
-# ) + plot_annotation(title = "CAT_r2_bias_MAE")
-# 
-# FR_r2_bias_MAE<-(
-#   (FR_r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (FR_Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank())) 
-#   /
-#     (FR_MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank()))
-# ) + plot_annotation(title = "FR_r2_bias_MAE")
-# 
-# CAT_FR_r2<-(
-#   (CAT_r2 + 
-#      theme(legend.position = "none"))
-#   / 
-#     (FR_r2)
-# ) + plot_annotation(title = "CAT_FR_r2")
-# 
-# CAT_FR_Bias<-(
-#   (CAT_Bias + 
-#      theme(legend.position = "none"))
-#   / 
-#     (FR_Bias)
-# ) + plot_annotation(title = "CAT_FR_Bias")
-# 
-# CAT_FR_MAE<-(
-#   (CAT_MAE + 
-#      theme(legend.position = "none"))
-#   / 
-#     (FR_MAE)
-# ) + plot_annotation(title = "CAT_FR_MAE")
+summer_stats_df<-read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
 
-#########SAVE####
+summer_df<- summer_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n_pred > 1300 & n > 20)
+
+summer_r2<-summer_df %>%
+  boxplot(., "r2") +
+  labs(title = "summer_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_Bias<- summer_df %>%
+  boxplot(., "Bias") +
+  labs(title = "summer_Bias") +
+  ylim(-60,60)
+
+summer_MAE<-summer_df %>%
+  boxplot(., "MAE") +
+  labs(title = "summer_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+summer_CAT_r2<-summer_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "summer_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_CAT_Bias<- summer_df %>% 
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "summer_CAT_Bias") +
+  ylim(-60,60)
+
+summer_CAT_MAE<-summer_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "summer_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+summer_FR_r2<-summer_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "summer_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_FR_Bias<- summer_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "Bias") +
+  labs(title = "summer_FR_Bias") +
+  ylim(-60,60)
+
+summer_FR_MAE<-summer_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "summer_FR_MAE") +
+  ylim(0,60)
+
+##OUTLIER DATA####
+
+outlier_stats_df<-read.csv("data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_STATS.csv")
+
+outlier_df<- outlier_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n_pred > 4000 & n > 20)
+
+outlier_r2<-outlier_df %>%
+  boxplot(., "r2") +
+  labs(title = "outlier_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier_Bias<- outlier_df %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier_Bias") +
+  ylim(-60,60)
+
+outlier_MAE<-outlier_df %>%
+  boxplot(., "MAE") +
+  labs(title = "outlier_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+outlier_CAT_r2<-outlier_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier_CAT_Bias<- outlier_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier_CAT_Bias") +
+  ylim(-60,60)
+
+outlier_CAT_MAE<-outlier_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+outlier_FR_r2<-outlier_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier_FR_Bias<- outlier_df %>%
+  filter(SOURCE == "FR") %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier_FR_Bias") +
+  ylim(-60,60)
+
+outlier_FR_MAE<-outlier_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier_FR_MAE") +
+  ylim(0,60)
+
+###SAVE####
 
 plots <- list(
-  A_r2 = r2,
-  A_Bias = Bias,
-  A_MAE = MAE,
-  #A_r2_bias_MAE = r2_bias_MAE,
-  B_CAT_r2 = CAT_r2,
-  B_CAT_Bias = CAT_Bias,
-  B_CAT_MAE = CAT_MAE,
-  #B_CAT_r2_bias_MAE = CAT_r2_bias_MAE,
-  C_FR_r2 = FR_r2,
-  C_FR_Bias = FR_Bias,
-  C_FR_MAE = FR_MAE,
-  #C_FR_r2_bias_MAE = FR_r2_bias_MAE,
-  #D_CAT_FR_r2 = CAT_FR_r2,
-  #D_CAT_FR_Bias = CAT_FR_Bias,
-  #D_CAT_FR_MAE = CAT_FR_MAE
+  r2 = r2,
+  Bias = Bias,
+  MAE = MAE,
+  CAT_r2 = CAT_r2,
+  CAT_Bias = CAT_Bias,
+  CAT_MAE = CAT_MAE,
+  FR_r2 = FR_r2,
+  FR_Bias = FR_Bias,
+  FR_MAE = FR_MAE,
+  summer_r2 = summer_r2,
+  summer_Bias = summer_Bias,
+  summer_MAE = summer_MAE,
+  summer_CAT_r2 = summer_CAT_r2,
+  summer_CAT_Bias = summer_CAT_Bias,
+  summer_CAT_MAE = summer_CAT_MAE,
+  summer_FR_r2 = summer_FR_r2,
+  summer_FR_Bias = summer_FR_Bias,
+  summer_FR_MAE = summer_FR_MAE,
+  outlier_r2 = outlier_r2,
+  outlier_Bias = outlier_Bias,
+  outlier_MAE = outlier_MAE,
+  outlier_CAT_r2 = outlier_CAT_r2,
+  outlier_CAT_Bias = outlier_CAT_Bias,
+  outlier_CAT_MAE = outlier_CAT_MAE,
+  outlier_FR_r2 = outlier_FR_r2,
+  outlier_FR_Bias = outlier_FR_Bias,
+  outlier_FR_MAE = outlier_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/ALL/")
-#dir<-c("data/STATS_PLOTS/SUMMER/")
+dir<-c("data/STATS_PLOTS/")
 
 for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
 
+###MERGED PLOTS####
 
-# #####ONLY ROSMARINUS##########################
-# 
-# #ALL
-# 
-# ROS_r2<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   boxplot(., "r2") +
-#   labs(title = "ROS_r2") +
-#   ylim(0,1)
-# 
-# ROS_Bias<- df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   boxplot(., "Bias") +
-#   labs(title = "ROS_Bias") +
-#   ylim(-60,60)
-# 
-# ROS_MAE<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   boxplot(., "MAE") +
-#   labs(title = "ROS_MAE") +
-#   ylim(0,60)
-# 
-# ###CAT
-# 
-# ROS_CAT_r2<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "CAT") %>% 
-#   boxplot(., "r2") +
-#   labs(title = "ROS_CAT_r2") +
-#   ylim(0,1)
-# 
-# 
-# ROS_CAT_Bias<- df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "CAT") %>% 
-#   boxplot(., "Bias") +
-#   labs(title = "ROS_CAT_Bias") +
-#   ylim(-60,60)
-# 
-# ROS_CAT_MAE<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "CAT") %>% 
-#   boxplot(., "MAE") +
-#   labs(title = "ROS_CAT_MAE") +
-#   ylim(0,60)
-# 
-# ###FR
-# 
-# ROS_FR_r2<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "FR") %>% 
-#   boxplot(., "r2") +
-#   labs(title = "ROS_FR_r2") +
-#   ylim(0,1)
-# 
-# 
-# ROS_FR_Bias<- df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "FR") %>% 
-#   boxplot(., "Bias") +
-#   labs(title = "ROS_FR_Bias") +
-#   ylim(-60,60)
-# 
-# ROS_FR_MAE<-df %>%
-#   filter(SP == "Rosmarinus officinalis") %>% 
-#   filter(SOURCE == "FR") %>% 
-#   boxplot(., "MAE") +
-#   labs(title = "ROS_FR_MAE") +
-#   ylim(0,60)
-# 
-# ######COMBINED PLOTS####
-# 
-# ROS_r2_bias_MAE<-(
-#   (ROS_r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (ROS_Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank()))
-#   /
-#     (ROS_MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank()))
-# ) + plot_annotation(title = "ROS_r2_bias_MAE")
-# 
-# ROS_CAT_r2_bias_MAE<-(
-#   (ROS_CAT_r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (ROS_CAT_Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank()))
-#   /
-#     (ROS_CAT_MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank()))
-# ) + plot_annotation(title = "ROS_CAT_r2_bias_MAE")
-# 
-# ROS_FR_r2_bias_MAE<-(
-#   (ROS_FR_r2 + 
-#      theme(legend.position = "none"))
-#   /
-#     (ROS_FR_Bias + 
-#        theme(legend.position = "none",
-#              strip.background = element_blank(),
-#              strip.text = element_blank()))
-#   /
-#     (ROS_FR_MAE + 
-#        theme(strip.background = element_blank(), 
-#              strip.text = element_blank()))
-# ) + plot_annotation(title = "ROS_FR_r2_bias_MAE")
-# 
-# ROS_CAT_FR_r2<-(
-#   (ROS_CAT_r2 + 
-#      theme(legend.position = "none"))
-#   / 
-#     (ROS_FR_r2)
-# ) + plot_annotation(title = "ROS_CAT_FR_r2")
-# 
-# ROS_CAT_FR_Bias<-(
-#   (ROS_CAT_Bias + 
-#      theme(legend.position = "none"))
-#   / 
-#     (ROS_FR_Bias)
-# ) + plot_annotation(title = "ROS_CAT_FR_Bias")
-# 
-# ROS_CAT_FR_MAE<-(
-#   (ROS_CAT_MAE + 
-#      theme(legend.position = "none"))
-#   / 
-#     (ROS_FR_MAE)
-# ) + plot_annotation(title = "ROS_CAT_FR_MAE")
-# 
-# 
-# plots <- list(
-#   A_ROS_r2 = ROS_r2,
-#   A_ROS_Bias = ROS_Bias,
-#   A_ROS_MAE = ROS_MAE,
-#   A_ROS_r2_bias_MAE = ROS_r2_bias_MAE,
-#   B_ROS_CAT_r2 = ROS_CAT_r2,
-#   B_ROS_CAT_Bias = ROS_CAT_Bias,
-#   B_ROS_CAT_MAE = ROS_CAT_MAE,
-#   B_ROS_CAT_r2_bias_MAE = ROS_CAT_r2_bias_MAE,
-#   C_ROS_FR_r2 = ROS_FR_r2,
-#   C_ROS_FR_Bias = ROS_FR_Bias,
-#   C_ROS_FR_MAE = ROS_FR_MAE,
-#   C_ROS_FR_r2_bias_MAE = ROS_FR_r2_bias_MAE,
-#   D_ROS_CAT_FR_r2 = ROS_CAT_FR_r2,
-#   D_ROS_CAT_FR_Bias = ROS_CAT_FR_Bias,
-#   D_ROS_CAT_FR_MAE = ROS_CAT_FR_MAE
-# )
-# 
-# dir<-c("data/STATS_PLOTS/ROS/")
-# #dir<-c("data/STATS_PLOTS/SUMMER/ROS/")
-# 
-# for (i in names(plots)) {
-#   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
-# }
+all_r2<-(
+  (r2 +
+     theme(legend.position = "none"))
+  /
+    (summer_r2 +
+       theme(legend.position = "none",
+             strip.background = element_blank(),
+             strip.text = element_blank()))
+  /
+    (outlier_r2 +
+       theme(strip.background = element_blank(),
+             strip.text = element_blank()))
+) + plot_annotation(title = "all_r2")
+
+
+
+all_Bias<-(
+  (Bias +
+     theme(legend.position = "none"))
+  /
+    (summer_Bias +
+       theme(legend.position = "none",
+             strip.background = element_blank(),
+             strip.text = element_blank()))
+  /
+    (outlier_Bias +
+       theme(strip.background = element_blank(),
+             strip.text = element_blank()))
+) + plot_annotation(title = "all_Bias")
+
+all_MAE<-(
+  (MAE +
+     theme(legend.position = "none"))
+  /
+    (summer_MAE +
+       theme(legend.position = "none",
+             strip.background = element_blank(),
+             strip.text = element_blank()))
+  /
+    (outlier_MAE +
+       theme(strip.background = element_blank(),
+             strip.text = element_blank()))
+) + plot_annotation(title = "all_MAE")
+
+###SAVE####
+
+all_plots <- list(
+  all_r2 = all_r2,
+  all_Bias = all_Bias,
+  all_MAE = all_MAE
+)
+
+dir<-c("data/STATS_PLOTS/ALL/")
+
+for (i in names(all_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = all_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+
+###ONLY ROSMARINUS####
+
+##ALL DATA####
+
+ROS_r2<-df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "r2") +
+  labs(title = "ROS_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+ROS_Bias<- df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "Bias") +
+  labs(title = "ROS_Bias") +
+  ylim(-60,60)
+
+ROS_MAE<-df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "MAE") +
+  labs(title = "ROS_MAE") +
+  ylim(0,60)
+
+###SUMMER####
+
+summer_ROS_r2<-summer_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "r2") +
+  labs(title = "summer_ROS_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_ROS_Bias<- summer_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "Bias") +
+  labs(title = "summer_ROS_Bias") +
+  ylim(-60,60)
+
+summer_ROS_MAE<-summer_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "MAE") +
+  labs(title = "summer_ROS_MAE") +
+  ylim(0,60)
+
+
+###OUTLIER####
+
+outlier_ROS_r2<-outlier_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "r2") +
+  labs(title = "outlier_ROS_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier_ROS_Bias<- outlier_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier_ROS_Bias") +
+  ylim(-60,60)
+
+outlier_ROS_MAE<-outlier_df %>%
+  filter(SP == "Rosmarinus officinalis") %>%
+  boxplot(., "MAE") +
+  labs(title = "outlier_ROS_MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+ROS_plots <- list(
+  ROS_r2 = ROS_r2,
+  ROS_Bias = ROS_Bias,
+  ROS_MAE = ROS_MAE,
+  summer_ROS_r2 = summer_ROS_r2,
+  summer_ROS_Bias = summer_ROS_Bias,
+  summer_ROS_MAE = summer_ROS_MAE,
+  outlier_ROS_r2 = outlier_ROS_r2,
+  outlier_ROS_Bias = outlier_ROS_Bias,
+  outlier_ROS_MAE = outlier_ROS_MAE
+)
+
+dir<-c("data/STATS_PLOTS/ROS/")
+
+for (i in names(ROS_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = ROS_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+
