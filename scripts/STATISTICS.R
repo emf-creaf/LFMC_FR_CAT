@@ -58,8 +58,8 @@ for (i in 1:length(files_path2)) {
 
 ##SINGLE FILE#########
 
-file<-read.csv("data/PLOTS_SIMULATIONS/Badalona/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE.csv")
-simulations<-list("Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE" = file)
+# file<-read.csv("data/PLOTS_SIMULATIONS/Badalona/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE.csv")
+# simulations<-list("Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE" = file)
 
 ######EVALSTATS########
 
@@ -100,7 +100,7 @@ evalstats <- function(obs, pred) {
 
 #####################EVALUATION STATISTICS######################################
 
-process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL") {
+process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
   SIMULATION$date <- as.Date(SIMULATION$date)
   
   split <- strsplit(FILENAME, "_")[[1]]
@@ -150,13 +150,29 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL") {
   if (DF_TYPE == "outlier") {
     med <- median(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #median 
     mad <- mad(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #Median absolute deviation
-    threshold <- 3 * mad
+    threshold <- TH * mad
     
-    #create  "is_outlier" column and 
+    MERGED_LFMC_ALL_OUTLIER <- MERGED_LFMC_ALL %>%
+      mutate(is_outlier = (LFMC.MEASURED > (med + threshold)) | (LFMC.MEASURED < (med - threshold)))
+    
     MERGED_LFMC_ALL <- MERGED_LFMC_ALL %>%
       mutate(is_outlier = (LFMC.MEASURED > (med + threshold)) | (LFMC.MEASURED < (med - threshold))) %>%
       mutate(LFMC.MEASURED = ifelse(is_outlier, NA, LFMC.MEASURED)) 
       
+  }
+  
+  if (DF_TYPE == "outlier_top") {
+    med <- median(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #median 
+    mad <- mad(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #Median absolute deviation
+    threshold <- TH * mad
+    
+    MERGED_LFMC_ALL_OUTLIER <- MERGED_LFMC_ALL %>% 
+      mutate(is_outlier = (LFMC.MEASURED > (med + threshold)))
+    
+    MERGED_LFMC_ALL <- MERGED_LFMC_ALL %>% 
+      mutate(is_outlier = (LFMC.MEASURED > (med + threshold))) %>% 
+      mutate(LFMC.MEASURED = ifelse(is_outlier, NA, LFMC.MEASURED))
+  
   }
   
   result_M <- data.frame(
@@ -187,23 +203,29 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL") {
   
   result <- rbind(result_M, result_R)
   
+  if (DF_TYPE == "outlier" | DF_TYPE == "outlier_top") {
+    return(list(result = result, merged_data = MERGED_LFMC_ALL_OUTLIER))
+  } else {
   return(list(result = result, merged_data = MERGED_LFMC_ALL))
+  }
 }
 
 
-process_all_simulations <- function(SIMULATIONS, DATA_TYPE) {
+process_all_simulations <- function(SIMULATIONS, DATA_TYPE, TH) {
   stats_df <- data.frame()
   data_list <- list()
   
   for (i in 1:length(SIMULATIONS)) {
     filename <- names(SIMULATIONS[i])
-    result <- process_simulation(SIMULATION = SIMULATIONS[[i]], FILENAME = filename, DF_TYPE = DATA_TYPE)
+    result <- process_simulation(SIMULATION = SIMULATIONS[[i]], FILENAME = filename, DF_TYPE = DATA_TYPE, TH)
     stats_df <- rbind(stats_df, result$result)
     data_list[[i]] <- result$merged_data
     if (DATA_TYPE == "summer") {
       names(data_list)[i] <- paste0(filename, "_SUMMER")
     } else if (DATA_TYPE == "outlier") {
-      names(data_list)[i] <- paste0(filename, "_OUTLIER")
+      names(data_list)[i] <- paste0(filename, "_OUTLIER_", TH)
+    } else if (DATA_TYPE == "outlier_top") {
+      names(data_list)[i] <- paste0(filename, "_OUTLIER_TOP_", TH)
     } else {
       names(data_list)[i] <- filename
     }
@@ -214,47 +236,103 @@ process_all_simulations <- function(SIMULATIONS, DATA_TYPE) {
 
 data<- process_all_simulations(simulations, DATA_TYPE = "all")
 summer_data<- process_all_simulations(simulations, DATA_TYPE = "summer")
-outlier_data<- process_all_simulations(simulations, DATA_TYPE = "outlier")
+outlier3_data<- process_all_simulations(simulations, DATA_TYPE = "outlier", TH = 3)
+outlier3_top_data<- process_all_simulations(simulations, DATA_TYPE = "outlier_top", TH = 3)
+outlier2.5_data<- process_all_simulations(simulations, DATA_TYPE = "outlier", TH = 2.5)
+outlier2.5_top_data<- process_all_simulations(simulations, DATA_TYPE = "outlier_top", TH = 2.5)
 
 stats_df<-data$stats_df %>% 
   arrange(LFMC_TYPE)
 summer_stats_df<-summer_data$stats_df %>% 
   arrange(LFMC_TYPE)
-outlier_stats_df<-outlier_data$stats_df %>% 
+outlier3_stats_df<-outlier3_data$stats_df %>% 
+  arrange(LFMC_TYPE)
+outlier3_top_stats_df<-outlier3_top_data$stats_df %>% 
+  arrange(LFMC_TYPE)
+outlier2.5_stats_df<-outlier2.5_data$stats_df %>%
+  arrange(LFMC_TYPE)
+outlier2.5_top_stats_df<-outlier2.5_top_data$stats_df %>% 
   arrange(LFMC_TYPE)
 
-# dir.create("data/SIMULATIONS_DF/", showWarnings = F)
-# write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
-# write.csv(summer_stats_df, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv", row.names = F)
-# write.csv(outlier_stats_df, "data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_STATS.csv", row.names = F)
+
+dir.create("data/SIMULATIONS_DF/", showWarnings = F)
+write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
+write.csv(summer_stats_df, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier3_stats_df, "data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier3_top_stats_df, "data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier2.5_stats_df, "data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier2.5_top_stats_df, "data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv", row.names = F)
 
 
 data_list<-data$data_list
 summer_data_list<-summer_data$data_list
-outlie_data_list<-outlier_data$data_list
+outlier3_data_list<-outlier3_data$data_list
+outlier3_top_data_list<-outlier3_top_data$data_list
+outlier2.5_data_list<-outlier2.5_data$data_list
+outlier2.5_top_data_list<-outlier2.5_top_data$data_list
 
-#saveRDS(data_list, "data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
-#saveRDS(summer_data_list, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
-#saveRDS(outlie_data_list, "data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_DATA_LIST.rds")
+
+saveRDS(data_list, "data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
+saveRDS(summer_data_list, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier3_data_list, "data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier3_top_data_list, "data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier2.5_data_list, "data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier2.5_top_data_list, "data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
+
+
+#load saved data####
+
+stats_df<- read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+summer_stats_df<- read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
+outlier3_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv")
+outlier3_top_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv")
+outlier2.5_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv")
+outlier2.5_top_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv")
+
+
+data_list<- readRDS("data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
+summer_data_list<- readRDS("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
+outlier3_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
+outlier3_top_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
+outlier2.5_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
+outlier2.5_top_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
+
 #####################PLOTS######################################################
 
-func_time_plot <- function(DATA_LIST) {
+func_time_plot <- function(DATA_LIST, mark_outlier = FALSE) {
   time_plot <- list()
   
   for (i in seq_along(DATA_LIST)) {
-    time_p <- ggplot(data = DATA_LIST[[i]], aes(x = date)) +
-      geom_line(aes(y = LFMC.MODELED, colour = "LFMC.MODELED")) +
-      geom_line(aes(y = LFMC_rodrigo, colour = "LFMC.RODRIGO")) +
-      geom_point(aes(y = LFMC.MEASURED, colour = "LFMC.MEASURED")) +
-      geom_line(data = na.omit(DATA_LIST[[i]]), aes(y = LFMC.MEASURED, colour = "LFMC.MEASURED")) +
-      scale_color_manual(values = c("LFMC.MODELED" = "black", "LFMC.RODRIGO" = "blue", "LFMC.MEASURED" = "red")) +
-      theme_classic() +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
-      xlab("DATE") +
-      ylab("LFMC") +
-      labs(title = names(DATA_LIST)[i]) +
-      scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
-      scale_y_continuous(limits = c(0, 200))
+    if (mark_outlier) {
+      time_p <- ggplot(data = DATA_LIST[[i]], aes(x = date)) +
+        geom_line(aes(y = LFMC.MODELED, colour = "LFMC.MODELED")) +
+        geom_line(aes(y = LFMC_rodrigo, colour = "LFMC.RODRIGO")) +
+        geom_point(aes(y = LFMC.MEASURED, colour = is_outlier)) +
+        geom_line(data = DATA_LIST[[i]] %>% filter(!is_outlier) %>% na.omit(), aes(y = LFMC.MEASURED, colour = "LFMC.MEASURED")) +
+        scale_color_manual(values = c("LFMC.MODELED" = "black", "LFMC.RODRIGO" = "blue", "LFMC.MEASURED" = "red", "FALSE" = "red", "TRUE" = "green")) +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlab("DATE") +
+        ylab("LFMC") +
+        labs(title = names(DATA_LIST)[i]) +
+        scale_x_date(date_breaks = "1 year", date_labels = "%Y") 
+      #scale_y_continuous(limits = c(0, 200))
+      
+    } else {
+      time_p <- ggplot(data = DATA_LIST[[i]], aes(x = date)) +
+        geom_line(aes(y = LFMC.MODELED, colour = "LFMC.MODELED")) +
+        geom_line(aes(y = LFMC_rodrigo, colour = "LFMC.RODRIGO")) +
+        geom_point(aes(y = LFMC.MEASURED, colour = "LFMC.MEASURED")) +
+        geom_line(data = na.omit(DATA_LIST[[i]]), aes(y = LFMC.MEASURED, colour = "LFMC.MEASURED")) +
+        scale_color_manual(values = c("LFMC.MODELED" = "black", "LFMC.RODRIGO" = "blue", "LFMC.MEASURED" = "red")) +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlab("DATE") +
+        ylab("LFMC") +
+        labs(title = names(DATA_LIST)[i]) +
+        scale_x_date(date_breaks = "1 year", date_labels = "%Y") 
+      #scale_y_continuous(limits = c(0, 200))
+    }
     
     time_plot[[i]] <- time_p
     names(time_plot)[i] <- names(DATA_LIST)[i]
@@ -263,19 +341,32 @@ func_time_plot <- function(DATA_LIST) {
   return(time_plot)
 }
 
-func_scatter_plot <- function(DATA_LIST) {
+func_scatter_plot <- function(DATA_LIST, mark_outlier = FALSE) {
   scatter_plot <- list()
   
   for (i in seq_along(DATA_LIST)) {
-    scatter_p <- ggplot(data = DATA_LIST[[i]], aes(x = LFMC.MODELED, y = LFMC.MEASURED)) +
-      geom_point() +
-      stat_smooth(method = "lm") +
-      theme_classic() +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
-      xlim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
-      ylim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
-      geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
-      labs(title = names(DATA_LIST)[i])
+    if (mark_outlier) {
+      scatter_p <- ggplot(data = DATA_LIST[[i]], aes(x = LFMC.MODELED, y = LFMC.MEASURED)) +
+        geom_point(aes(colour = is_outlier)) +
+        stat_smooth(method = "lm") +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        ylim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+        scale_color_manual(values = c("FALSE" = "black", "TRUE" = "red")) +
+        labs(title = names(DATA_LIST)[i])
+    } else {
+      scatter_p <- ggplot(data = na.omit(DATA_LIST[[i]]), aes(x = LFMC.MODELED, y = LFMC.MEASURED)) +
+        geom_point() +
+        stat_smooth(method = "lm") +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        ylim(c(0, max(max(DATA_LIST[[i]]$LFMC.MODELED, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+        labs(title = names(DATA_LIST)[i])
+    }
     
     scatter_plot[[i]] <- scatter_p
     names(scatter_plot)[i] <- names(DATA_LIST)[i]
@@ -284,19 +375,32 @@ func_scatter_plot <- function(DATA_LIST) {
   return(scatter_plot)
 }
 
-func_scatter_plotR <- function(DATA_LIST) {
+func_scatter_plotR <- function(DATA_LIST, mark_outlier = FALSE) {
   scatter_plotR <- list()
   
   for (i in seq_along(DATA_LIST)) {
-    scatter_pR <- ggplot(data = DATA_LIST[[i]], aes(x = LFMC_rodrigo, y = LFMC.MEASURED)) +
-      geom_point() +
-      stat_smooth(method = "lm") +
-      theme_classic() +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
-      xlim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
-      ylim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
-      geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
-      labs(title = names(DATA_LIST)[i])
+    if (mark_outlier) {
+      scatter_pR <- ggplot(data = DATA_LIST[[i]], aes(x = LFMC_rodrigo, y = LFMC.MEASURED)) +
+        geom_point(aes(colour = is_outlier)) +
+        stat_smooth(method = "lm") +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        ylim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+        scale_color_manual(values = c("FALSE" = "black", "TRUE" = "red")) +
+        labs(title = names(DATA_LIST)[i])
+    } else {
+      scatter_pR <- ggplot(data = na.omit(DATA_LIST[[i]]), aes(x = LFMC_rodrigo, y = LFMC.MEASURED)) +
+        geom_point() +
+        stat_smooth(method = "lm") +
+        theme_classic() +
+        theme(legend.position = "bottom", legend.title = element_blank()) +
+        xlim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        ylim(c(0, max(max(DATA_LIST[[i]]$LFMC_rodrigo, na.rm = TRUE), max(DATA_LIST[[i]]$LFMC.MEASURED, na.rm = TRUE), na.rm = TRUE))) +
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+        labs(title = names(DATA_LIST)[i])
+    }
     
     scatter_plotR[[i]] <- scatter_pR
     names(scatter_plotR)[i] <- names(DATA_LIST)[i]
@@ -305,17 +409,29 @@ func_scatter_plotR <- function(DATA_LIST) {
   return(scatter_plotR)
 }
 
-time_plot<-func_time_plot(data_list)
-scatter_plot<-func_scatter_plot(data_list)
-scatter_plotR<-func_scatter_plotR(data_list)
+time_plot<-func_time_plot(data_list, mark_outlier = FALSE)
+scatter_plot<-func_scatter_plot(data_list, mark_outlier = FALSE)
+scatter_plotR<-func_scatter_plotR(data_list, mark_outlier = FALSE)
 
-# summer_time_plot<-func_time_plot(summer_data_list)
-# summer_scatter_plot<-func_scatter_plot(summer_data_list)
-# summer_scatter_plotR<-func_scatter_plotR(summer_data_list)
+summer_time_plot<-func_time_plot(summer_data_list, mark_outlier = FALSE)
+summer_scatter_plot<-func_scatter_plot(summer_data_list, mark_outlier = FALSE)
+summer_scatter_plotR<-func_scatter_plotR(summer_data_list, mark_outlier = FALSE)
 
-#################################SAVE ALL THE SIMULATIONS STATISTICS AS .RData####
+outlier3_time_plot<-func_time_plot(outlier3_data_list, mark_outlier = TRUE)
+outlier3_scatter_plot<-func_scatter_plot(outlier3_data_list, mark_outlier = TRUE)
+outlier3_scatter_plotR<-func_scatter_plotR(outlier3_data_list, mark_outlier = TRUE)
 
-#rm(list = setdiff(ls(),c("stats_df_MEASURED_MODELED","data_list","sim_list", "scatter_plot", "time_plot")))
+outlier3_top_time_plot<-func_time_plot(outlier3_top_data_list, mark_outlier = TRUE)
+outlier3_top_scatter_plot<-func_scatter_plot(outlier3_top_data_list, mark_outlier = TRUE)
+outlier3_top_scatter_plotR<-func_scatter_plotR(outlier3_top_data_list, mark_outlier = TRUE)
+
+outlier2.5_time_plot<-func_time_plot(outlier2.5_data_list, mark_outlier = TRUE)
+outlier2.5_scatter_plot<-func_scatter_plot(outlier2.5_data_list, mark_outlier = TRUE)
+outlier2.5_scatter_plotR<-func_scatter_plotR(outlier2.5_data_list, mark_outlier = TRUE)
+
+outlier2.5_top_time_plot<-func_time_plot(outlier2.5_top_data_list, mark_outlier = TRUE)
+outlier2.5_top_scatter_plot<-func_scatter_plot(outlier2.5_top_data_list, mark_outlier = TRUE)
+outlier2.5_top_scatter_plotR<-func_scatter_plotR(outlier2.5_top_data_list, mark_outlier = TRUE)
 
 #####################DISPLAY PLOTS##############################################
 
@@ -326,20 +442,23 @@ plots_site_sp<-function(index,TIME_PLOT,SCATTER_PLOT,SCATTER_PLOTR,STATS_DF){
   p3 <- SCATTER_PLOTR[[index]] + labs(title = NULL)
   
   t1 <- ggtexttable(round(STATS_DF[index, 11:21],3), rows = NULL, theme = ttheme("light"))
-  t2 <- ggtexttable(round(STATS_DF[(index+length(time_plot)), 11:21],3), rows = NULL, theme = ttheme("light"))
+  t2 <- ggtexttable(round(STATS_DF[(index+length(TIME_PLOT)), 11:21],3), rows = NULL, theme = ttheme("light"))
   
   #t1 <- ggtexttable(round(summer_stats_df[index, 11:21],3), rows = NULL, theme = ttheme("light"))
   #t2 <- ggtexttable(round(summer_stats_df[(index+length(time_plot)), 11:21],3), rows = NULL, theme = ttheme("light"))
   
   plot_design <- p1 / (p2 | p3) / (t1 | t2) +
     plot_layout(heights = c(0.35, 0.55, 0.1)) +
-    plot_annotation(title = gsub(".csv", "", names(scatter_plot)[index]))
+    plot_annotation(title = gsub(".csv", "", names(SCATTER_PLOT)[index]))
 }
 
-print(plots_site_sp(1,time_plot,scatter_plot,scatter_plotR,stats_df))
+# print(plots_site_sp(1,time_plot,scatter_plot,scatter_plotR,stats_df))
+# print(plots_site_sp(1,summer_time_plot,summer_scatter_plot,summer_scatter_plotR,summer_stats_df))
+# print(plots_site_sp(1,outlier_time_plot,outlier_scatter_plot,outlier_scatter_plotR,outlier_stats_df))
+# print(plots_site_sp(1,outlier_top_time_plot,outlier_top_scatter_plot,outlier_top_scatter_plotR,outlier_top_stats_df))
 
-dir<-c("data/SIMULATIONS_PLOTS/")
-#dir<-c("data/SIMULATIONS_PLOTS/SUMMER/")
+dir<-c("data/SIMULATIONS_PLOTS/ALL/")
+dir.create(dir, showWarnings = FALSE)
 
 for (i in 1:length(time_plot)) {
   plot<-plots_site_sp(i,time_plot,scatter_plot,scatter_plotR,stats_df)
@@ -347,17 +466,54 @@ for (i in 1:length(time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-# for (i in 1:length(summer_time_plot)) {
-#   plot<-plots_site_sp(i,summer_time_plot,summer_scatter_plot,summer_scatter_plotR,summer_stats_df)
-#   plotname<-gsub(".csv", "", names(summer_time_plot[i]))
-#   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
-# }
+dir<-c("data/SIMULATIONS_PLOTS/SUMMER/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in 1:length(summer_time_plot)) {
+  plot<-plots_site_sp(i,summer_time_plot,summer_scatter_plot,summer_scatter_plotR,summer_stats_df)
+  plotname<-gsub(".csv", "", names(summer_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
+dir<-c("data/SIMULATIONS_PLOTS/OUTLIER3/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in 1:length(outlier3_time_plot)) {
+  plot<-plots_site_sp(i,outlier3_time_plot,outlier3_scatter_plot,outlier3_scatter_plotR,outlier3_stats_df)
+  plotname<-gsub(".csv", "", names(outlier3_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
+dir<-c("data/SIMULATIONS_PLOTS/OUTLIER3_TOP/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in 1:length(outlier3_top_time_plot)) {
+  plot<-plots_site_sp(i,outlier3_top_time_plot,outlier3_top_scatter_plot,outlier3_top_scatter_plotR,outlier3_top_stats_df)
+  plotname<-gsub(".csv", "", names(outlier3_top_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
+dir<-c("data/SIMULATIONS_PLOTS/OUTLIER2.5/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in 1:length(outlier2.5_time_plot)) {
+  plot<-plots_site_sp(i,outlier2.5_time_plot,outlier2.5_scatter_plot,outlier2.5_scatter_plotR,outlier2.5_stats_df)
+  plotname<-gsub(".csv", "", names(outlier2.5_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
+dir<-c("data/SIMULATIONS_PLOTS/OUTLIER2.5_TOP/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in 1:length(outlier2.5_top_time_plot)) {
+  plot<-plots_site_sp(i,outlier2.5_top_time_plot,outlier2.5_top_scatter_plot,outlier2.5_top_scatter_plotR,outlier2.5_top_stats_df)
+  plotname<-gsub(".csv", "", names(outlier2.5_top_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
 
 #################SECOND LEVEL ANALISIS #################################################################  
 
 stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
-
-#stats_df2<-read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
 
 plot<-stats_df %>%
   mutate(death = n_pred < 4000) %>%
@@ -401,27 +557,18 @@ plots <- list(
 )
 
 dir<-c("data/STATS_PLOTS/SIM/")
+dir.create(dir, showWarnings = FALSE)
 
 for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
 
 ##########BOXPLOTS######################################################################
-stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
 
-df<- stats_df %>% 
-  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
-         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
-         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
-         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
-  filter(n_pred > 4000 & n > 20)
-
-boxplot <- function(DF, yy, nest_levels = c("LAI","METEO","SOIL")) {
-  ggplot(DF, aes(x = LFMC_TYPE, y = .data[[yy]], color = LFMC_TYPE)) +
-    geom_boxplot() +
+boxplot <- function(DF, yy, facet = TRUE, nest_levels = c("LAI","METEO","SOIL")) {
+  g <- ggplot(DF, aes(x = LFMC_TYPE, y = .data[[yy]], color = LFMC_TYPE)) +
+    geom_boxplot(outliers = FALSE) +
     geom_jitter(alpha = 0.3) +
-    #facet_nested(~ LAI + METEO + SOIL, labeller=label_both) +
-    facet_nested(as.formula(paste("~", paste(nest_levels, collapse = " + "))), labeller = label_both) +
     theme_classic() +
     theme(
       legend.position = "bottom",
@@ -441,40 +588,166 @@ boxplot <- function(DF, yy, nest_levels = c("LAI","METEO","SOIL")) {
       vjust = -0.5,
       color = "black"
     )
+  
+  if (facet) {
+    g <- g + facet_nested(as.formula(paste("~", paste(nest_levels, collapse = " + "))), labeller = label_both)
+  }
+  
+  return(g)
 }
 
 #ALL DATA####
 
-r2<-df %>%
+stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+
+stats_df<- stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
+
+r2<-stats_df %>%
   boxplot(., "r2") +
   labs(title = "r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-Bias<- df %>%
+Bias<-stats_df %>%
   boxplot(., "Bias") +
   labs(title = "Bias") +
   ylim(-60,60)
 
-MAE<-df %>%
+MAE<-stats_df %>%
   boxplot(., "MAE") +
   labs(title = "MAE") +
   ylim(0,60)
 
+###SAVE PLOTS####
+
+plots <- list(
+  r2 = r2,
+  Bias = Bias,
+  MAE = MAE
+)
+
+dir<-c("data/STATS_PLOTS/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+###DIFERENT FACETING DATA####
+
+#LFMC TYPE####
+
+R2_LFMC<-stats_df %>%
+  boxplot(., "r2", facet = FALSE) +
+  labs(title = "R2_LFMC") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+Bias_LFMC<-stats_df %>%
+  boxplot(., "Bias", facet = FALSE) +
+  labs(title = "Bias_LFMC") +
+  ylim(-60,60)
+
+MAE_LFMC<-stats_df %>%
+  boxplot(., "MAE", facet = FALSE) +
+  labs(title = "MAE_LFMC") +
+  ylim(0,60)
+
+#ONLY LAI####
+
+R2_LAI<-stats_df %>%
+  boxplot(., "r2", nest_levels = c("LAI")) +
+  labs(title = "R2_LAI") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+Bias_LAI<-stats_df %>%
+  boxplot(., "Bias", nest_levels = c("LAI")) +
+  labs(title = "Bias_LAI") +
+  ylim(-60,60)
+
+MAE_LAI<-stats_df %>%
+  boxplot(., "MAE", nest_levels = c("LAI")) +
+  labs(title = "MAE_LAI") +
+  ylim(0,60)
+
+#ONLY METEO####
+
+R2_METEO<-stats_df %>%
+  boxplot(., "r2", nest_levels = c("METEO")) +
+  labs(title = "R2_METEO") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+Bias_METEO<-stats_df %>%
+  boxplot(., "Bias", nest_levels = c("METEO")) +
+  labs(title = "Bias_METEO") +
+  ylim(-60,60)
+
+MAE_METEO<-stats_df %>%
+  boxplot(., "MAE", nest_levels = c("METEO")) +
+  labs(title = "MAE_METEO") +
+  ylim(0,60)
+
+#ONLY SOIL####
+
+R2_SOIL<-stats_df %>%
+  boxplot(., "r2", nest_levels = c("SOIL")) +
+  labs(title = "R2_SOIL") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+Bias_SOIL<-stats_df %>%
+  boxplot(., "Bias", nest_levels = c("SOIL")) +
+  labs(title = "Bias_SOIL") +
+  ylim(-60,60)
+
+MAE_SOIL<-stats_df %>%
+  boxplot(., "MAE", nest_levels = c("SOIL")) +
+  labs(title = "MAE_SOIL") +
+  ylim(0,60)
+
+#SAVE PLOTS####
+
+plots <- list(
+  R2_LFMC = R2_LFMC,
+  Bias_LFMC = Bias_LFMC,
+  MAE_LFMC = MAE_LFMC,
+  R2_LAI = R2_LAI,
+  Bias_LAI = Bias_LAI,
+  MAE_LAI = MAE_LAI,
+  R2_METEO = R2_METEO,
+  Bias_METEO = Bias_METEO,
+  MAE_METEO = MAE_METEO,
+  R2_SOIL = R2_SOIL,
+  Bias_SOIL = Bias_SOIL,
+  MAE_SOIL = MAE_SOIL
+)
+
+dir<-c("data/STATS_PLOTS/INDIVIDUAL/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+##CAT AND FR####
+
 ###CAT####
 
-CAT_r2<-df %>%
+CAT_r2<-stats_df %>%
   filter(SOURCE == "CAT") %>% 
   boxplot(., "r2") +
   labs(title = "CAT_r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-CAT_Bias<- df %>%
+CAT_Bias<-stats_df %>%
   filter(SOURCE == "CAT") %>% 
   boxplot(., "Bias") +
   labs(title = "CAT_Bias") +
   ylim(-60,60)
 
-CAT_MAE<-df %>%
+CAT_MAE<-stats_df %>%
   filter(SOURCE == "CAT") %>% 
   boxplot(., "MAE") +
   labs(title = "CAT_MAE") +
@@ -482,27 +755,53 @@ CAT_MAE<-df %>%
 
 ###FR####
 
-FR_r2<-df %>%
+FR_r2<-stats_df %>%
   filter(SOURCE == "FR") %>% 
   boxplot(., "r2") +
   labs(title = "FR_r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-FR_Bias<- df %>%
+FR_Bias<-stats_df %>%
   filter(SOURCE == "FR") %>% 
   boxplot(., "Bias") +
   labs(title = "FR_Bias") +
   ylim(-60,60)
 
-FR_MAE<-df %>%
+FR_MAE<-stats_df %>%
   filter(SOURCE == "FR") %>% 
   boxplot(., "MAE") +
   labs(title = "FR_MAE") +
   ylim(0,60)
 
+
+#SAVE PLOTS####
+
+plots <- list(
+  CAT_r2 = CAT_r2,
+  CAT_Bias = CAT_Bias,
+  CAT_MAE = CAT_MAE,
+  FR_r2 = FR_r2,
+  FR_Bias = FR_Bias,
+  FR_MAE = FR_MAE
+)
+
+dir<-c("data/STATS_PLOTS/CAT_FR/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
 #SUMMER DATA####
 
 summer_stats_df<-read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
+
+summer_stats_df<-summer_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
 
 summer_df<- summer_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -566,84 +865,9 @@ summer_FR_MAE<-summer_df %>%
   labs(title = "summer_FR_MAE") +
   ylim(0,60)
 
-##OUTLIER DATA####
+###SAVE PLOTS####
 
-outlier_stats_df<-read.csv("data/SIMULATIONS_DF/OUTLIER_LFMC_SIM_STATS.csv")
-
-outlier_df<- outlier_stats_df %>% 
-  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
-         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
-         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
-         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
-  filter(n_pred > 4000 & n > 20)
-
-outlier_r2<-outlier_df %>%
-  boxplot(., "r2") +
-  labs(title = "outlier_r2") +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
-
-outlier_Bias<- outlier_df %>%
-  boxplot(., "Bias") +
-  labs(title = "outlier_Bias") +
-  ylim(-60,60)
-
-outlier_MAE<-outlier_df %>%
-  boxplot(., "MAE") +
-  labs(title = "outlier_MAE") +
-  ylim(0,60)
-
-###CAT####
-
-outlier_CAT_r2<-outlier_df %>%
-  filter(SOURCE == "CAT") %>% 
-  boxplot(., "r2") +
-  labs(title = "outlier_CAT_r2") +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
-
-outlier_CAT_Bias<- outlier_df %>%
-  filter(SOURCE == "CAT") %>% 
-  boxplot(., "Bias") +
-  labs(title = "outlier_CAT_Bias") +
-  ylim(-60,60)
-
-outlier_CAT_MAE<-outlier_df %>%
-  filter(SOURCE == "CAT") %>% 
-  boxplot(., "MAE") +
-  labs(title = "outlier_CAT_MAE") +
-  ylim(0,60)
-
-###FR####
-
-outlier_FR_r2<-outlier_df %>%
-  filter(SOURCE == "FR") %>% 
-  boxplot(., "r2") +
-  labs(title = "outlier_FR_r2") +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
-
-outlier_FR_Bias<- outlier_df %>%
-  filter(SOURCE == "FR") %>%
-  boxplot(., "Bias") +
-  labs(title = "outlier_FR_Bias") +
-  ylim(-60,60)
-
-outlier_FR_MAE<-outlier_df %>%
-  filter(SOURCE == "FR") %>% 
-  boxplot(., "MAE") +
-  labs(title = "outlier_FR_MAE") +
-  ylim(0,60)
-
-###SAVE####
-
-plots <- list(
-  r2 = r2,
-  Bias = Bias,
-  MAE = MAE,
-  CAT_r2 = CAT_r2,
-  CAT_Bias = CAT_Bias,
-  CAT_MAE = CAT_MAE,
-  FR_r2 = FR_r2,
-  FR_Bias = FR_Bias,
-  FR_MAE = FR_MAE,
+summer_plots <- list(
   summer_r2 = summer_r2,
   summer_Bias = summer_Bias,
   summer_MAE = summer_MAE,
@@ -652,166 +876,457 @@ plots <- list(
   summer_CAT_MAE = summer_CAT_MAE,
   summer_FR_r2 = summer_FR_r2,
   summer_FR_Bias = summer_FR_Bias,
-  summer_FR_MAE = summer_FR_MAE,
-  outlier_r2 = outlier_r2,
-  outlier_Bias = outlier_Bias,
-  outlier_MAE = outlier_MAE,
-  outlier_CAT_r2 = outlier_CAT_r2,
-  outlier_CAT_Bias = outlier_CAT_Bias,
-  outlier_CAT_MAE = outlier_CAT_MAE,
-  outlier_FR_r2 = outlier_FR_r2,
-  outlier_FR_Bias = outlier_FR_Bias,
-  outlier_FR_MAE = outlier_FR_MAE
+  summer_FR_MAE = summer_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/")
+dir<-c("data/STATS_PLOTS/SUMMER/")
+dir.create(dir, showWarnings = FALSE)
 
-for (i in names(plots)) {
-  ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+for (i in names(summer_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = summer_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
 
-###MERGED PLOTS####
+##outlier3 DATA####
 
-all_r2<-(
-  (r2 +
-     theme(legend.position = "none"))
-  /
-    (summer_r2 +
-       theme(legend.position = "none",
-             strip.background = element_blank(),
-             strip.text = element_blank()))
-  /
-    (outlier_r2 +
-       theme(strip.background = element_blank(),
-             strip.text = element_blank()))
-) + plot_annotation(title = "all_r2")
+outlier3_stats_df<-read.csv("data/SIMULATIONS_DF/outlier3_LFMC_SIM_STATS.csv")
 
+outlier3_df<- outlier3_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
 
-
-all_Bias<-(
-  (Bias +
-     theme(legend.position = "none"))
-  /
-    (summer_Bias +
-       theme(legend.position = "none",
-             strip.background = element_blank(),
-             strip.text = element_blank()))
-  /
-    (outlier_Bias +
-       theme(strip.background = element_blank(),
-             strip.text = element_blank()))
-) + plot_annotation(title = "all_Bias")
-
-all_MAE<-(
-  (MAE +
-     theme(legend.position = "none"))
-  /
-    (summer_MAE +
-       theme(legend.position = "none",
-             strip.background = element_blank(),
-             strip.text = element_blank()))
-  /
-    (outlier_MAE +
-       theme(strip.background = element_blank(),
-             strip.text = element_blank()))
-) + plot_annotation(title = "all_MAE")
-
-###SAVE####
-
-all_plots <- list(
-  all_r2 = all_r2,
-  all_Bias = all_Bias,
-  all_MAE = all_MAE
-)
-
-dir<-c("data/STATS_PLOTS/ALL/")
-
-for (i in names(all_plots)) {
-  ggsave(filename = paste0(dir, i, ".png"), plot = all_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
-}
-
-
-###ONLY ROSMARINUS####
-
-##ALL DATA####
-
-ROS_r2<-df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_r2<-outlier3_df %>%
   boxplot(., "r2") +
-  labs(title = "ROS_r2") +
+  labs(title = "outlier3_r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-ROS_Bias<- df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_Bias<- outlier3_df %>%
   boxplot(., "Bias") +
-  labs(title = "ROS_Bias") +
+  labs(title = "outlier3_Bias") +
   ylim(-60,60)
 
-ROS_MAE<-df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_MAE<-outlier3_df %>%
   boxplot(., "MAE") +
-  labs(title = "ROS_MAE") +
+  labs(title = "outlier3_MAE") +
   ylim(0,60)
 
-###SUMMER####
+###CAT####
 
-summer_ROS_r2<-summer_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_CAT_r2<-outlier3_df %>%
+  filter(SOURCE == "CAT") %>% 
   boxplot(., "r2") +
-  labs(title = "summer_ROS_r2") +
+  labs(title = "outlier3_CAT_r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-summer_ROS_Bias<- summer_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_CAT_Bias<- outlier3_df %>%
+  filter(SOURCE == "CAT") %>% 
   boxplot(., "Bias") +
-  labs(title = "summer_ROS_Bias") +
+  labs(title = "outlier3_CAT_Bias") +
   ylim(-60,60)
 
-summer_ROS_MAE<-summer_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_CAT_MAE<-outlier3_df %>%
+  filter(SOURCE == "CAT") %>% 
   boxplot(., "MAE") +
-  labs(title = "summer_ROS_MAE") +
+  labs(title = "outlier3_CAT_MAE") +
   ylim(0,60)
 
+###FR####
 
-###OUTLIER####
-
-outlier_ROS_r2<-outlier_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_FR_r2<-outlier3_df %>%
+  filter(SOURCE == "FR") %>% 
   boxplot(., "r2") +
-  labs(title = "outlier_ROS_r2") +
+  labs(title = "outlier3_FR_r2") +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
 
-outlier_ROS_Bias<- outlier_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_FR_Bias<- outlier3_df %>%
+  filter(SOURCE == "FR") %>%
   boxplot(., "Bias") +
-  labs(title = "outlier_ROS_Bias") +
+  labs(title = "outlier3_FR_Bias") +
   ylim(-60,60)
 
-outlier_ROS_MAE<-outlier_df %>%
-  filter(SP == "Rosmarinus officinalis") %>%
+outlier3_FR_MAE<-outlier3_df %>%
+  filter(SOURCE == "FR") %>% 
   boxplot(., "MAE") +
-  labs(title = "outlier_ROS_MAE") +
+  labs(title = "outlier3_FR_MAE") +
   ylim(0,60)
 
 ###SAVE####
 
-ROS_plots <- list(
-  ROS_r2 = ROS_r2,
-  ROS_Bias = ROS_Bias,
-  ROS_MAE = ROS_MAE,
-  summer_ROS_r2 = summer_ROS_r2,
-  summer_ROS_Bias = summer_ROS_Bias,
-  summer_ROS_MAE = summer_ROS_MAE,
-  outlier_ROS_r2 = outlier_ROS_r2,
-  outlier_ROS_Bias = outlier_ROS_Bias,
-  outlier_ROS_MAE = outlier_ROS_MAE
+outlier3_plots <- list(
+  outlier3_r2 = outlier3_r2,
+  outlier3_Bias = outlier3_Bias,
+  outlier3_MAE = outlier3_MAE,
+  outlier3_CAT_r2 = outlier3_CAT_r2,
+  outlier3_CAT_Bias = outlier3_CAT_Bias,
+  outlier3_CAT_MAE = outlier3_CAT_MAE,
+  outlier3_FR_r2 = outlier3_FR_r2,
+  outlier3_FR_Bias = outlier3_FR_Bias,
+  outlier3_FR_MAE = outlier3_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/ROS/")
+dir<-c("data/STATS_PLOTS/outlier3/")
+dir.create(dir, showWarnings = FALSE)
 
-for (i in names(ROS_plots)) {
-  ggsave(filename = paste0(dir, i, ".png"), plot = ROS_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+for (i in names(outlier3_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = outlier3_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
 
+#outlier3_TOP DATA####
+
+outlier3_top_stats_df<-read.csv("data/SIMULATIONS_DF/outlier3_TOP_LFMC_SIM_STATS.csv")
+
+outlier3_top_df<- outlier3_top_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
+
+outlier3_top_r2<-outlier3_top_df %>%
+  boxplot(., "r2") +
+  labs(title = "outlier3_top_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier3_top_Bias<- outlier3_top_df %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier3_top_Bias") +
+  ylim(-60,60)
+
+outlier3_top_MAE<-outlier3_top_df %>%
+  boxplot(., "MAE") +
+  labs(title = "outlier3_top_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+outlier3_top_CAT_r2<-outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier3_top_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier3_top_CAT_Bias<- outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier3_top_CAT_Bias") +
+  ylim(-60,60)
+
+outlier3_top_CAT_MAE<-outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier3_top_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+outlier3_top_FR_r2<-outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier3_top_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier3_top_FR_Bias<- outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier3_top_FR_Bias") +
+  ylim(-60,60)
+
+outlier3_top_FR_MAE<-outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier3_top_FR_MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+outlier3_top_plots <- list(
+  outlier3_top_r2 = outlier3_top_r2,
+  outlier3_top_Bias = outlier3_top_Bias,
+  outlier3_top_MAE = outlier3_top_MAE,
+  outlier3_top_CAT_r2 = outlier3_top_CAT_r2,
+  outlier3_top_CAT_Bias = outlier3_top_CAT_Bias,
+  outlier3_top_CAT_MAE = outlier3_top_CAT_MAE,
+  outlier3_top_FR_r2 = outlier3_top_FR_r2,
+  outlier3_top_FR_Bias = outlier3_top_FR_Bias,
+  outlier3_top_FR_MAE = outlier3_top_FR_MAE
+)
+
+dir<-c("data/STATS_PLOTS/outlier3_TOP/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(outlier3_top_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = outlier3_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+#outlier2.5 DATA####
+
+outlier2.5_stats_df<-read.csv("data/SIMULATIONS_DF/outlier2.5_LFMC_SIM_STATS.csv")
+
+outlier2.5_df<- outlier2.5_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
+
+outlier2.5_r2<-outlier2.5_df %>%
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_Bias<- outlier2.5_df %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_Bias") +
+  ylim(-60,60)
+
+outlier2.5_MAE<-outlier2.5_df %>%
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+outlier2.5_CAT_r2<-outlier2.5_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_CAT_Bias<- outlier2.5_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_CAT_Bias") +
+  ylim(-60,60)
+
+outlier2.5_CAT_MAE<-outlier2.5_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+outlier2.5_FR_r2<-outlier2.5_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_FR_Bias<- outlier2.5_df %>%
+  filter(SOURCE == "FR") %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_FR_Bias") +
+  ylim(-60,60)
+
+outlier2.5_FR_MAE<-outlier2.5_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_FR_MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+outlier2.5_plots <- list(
+  outlier2.5_r2 = outlier2.5_r2,
+  outlier2.5_Bias = outlier2.5_Bias,
+  outlier2.5_MAE = outlier2.5_MAE,
+  outlier2.5_CAT_r2 = outlier2.5_CAT_r2,
+  outlier2.5_CAT_Bias = outlier2.5_CAT_Bias,
+  outlier2.5_CAT_MAE = outlier2.5_CAT_MAE,
+  outlier2.5_FR_r2 = outlier2.5_FR_r2,
+  outlier2.5_FR_Bias = outlier2.5_FR_Bias,
+  outlier2.5_FR_MAE = outlier2.5_FR_MAE
+)
+
+dir<-c("data/STATS_PLOTS/outlier2.5/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(outlier2.5_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = outlier2.5_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+#outlier2.5_TOP DATA####
+
+outlier2.5_top_stats_df<-read.csv("data/SIMULATIONS_DF/outlier2.5_TOP_LFMC_SIM_STATS.csv")
+
+outlier2.5_top_df<- outlier2.5_top_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
+
+outlier2.5_top_r2<-outlier2.5_top_df %>%
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_top_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_top_Bias<- outlier2.5_top_df %>%
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_top_Bias") +
+  ylim(-60,60)
+
+outlier2.5_top_MAE<-outlier2.5_top_df %>%
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_top_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+outlier2.5_top_CAT_r2<-outlier2.5_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_top_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_top_CAT_Bias<- outlier2.5_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_top_CAT_Bias") +
+  ylim(-60,60)
+
+outlier2.5_top_CAT_MAE<-outlier2.5_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_top_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+outlier2.5_top_FR_r2<-outlier2.5_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "outlier2.5_top_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+outlier2.5_top_FR_Bias<- outlier2.5_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "Bias") +
+  labs(title = "outlier2.5_top_FR_Bias") +
+  ylim(-60,60)
+
+outlier2.5_top_FR_MAE<-outlier2.5_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "outlier2.5_top_FR_MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+outlier2.5_top_plots <- list(
+  outlier2.5_top_r2 = outlier2.5_top_r2,
+  outlier2.5_top_Bias = outlier2.5_top_Bias,
+  outlier2.5_top_MAE = outlier2.5_top_MAE,
+  outlier2.5_top_CAT_r2 = outlier2.5_top_CAT_r2,
+  outlier2.5_top_CAT_Bias = outlier2.5_top_CAT_Bias,
+  outlier2.5_top_CAT_MAE = outlier2.5_top_CAT_MAE,
+  outlier2.5_top_FR_r2 = outlier2.5_top_FR_r2,
+  outlier2.5_top_FR_Bias = outlier2.5_top_FR_Bias,
+  outlier2.5_top_FR_MAE = outlier2.5_top_FR_MAE
+)
+
+dir<-c("data/STATS_PLOTS/outlier2.5_TOP/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(outlier2.5_top_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = outlier2.5_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
+# ###MERGED PLOTS####
+# 
+# all_r2<-(
+#   (r2 +
+#      theme(legend.position = "none"))
+#   /
+#     (summer_r2 +
+#        theme(legend.position = "none",
+#              strip.background = element_blank(),
+#              strip.text = element_blank()))
+#   /
+#     (outlier_r2 +
+#        theme(strip.background = element_blank(),
+#              strip.text = element_blank()))
+# ) + plot_annotation(title = "all_r2")
+# 
+# 
+# 
+# all_Bias<-(
+#   (Bias +
+#      theme(legend.position = "none"))
+#   /
+#     (summer_Bias +
+#        theme(legend.position = "none",
+#              strip.background = element_blank(),
+#              strip.text = element_blank()))
+#   /
+#     (outlier_Bias +
+#        theme(strip.background = element_blank(),
+#              strip.text = element_blank()))
+# ) + plot_annotation(title = "all_Bias")
+# 
+# all_MAE<-(
+#   (MAE +
+#      theme(legend.position = "none"))
+#   /
+#     (summer_MAE +
+#        theme(legend.position = "none",
+#              strip.background = element_blank(),
+#              strip.text = element_blank()))
+#   /
+#     (outlier_MAE +
+#        theme(strip.background = element_blank(),
+#              strip.text = element_blank()))
+# ) + plot_annotation(title = "all_MAE")
+# 
+# ###SAVE####
+# 
+# all_plots <- list(
+#   all_r2 = all_r2,
+#   all_Bias = all_Bias,
+#   all_MAE = all_MAE
+# )
+# 
+# dir<-c("data/STATS_PLOTS/ALL/")
+# dir.create(dir, showWarnings = FALSE)
+# 
+# for (i in names(all_plots)) {
+#   ggsave(filename = paste0(dir, i, ".png"), plot = all_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+# }
+
+
+#FACET WITH SPECIES####
+
+#ALL DATA####
+
+SP_r2<-stats_df %>%
+  boxplot(., "r2", nest_levels = c("SP")) +
+  labs(title = "r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+SP_Bias<- stats_df %>%
+  boxplot(., "Bias", nest_levels = c("SP")) +
+  labs(title = "Bias") +
+  ylim(-60,60)
+
+SP_MAE<-stats_df %>%
+  boxplot(., "MAE", nest_levels = c("SP")) +
+  labs(title = "MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+SP_plots <- list(
+  SP_r2 = SP_r2,
+  SP_Bias = SP_Bias,
+  SP_MAE = SP_MAE
+)
+
+dir<-c("data/STATS_PLOTS/SP/")
+dir.create(dir, showWarnings = FALSE)
+
+for (i in names(SP_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = SP_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
 
