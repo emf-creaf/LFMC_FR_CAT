@@ -70,7 +70,7 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   
   if (SOIL_MOD == TRUE) {
     #LOAD THE MODIFIED ROCK SOIL
-    soil_table2 <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
+    soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
   }else {
     soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
   }
@@ -332,7 +332,7 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #################################SIMULATIONS####################################
 
-#sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
+sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="FR"]
 #sites<-CAT_FR_SITES$site_name
 
 #sites<- c("Badalona","Port de la Selva")
@@ -344,16 +344,15 @@ for (site_name in sites) {
   #SIMULATION PARAMETERS
   years<-c(2012:2022) #VECTOR OF YEARS
   type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
-  sp<-"Cistus monspeliensis" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
+  sp<-"MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
   transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
   lfmcomp<-"leaf" #"leaf" or "fine"
   
   control<-defaultControl(transpirationMode)
   control$segmentedXylemVulnerability=F
-  
   control$lfmcComponent = lfmcomp
   
-  lai<-"MODIS" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
+  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
   meteo<-"ERA5" #INTER, ERA5
   soil_mod<-F #T or F
   
