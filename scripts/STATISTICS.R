@@ -26,7 +26,7 @@ PATTERN<- ".*(TRUE|FALSE)"
 
 #####################READ SIM_FILES#############################################
 
-# files_path1<-list.files(paste0("data/PLOTS_SIMULATIONS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
+# files_path1<-list.files(paste0("results/SIMULATION_RESULTS/", sites), pattern = paste0(PATTERN,"\\.RDS$"), recursive = TRUE, full.names = TRUE)
 # files_name1<-basename(files_path1)
 # 
 # sim_list<-list()
@@ -36,10 +36,10 @@ PATTERN<- ".*(TRUE|FALSE)"
 
 #####################READ DATA_FILES############################################
 
-files_path2<-list.files(paste0("data/PLOTS_SIMULATIONS/", sites), pattern = paste0(PATTERN,"\\.csv$"), recursive = TRUE, full.names = TRUE)
+files_path2<-list.files(paste0("results/SIMULATION_RESULTS/", sites), pattern = paste0(PATTERN,"\\.csv$"), recursive = TRUE, full.names = TRUE)
 files_name2<-basename(files_path2) %>% sub("\\.csv$", "", .)
 
-# files_pathrm<-dir(paste0("data/PLOTS_SIMULATIONS/", sites), pattern = PATTERN, recursive = TRUE, full.names = TRUE)
+# files_pathrm<-dir(paste0("results/SIMULATION_RESULTS/", sites), pattern = PATTERN, recursive = TRUE, full.names = TRUE)
 # unlink(files_pathrm, recursive = T)
 # 
 # for (path in files_pathrm) {
@@ -58,7 +58,7 @@ for (i in 1:length(files_path2)) {
 
 ##SINGLE FILE#########
 
-# file<-read.csv("data/PLOTS_SIMULATIONS/Badalona/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE.csv")
+# file<-read.csv("results/SIMULATION_RESULTS/Badalona/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE/Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE.csv")
 # simulations<-list("Badalona_2012-2022_Cistus monspeliensis_MODIS_ERA5_FALSE" = file)
 
 ######EVALSTATS########
@@ -255,13 +255,13 @@ outlier2.5_top_stats_df<-outlier2.5_top_data$stats_df %>%
   arrange(LFMC_TYPE)
 
 
-dir.create("data/SIMULATIONS_DF/", showWarnings = F)
-write.csv(stats_df, "data/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
-write.csv(summer_stats_df, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv", row.names = F)
-write.csv(outlier3_stats_df, "data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv", row.names = F)
-write.csv(outlier3_top_stats_df, "data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv", row.names = F)
-write.csv(outlier2.5_stats_df, "data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv", row.names = F)
-write.csv(outlier2.5_top_stats_df, "data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv", row.names = F)
+dir.create("results/SIMULATIONS_DF/", showWarnings = F)
+write.csv(stats_df, "results/SIMULATIONS_DF/LFMC_SIM_STATS.csv", row.names = F)
+write.csv(summer_stats_df, "results/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier3_stats_df, "results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier3_top_stats_df, "results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier2.5_stats_df, "results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv", row.names = F)
+write.csv(outlier2.5_top_stats_df, "results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv", row.names = F)
 
 
 data_list<-data$data_list
@@ -272,30 +272,30 @@ outlier2.5_data_list<-outlier2.5_data$data_list
 outlier2.5_top_data_list<-outlier2.5_top_data$data_list
 
 
-saveRDS(data_list, "data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
-saveRDS(summer_data_list, "data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
-saveRDS(outlier3_data_list, "data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
-saveRDS(outlier3_top_data_list, "data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
-saveRDS(outlier2.5_data_list, "data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
-saveRDS(outlier2.5_top_data_list, "data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
+saveRDS(data_list, "results/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
+saveRDS(summer_data_list, "results/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier3_data_list, "results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier3_top_data_list, "results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier2.5_data_list, "results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
+saveRDS(outlier2.5_top_data_list, "results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
 
 
 #load saved data####
 
-stats_df<- read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
-summer_stats_df<- read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
-outlier3_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv")
-outlier3_top_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv")
-outlier2.5_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv")
-outlier2.5_top_stats_df<- read.csv("data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv")
+stats_df<- read.csv("results/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+summer_stats_df<- read.csv("results/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
+outlier3_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv")
+outlier3_top_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv")
+outlier2.5_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv")
+outlier2.5_top_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv")
 
 
-data_list<- readRDS("data/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
-summer_data_list<- readRDS("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
-outlier3_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
-outlier3_top_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
-outlier2.5_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
-outlier2.5_top_data_list<- readRDS("data/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
+data_list<- readRDS("results/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
+summer_data_list<- readRDS("results/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
+outlier3_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.rds")
+outlier3_top_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
+outlier2.5_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
+outlier2.5_top_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
 
 #####################PLOTS######################################################
 
@@ -457,8 +457,8 @@ plots_site_sp<-function(index,TIME_PLOT,SCATTER_PLOT,SCATTER_PLOTR,STATS_DF){
 # print(plots_site_sp(1,outlier_time_plot,outlier_scatter_plot,outlier_scatter_plotR,outlier_stats_df))
 # print(plots_site_sp(1,outlier_top_time_plot,outlier_top_scatter_plot,outlier_top_scatter_plotR,outlier_top_stats_df))
 
-dir<-c("data/SIMULATIONS_PLOTS/ALL/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/ALL/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(time_plot)) {
   plot<-plots_site_sp(i,time_plot,scatter_plot,scatter_plotR,stats_df)
@@ -466,8 +466,8 @@ for (i in 1:length(time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-dir<-c("data/SIMULATIONS_PLOTS/SUMMER/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/SUMMER/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(summer_time_plot)) {
   plot<-plots_site_sp(i,summer_time_plot,summer_scatter_plot,summer_scatter_plotR,summer_stats_df)
@@ -475,8 +475,8 @@ for (i in 1:length(summer_time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-dir<-c("data/SIMULATIONS_PLOTS/OUTLIER3/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/OUTLIER3/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(outlier3_time_plot)) {
   plot<-plots_site_sp(i,outlier3_time_plot,outlier3_scatter_plot,outlier3_scatter_plotR,outlier3_stats_df)
@@ -484,8 +484,8 @@ for (i in 1:length(outlier3_time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-dir<-c("data/SIMULATIONS_PLOTS/OUTLIER3_TOP/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/OUTLIER3_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(outlier3_top_time_plot)) {
   plot<-plots_site_sp(i,outlier3_top_time_plot,outlier3_top_scatter_plot,outlier3_top_scatter_plotR,outlier3_top_stats_df)
@@ -493,8 +493,8 @@ for (i in 1:length(outlier3_top_time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-dir<-c("data/SIMULATIONS_PLOTS/OUTLIER2.5/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/OUTLIER2.5/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(outlier2.5_time_plot)) {
   plot<-plots_site_sp(i,outlier2.5_time_plot,outlier2.5_scatter_plot,outlier2.5_scatter_plotR,outlier2.5_stats_df)
@@ -502,8 +502,8 @@ for (i in 1:length(outlier2.5_time_plot)) {
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
-dir<-c("data/SIMULATIONS_PLOTS/OUTLIER2.5_TOP/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/SIMULATIONS_PLOTS/OUTLIER2.5_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in 1:length(outlier2.5_top_time_plot)) {
   plot<-plots_site_sp(i,outlier2.5_top_time_plot,outlier2.5_top_scatter_plot,outlier2.5_top_scatter_plotR,outlier2.5_top_stats_df)
@@ -513,24 +513,11 @@ for (i in 1:length(outlier2.5_top_time_plot)) {
 
 #################SECOND LEVEL ANALISIS #################################################################  
 
-stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
-
-plot<-stats_df %>%
-  mutate(death = n_pred < 4000) %>%
-  filter(LFMC_TYPE == "MEASURED") %>% 
-  ggplot(aes(x = interaction(LAI,SOIL,METEO), y = n_pred, color = death)) +
-  geom_jitter() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  coord_flip() +
-  scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
-  theme(legend.position = "bottom",
-        text = element_text(size = 15))+
-  facet_wrap(~SP)
-
-# stats_df %>%
+# stats_df<-read.csv("results/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+# 
+# plot<-stats_df %>%
 #   mutate(death = n_pred < 4000) %>%
 #   filter(LFMC_TYPE == "MEASURED") %>% 
-#   filter(SP == "Genista cinerea") %>% 
 #   ggplot(aes(x = interaction(LAI,SOIL,METEO), y = n_pred, color = death)) +
 #   geom_jitter() +
 #   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
@@ -538,30 +525,43 @@ plot<-stats_df %>%
 #   scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
 #   theme(legend.position = "bottom",
 #         text = element_text(size = 15))+
-#   facet_wrap(~SP+SITE_NAME)
-
-death<-stats_df %>%
-  mutate(death = n_pred < 4000) %>% 
-  filter(death) %>% 
-  ggplot(aes(x = interaction(SP), y = n_pred, color = death)) +
-  geom_jitter() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  coord_flip() +
-  scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
-  theme(legend.position = "none",
-        text = element_text(size =15))
-
-plots <- list(
-  plot = plot,
-  death = death
-)
-
-dir<-c("data/STATS_PLOTS/SIM/")
-dir.create(dir, showWarnings = FALSE)
-
-for (i in names(plots)) {
-  ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
-}
+#   facet_wrap(~SP)
+# 
+# # stats_df %>%
+# #   mutate(death = n_pred < 4000) %>%
+# #   filter(LFMC_TYPE == "MEASURED") %>% 
+# #   filter(SP == "Genista cinerea") %>% 
+# #   ggplot(aes(x = interaction(LAI,SOIL,METEO), y = n_pred, color = death)) +
+# #   geom_jitter() +
+# #   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+# #   coord_flip() +
+# #   scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
+# #   theme(legend.position = "bottom",
+# #         text = element_text(size = 15))+
+# #   facet_wrap(~SP+SITE_NAME)
+# 
+# death<-stats_df %>%
+#   mutate(death = n_pred < 4000) %>% 
+#   filter(death) %>% 
+#   ggplot(aes(x = interaction(SP), y = n_pred, color = death)) +
+#   geom_jitter() +
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+#   coord_flip() +
+#   scale_color_manual(values = c("TRUE" = "#FF5733", "FALSE" = "#83FF79"))+
+#   theme(legend.position = "none",
+#         text = element_text(size =15))
+# 
+# plots <- list(
+#   plot = plot,
+#   death = death
+# )
+# 
+# dir<-c("results/STATS_PLOTS/SIM/")
+# dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+# 
+# for (i in names(plots)) {
+#   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+# }
 
 ##########BOXPLOTS######################################################################
 
@@ -598,7 +598,7 @@ boxplot <- function(DF, yy, facet = TRUE, nest_levels = c("LAI","METEO","SOIL"))
 
 #ALL DATA####
 
-stats_df<-read.csv("data/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
+stats_df<-read.csv("results/SIMULATIONS_DF/LFMC_SIM_STATS.csv")
 
 stats_df<- stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -630,8 +630,8 @@ plots <- list(
   MAE = MAE
 )
 
-dir<-c("data/STATS_PLOTS/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -724,8 +724,8 @@ plots <- list(
   MAE_SOIL = MAE_SOIL
 )
 
-dir<-c("data/STATS_PLOTS/INDIVIDUAL/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/INDIVIDUAL/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -785,8 +785,8 @@ plots <- list(
   FR_MAE = FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/CAT_FR/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/CAT_FR/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -794,7 +794,7 @@ for (i in names(plots)) {
 
 #SUMMER DATA####
 
-summer_stats_df<-read.csv("data/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
+summer_stats_df<-read.csv("results/SIMULATIONS_DF/SUMMER_LFMC_SIM_STATS.csv")
 
 summer_stats_df<-summer_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -879,8 +879,8 @@ summer_plots <- list(
   summer_FR_MAE = summer_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/SUMMER/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/SUMMER/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(summer_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = summer_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -888,7 +888,7 @@ for (i in names(summer_plots)) {
 
 ##outlier3 DATA####
 
-outlier3_stats_df<-read.csv("data/SIMULATIONS_DF/outlier3_LFMC_SIM_STATS.csv")
+outlier3_stats_df<-read.csv("results/SIMULATIONS_DF/outlier3_LFMC_SIM_STATS.csv")
 
 outlier3_df<- outlier3_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -966,8 +966,8 @@ outlier3_plots <- list(
   outlier3_FR_MAE = outlier3_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/outlier3/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/outlier3/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(outlier3_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = outlier3_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -975,7 +975,7 @@ for (i in names(outlier3_plots)) {
 
 #outlier3_TOP DATA####
 
-outlier3_top_stats_df<-read.csv("data/SIMULATIONS_DF/outlier3_TOP_LFMC_SIM_STATS.csv")
+outlier3_top_stats_df<-read.csv("results/SIMULATIONS_DF/outlier3_TOP_LFMC_SIM_STATS.csv")
 
 outlier3_top_df<- outlier3_top_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -1053,8 +1053,8 @@ outlier3_top_plots <- list(
   outlier3_top_FR_MAE = outlier3_top_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/outlier3_TOP/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/outlier3_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(outlier3_top_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = outlier3_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -1062,7 +1062,7 @@ for (i in names(outlier3_top_plots)) {
 
 #outlier2.5 DATA####
 
-outlier2.5_stats_df<-read.csv("data/SIMULATIONS_DF/outlier2.5_LFMC_SIM_STATS.csv")
+outlier2.5_stats_df<-read.csv("results/SIMULATIONS_DF/outlier2.5_LFMC_SIM_STATS.csv")
 
 outlier2.5_df<- outlier2.5_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -1140,8 +1140,8 @@ outlier2.5_plots <- list(
   outlier2.5_FR_MAE = outlier2.5_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/outlier2.5/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/outlier2.5/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(outlier2.5_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = outlier2.5_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -1149,7 +1149,7 @@ for (i in names(outlier2.5_plots)) {
 
 #outlier2.5_TOP DATA####
 
-outlier2.5_top_stats_df<-read.csv("data/SIMULATIONS_DF/outlier2.5_TOP_LFMC_SIM_STATS.csv")
+outlier2.5_top_stats_df<-read.csv("results/SIMULATIONS_DF/outlier2.5_TOP_LFMC_SIM_STATS.csv")
 
 outlier2.5_top_df<- outlier2.5_top_stats_df %>% 
   mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
@@ -1227,8 +1227,8 @@ outlier2.5_top_plots <- list(
   outlier2.5_top_FR_MAE = outlier2.5_top_FR_MAE
 )
 
-dir<-c("data/STATS_PLOTS/outlier2.5_TOP/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/outlier2.5_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(outlier2.5_top_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = outlier2.5_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -1288,8 +1288,8 @@ for (i in names(outlier2.5_top_plots)) {
 #   all_MAE = all_MAE
 # )
 # 
-# dir<-c("data/STATS_PLOTS/ALL/")
-# dir.create(dir, showWarnings = FALSE)
+# dir<-c("results/STATS_PLOTS/ALL/")
+# dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 # 
 # for (i in names(all_plots)) {
 #   ggsave(filename = paste0(dir, i, ".png"), plot = all_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
@@ -1323,8 +1323,8 @@ SP_plots <- list(
   SP_MAE = SP_MAE
 )
 
-dir<-c("data/STATS_PLOTS/SP/")
-dir.create(dir, showWarnings = FALSE)
+dir<-c("results/STATS_PLOTS/SP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 for (i in names(SP_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = SP_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)

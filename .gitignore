@@ -1,13 +1,7 @@
 raw_data/
 scripts/raw_scripts/
 data/PLOTS
-data/SIMULATIONS
-data/SIMULATIONS_DF
-data/SIMULATIONS_PLOTS
-data/SIMULATIONS_PLOTS_NEW
-data/PLOTS_SIMULATIONS
-data/STATS_PLOTS
-data/SITE_PLOT
+results/
 # History files
 .Rhistory
 .Rapp.history
