@@ -100,7 +100,7 @@ evalstats <- function(obs, pred) {
 
 #####################EVALUATION STATISTICS######################################
 
-process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
+process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = c("ALL"), TH) {
   SIMULATION$date <- as.Date(SIMULATION$date)
   
   split <- strsplit(FILENAME, "_")[[1]]
@@ -142,12 +142,7 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
   MERGED_LFMC_ALL <- SIMULATION %>%
     full_join(FILTERED_LFMC, by = c("date" = "date", "species" = "specie"), suffix = c(".MODELED", ".MEASURED"))
   
-  if (DF_TYPE == "summer") {
-    MERGED_LFMC_ALL <- MERGED_LFMC_ALL %>%
-      filter(month(date) >= 6 & month(date) <= 9)
-  }
-  
-  if (DF_TYPE == "outlier") {
+  if ("outlier" %in% DF_TYPE) {
     med <- median(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #median 
     mad <- mad(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #Median absolute deviation
     threshold <- TH * mad
@@ -161,7 +156,7 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
       
   }
   
-  if (DF_TYPE == "outlier_top") {
+  if ("outlier_top" %in% DF_TYPE) {
     med <- median(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #median 
     mad <- mad(MERGED_LFMC_ALL$LFMC.MEASURED, na.rm = TRUE) #Median absolute deviation
     threshold <- TH * mad
@@ -173,6 +168,11 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
       mutate(is_outlier = (LFMC.MEASURED > (med + threshold))) %>% 
       mutate(LFMC.MEASURED = ifelse(is_outlier, NA, LFMC.MEASURED))
   
+  }
+  
+  if ("summer" %in% DF_TYPE) {
+    MERGED_LFMC_ALL <- MERGED_LFMC_ALL %>%
+      filter(month(date) >= 6 & month(date) <= 9)
   }
   
   result_M <- data.frame(
@@ -203,7 +203,7 @@ process_simulation <- function(SIMULATION, FILENAME, DF_TYPE = "ALL", TH) {
   
   result <- rbind(result_M, result_R)
   
-  if (DF_TYPE == "outlier" | DF_TYPE == "outlier_top") {
+  if ("outlier" %in% DF_TYPE | "outlier_top" %in% DF_TYPE) {
     return(list(result = result, merged_data = MERGED_LFMC_ALL_OUTLIER))
   } else {
   return(list(result = result, merged_data = MERGED_LFMC_ALL))
@@ -220,12 +220,16 @@ process_all_simulations <- function(SIMULATIONS, DATA_TYPE, TH) {
     result <- process_simulation(SIMULATION = SIMULATIONS[[i]], FILENAME = filename, DF_TYPE = DATA_TYPE, TH)
     stats_df <- rbind(stats_df, result$result)
     data_list[[i]] <- result$merged_data
-    if (DATA_TYPE == "summer") {
+    if (all(DATA_TYPE == "summer")) {
       names(data_list)[i] <- paste0(filename, "_SUMMER")
-    } else if (DATA_TYPE == "outlier") {
+    } else if (all(DATA_TYPE == "outlier")) {
       names(data_list)[i] <- paste0(filename, "_OUTLIER_", TH)
-    } else if (DATA_TYPE == "outlier_top") {
+    } else if (all(DATA_TYPE == "outlier_top")) {
       names(data_list)[i] <- paste0(filename, "_OUTLIER_TOP_", TH)
+    } else if (all(DATA_TYPE == c("summer", "outlier")) | all(DATA_TYPE == c("outlier", "summer"))){
+      names(data_list)[i] <- paste0(filename, "_SUMMER_OUTLIER_", TH)
+    } else if (all(DATA_TYPE == c("summer", "outlier_top")) | all(DATA_TYPE == c("outlier_top", "summer"))){
+      names(data_list)[i] <- paste0(filename, "_SUMMER_OUTLIER_TOP_", TH)
     } else {
       names(data_list)[i] <- filename
     }
@@ -240,6 +244,7 @@ outlier3_data<- process_all_simulations(simulations, DATA_TYPE = "outlier", TH =
 outlier3_top_data<- process_all_simulations(simulations, DATA_TYPE = "outlier_top", TH = 3)
 outlier2.5_data<- process_all_simulations(simulations, DATA_TYPE = "outlier", TH = 2.5)
 outlier2.5_top_data<- process_all_simulations(simulations, DATA_TYPE = "outlier_top", TH = 2.5)
+summer_outlier3_top_data<- process_all_simulations(simulations, DATA_TYPE = c("summer", "outlier"), TH = 3)
 
 stats_df<-data$stats_df %>% 
   arrange(LFMC_TYPE)
@@ -253,6 +258,8 @@ outlier2.5_stats_df<-outlier2.5_data$stats_df %>%
   arrange(LFMC_TYPE)
 outlier2.5_top_stats_df<-outlier2.5_top_data$stats_df %>% 
   arrange(LFMC_TYPE)
+summer_outlier3_top_stats_df<-summer_outlier3_top_data$stats_df %>%
+  arrange(LFMC_TYPE)
 
 
 dir.create("results/SIMULATIONS_DF/", showWarnings = F)
@@ -262,7 +269,7 @@ write.csv(outlier3_stats_df, "results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv
 write.csv(outlier3_top_stats_df, "results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv", row.names = F)
 write.csv(outlier2.5_stats_df, "results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv", row.names = F)
 write.csv(outlier2.5_top_stats_df, "results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv", row.names = F)
-
+write.csv(summer_outlier3_top_stats_df, "results/SIMULATIONS_DF/SUMMER_OUTLIER3_TOP_LFMC_SIM_STATS.csv", row.names = F)
 
 data_list<-data$data_list
 summer_data_list<-summer_data$data_list
@@ -270,7 +277,7 @@ outlier3_data_list<-outlier3_data$data_list
 outlier3_top_data_list<-outlier3_top_data$data_list
 outlier2.5_data_list<-outlier2.5_data$data_list
 outlier2.5_top_data_list<-outlier2.5_top_data$data_list
-
+summer_outlier3_top_data_list<-summer_outlier3_top_data$data_list
 
 saveRDS(data_list, "results/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
 saveRDS(summer_data_list, "results/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
@@ -278,7 +285,7 @@ saveRDS(outlier3_data_list, "results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST.
 saveRDS(outlier3_top_data_list, "results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
 saveRDS(outlier2.5_data_list, "results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
 saveRDS(outlier2.5_top_data_list, "results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
-
+saveRDS(summer_outlier3_top_data_list, "results/SIMULATIONS_DF/SUMMER_OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
 
 #load saved data####
 
@@ -288,7 +295,7 @@ outlier3_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_STATS.csv
 outlier3_top_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_STATS.csv")
 outlier2.5_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_STATS.csv")
 outlier2.5_top_stats_df<- read.csv("results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_STATS.csv")
-
+summer_outlier3_top_stats_df<- read.csv("results/SIMULATIONS_DF/SUMMER_OUTLIER3_TOP_LFMC_SIM_STATS.csv")
 
 data_list<- readRDS("results/SIMULATIONS_DF/LFMC_SIM_DATA_LIST.rds")
 summer_data_list<- readRDS("results/SIMULATIONS_DF/SUMMER_LFMC_SIM_DATA_LIST.rds")
@@ -296,6 +303,7 @@ outlier3_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER3_LFMC_SIM_DATA_LIST
 outlier3_top_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
 outlier2.5_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER2.5_LFMC_SIM_DATA_LIST.rds")
 outlier2.5_top_data_list<- readRDS("results/SIMULATIONS_DF/OUTLIER2.5_TOP_LFMC_SIM_DATA_LIST.rds")
+summer_outlier3_top_data_list<- readRDS("results/SIMULATIONS_DF/SUMMER_OUTLIER3_TOP_LFMC_SIM_DATA_LIST.rds")
 
 #####################PLOTS######################################################
 
@@ -433,6 +441,10 @@ outlier2.5_top_time_plot<-func_time_plot(outlier2.5_top_data_list, mark_outlier 
 outlier2.5_top_scatter_plot<-func_scatter_plot(outlier2.5_top_data_list, mark_outlier = TRUE)
 outlier2.5_top_scatter_plotR<-func_scatter_plotR(outlier2.5_top_data_list, mark_outlier = TRUE)
 
+summer_outlier3_top_time_plot<-func_time_plot(summer_outlier3_top_data_list, mark_outlier = TRUE)
+summer_outlier3_top_scatter_plot<-func_scatter_plot(summer_outlier3_top_data_list, mark_outlier = TRUE)
+summer_outlier3_top_scatter_plotR<-func_scatter_plotR(summer_outlier3_top_data_list, mark_outlier = TRUE)
+
 #####################DISPLAY PLOTS##############################################
 
 plots_site_sp<-function(index,TIME_PLOT,SCATTER_PLOT,SCATTER_PLOTR,STATS_DF){
@@ -508,6 +520,15 @@ dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 for (i in 1:length(outlier2.5_top_time_plot)) {
   plot<-plots_site_sp(i,outlier2.5_top_time_plot,outlier2.5_top_scatter_plot,outlier2.5_top_scatter_plotR,outlier2.5_top_stats_df)
   plotname<-gsub(".csv", "", names(outlier2.5_top_time_plot[i]))
+  ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
+}
+
+dir<-c("results/SIMULATIONS_PLOTS/SUMMER_OUTLIER3_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+
+for (i in 1:length(summer_outlier3_top_time_plot)) {
+  plot<-plots_site_sp(i,summer_outlier3_top_time_plot,summer_outlier3_top_scatter_plot,summer_outlier3_top_scatter_plotR,summer_outlier3_top_stats_df)
+  plotname<-gsub(".csv", "", names(summer_outlier3_top_time_plot[i]))
   ggsave(filename = paste0(dir,plotname,".png"), plot = plot, width = 1920, height = 1080, units = "px", dpi = 96)
 }
 
@@ -1233,6 +1254,94 @@ dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 for (i in names(outlier2.5_top_plots)) {
   ggsave(filename = paste0(dir, i, ".png"), plot = outlier2.5_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
 }
+
+#summer_outlier3_TOP DATA####
+
+summer_outlier3_top_stats_df<-read.csv("results/SIMULATIONS_DF/summer_outlier3_top_LFMC_SIM_STATS.csv")
+
+summer_outlier3_top_df<- summer_outlier3_top_stats_df %>% 
+  mutate(LAI = ifelse(LAI == "MEDFATE", "Allometric", ifelse(LAI == "MODIS", "Modis", LAI)),
+         METEO = ifelse(METEO == "ERA5", "ERA5_Land", ifelse(METEO == "INTER", "Interpolated", METEO)),
+         SOIL = ifelse(SOIL == "FALSE", "SoilGrids", ifelse(SOIL == "TRUE", "RC modification", SOIL)),
+         LFMC_TYPE = ifelse(LFMC_TYPE == "MEASURED", "Modeled LFMC", ifelse(LFMC_TYPE == "RODRIGO", "Semi-Mechanistic LFMC", LFMC_TYPE))) %>% 
+  filter(n > 20)
+
+summer_outlier3_top_r2<-summer_outlier3_top_df %>%
+  boxplot(., "r2") +
+  labs(title = "summer_outlier3_top_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_outlier3_top_Bias<- summer_outlier3_top_df %>%
+  boxplot(., "Bias") +
+  labs(title = "summer_outlier3_top_Bias") +
+  ylim(-60,60)
+
+summer_outlier3_top_MAE<-summer_outlier3_top_df %>%
+  boxplot(., "MAE") +
+  labs(title = "summer_outlier3_top_MAE") +
+  ylim(0,60)
+
+###CAT####
+
+summer_outlier3_top_CAT_r2<-summer_outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "r2") +
+  labs(title = "summer_outlier3_top_CAT_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_outlier3_top_CAT_Bias<- summer_outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "Bias") +
+  labs(title = "summer_outlier3_top_CAT_Bias") +
+  ylim(-60,60)
+
+summer_outlier3_top_CAT_MAE<-summer_outlier3_top_df %>%
+  filter(SOURCE == "CAT") %>% 
+  boxplot(., "MAE") +
+  labs(title = "summer_outlier3_top_CAT_MAE") +
+  ylim(0,60)
+
+###FR####
+
+summer_outlier3_top_FR_r2<-summer_outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "r2") +
+  labs(title = "summer_outlier3_top_FR_r2") +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1))
+
+summer_outlier3_top_FR_Bias<- summer_outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "Bias") +
+  labs(title = "summer_outlier3_top_FR_Bias") +
+  ylim(-60,60)
+
+summer_outlier3_top_FR_MAE<-summer_outlier3_top_df %>%
+  filter(SOURCE == "FR") %>% 
+  boxplot(., "MAE") +
+  labs(title = "summer_outlier3_top_FR_MAE") +
+  ylim(0,60)
+
+###SAVE####
+
+summer_outlier3_top_plots <- list(
+  summer_outlier3_top_r2 = summer_outlier3_top_r2,
+  summer_outlier3_top_Bias = summer_outlier3_top_Bias,
+  summer_outlier3_top_MAE = summer_outlier3_top_MAE,
+  summer_outlier3_top_CAT_r2 = summer_outlier3_top_CAT_r2,
+  summer_outlier3_top_CAT_Bias = summer_outlier3_top_CAT_Bias,
+  summer_outlier3_top_CAT_MAE = summer_outlier3_top_CAT_MAE,
+  summer_outlier3_top_FR_r2 = summer_outlier3_top_FR_r2,
+  summer_outlier3_top_FR_Bias = summer_outlier3_top_FR_Bias,
+  summer_outlier3_top_FR_MAE = summer_outlier3_top_FR_MAE
+)
+
+dir<-c("results/STATS_PLOTS/summer_outlier3_TOP/")
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+
+for (i in names(summer_outlier3_top_plots)) {
+  ggsave(filename = paste0(dir, i, ".png"), plot = summer_outlier3_top_plots[[i]], device = "png", width = 1920, height = 1080, units = "px", dpi = 130)
+}
+
 
 # ###MERGED PLOTS####
 # 
