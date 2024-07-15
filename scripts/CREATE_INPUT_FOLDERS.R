@@ -234,7 +234,7 @@ for (i in 1:length(METEO_list)) {
 
 METEO_df<-bind_rows(METEO_list)
 
-write.csv(METEO_df, "raw_data/ERA5_DATA/METEO_ERA5_DATA/METEO_ERA5_DATA.csv", row.names = F)
+write.csv(METEO_df, "data/ERA5_DATA.csv", row.names = F)
 
 #SAVE THE METEO DATA TO CORRECT PLOT FOLDER
 
@@ -286,6 +286,18 @@ for (i in CAT_FR_SITES_NAMES) {
 # new_names<-meteo[[1]]$site_name
 # names(meteo_interpolators) <- new_names
 meteo_interpolators<-readRDS("raw_data/interpoladores_meteo_cat/meteo_interpolators_list.RDS")
+
+#ADD SITE COLUMN TO THE DF OF EACH LIST:
+
+for (i in 1:length(meteo_interpolators)) {
+  meteo_interpolators[[i]]$Site<-names(meteo_interpolators[i])
+}
+
+#MERGE THE LIST DF IN A SINGLE DF AND SAVE
+
+meteo_df<-bind_rows(meteo_interpolators)
+
+write.csv(meteo_df, "data/INTERPOLATED_CAT_DATA.csv", row.names = F)
 
 #SAVE INTERPOLATED METEO TO CAT PLOTS
 CAT_SITES_NAMES<-CAT_FR_SITES$site_name[1:9]
