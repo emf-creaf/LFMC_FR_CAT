@@ -234,7 +234,7 @@ for (i in 1:length(METEO_list)) {
 
 METEO_df<-bind_rows(METEO_list)
 
-write.csv(METEO_df, "data/ERA5_DATA.csv", row.names = F)
+write.csv(METEO_df, "data/METEO_ERA5_DATA.csv", row.names = F)
 
 #SAVE THE METEO DATA TO CORRECT PLOT FOLDER
 
@@ -297,7 +297,7 @@ for (i in 1:length(meteo_interpolators)) {
 
 meteo_df<-bind_rows(meteo_interpolators)
 
-write.csv(meteo_df, "data/INTERPOLATED_CAT_DATA.csv", row.names = F)
+write.csv(meteo_df, "data/METEO_INTERPOLATED_CAT_DATA.csv", row.names = F)
 
 #SAVE INTERPOLATED METEO TO CAT PLOTS
 CAT_SITES_NAMES<-CAT_FR_SITES$site_name[1:9]
