@@ -1,0 +1,135 @@
+"Date","Code_Site.x","Placette","sp","sp_correct_name","coverage","height"
+"2016-05-18","D04S1",1,"Pin d'Alep","Pinus halepensis",15,950
+"2016-05-18","D04S1",1,"Romarin","Rosmarinus officinalis",1.5,40
+"2016-05-18","D04S1",1,"Romarin","Rosmarinus officinalis",27,90
+"2016-05-18","D04S1",1,"Romarin","Rosmarinus officinalis",1.5,130
+"2016-05-18","D04S1",1,"Genet cendre","Genista cinerea",4,40
+"2016-05-18","D04S1",1,"Genet cendre","Genista cinerea",6,80
+"2016-05-18","D04S1",1,"Genet cendre","Genista cinerea",10,140
+"2016-05-18","D04S2",1,"Buis","Buxus sempervirens",10,100
+"2016-05-18","D04S2",1,"Buis","Buxus sempervirens",28,140
+"2016-05-18","D04S2",1,"Genet cendre","Genista cinerea",27,80
+"2016-05-18","D04S2",1,"Genet cendre","Genista cinerea",3,130
+"2016-05-18","D04S2",1,"Thym","Thymus vulgaris",20,20
+"2016-05-17","D05S1",1,"Pin noir","Pinus nigra",25,380
+"2016-05-17","D05S1",1,"Erable à feuilles d'obier","Acer opalus subsp. opalus",10,500
+"2016-05-17","D05S1",1,"Cytise à feuille sessile","Cytisophyllum sessilifolium",15,150
+"2016-05-17","D05S1",1,"Genet cendre","Genista cinerea",10,170
+"2016-06-02","D06S1",1,"Pin d'Alep","Pinus halepensis",25,400
+"2016-06-02","D06S1",1,"Romarin","Rosmarinus officinalis",10.5,40
+"2016-06-02","D06S1",1,"Romarin","Rosmarinus officinalis",4.5,70
+"2016-06-02","D06S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",10,90
+"2016-06-02","D06S2",1,"Mimosas","Acacia dealbata",20,830
+"2016-06-02","D06S2",1,"Ciste de Montpellier","Cistus monspeliensis",65,180
+"2016-06-02","D06S2",1,"Myrthe","Myrtus communis",15,180
+"2016-06-01","D06S3",1,"Chene vert","Quercus ilex",20,450
+"2016-06-01","D06S3",1,"Calycotome","Calicotome spinosa",20,180
+"2016-06-01","D06S3",1,"Pistachier lentisque","Pistacia lentiscus",12,70
+"2016-06-01","D06S3",1,"Pistachier lentisque","Pistacia lentiscus",3,110
+"2016-06-01","D06S3",1,"Ciste cotonneux","Cistus albidus",8,80
+"2016-06-01","D06S3",1,"Ciste cotonneux","Cistus albidus",12,140
+"2016-05-09","D07S1",1,"Chene vert","Quercus ilex",25,250
+"2016-05-09","D07S1",1,"Arbousier","Arbutus unedo",15,250
+"2016-05-09","D07S1",1,"Arbousier","Arbutus unedo",20,190
+"2016-05-09","D07S1",1,"Chene vert","Quercus ilex",10,180
+"2016-05-09","D07S1",1,"Coronille","Coronilla",3.2,80
+"2016-05-09","D07S1",1,"Coronille","Coronilla",4.8,130
+"2016-06-08","D11S1",1,"Romarin","Rosmarinus officinalis",40,90
+"2016-06-08","D11S1",1,"Chene kermes","Quercus coccifera",25,95
+"2016-06-08","D11S2",1,"Bruyere à balai","Erica scoparia subsp. scoparia",80,150
+"2016-06-08","D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",6,40
+"2016-06-08","D11S2",2,"Ciste de Montpellier","Cistus monspeliensis",9,80
+"2016-04-27","D13S1",1,"Chene kermes","Quercus coccifera",36,30
+"2016-04-27","D13S1",2,"Chene kermes","Quercus coccifera",55,100
+"2016-04-27","D13S1",2,"Chene vert","Quercus ilex",30,200
+"2016-04-03","D13S2",1,"Chene kermes","Quercus coccifera",70,70
+"2016-04-03","D13S2",1,"Romarin","Rosmarinus officinalis",23.75,120
+"2016-04-04","D26S1",1,"Pin d'Alep","Pinus halepensis",15,450
+"2016-04-04","D26S1",1,"Chene blanc","Quercus pubescens",5,270
+"2016-04-04","D26S1",1,"Genet scorpion","Genista scorpius",4,40
+"2016-04-04","D26S1",1,"Genet scorpion","Genista scorpius",36,80
+"2017-05-19","D2AS1",1,"Arbousier","Arbutus unedo",25,170
+"2017-05-19","D2AS1",1,"Ciste de Montpellier","Cistus monspeliensis",10,80
+"2017-05-19","D2AS1",1,"Ciste de Montpellier","Cistus monspeliensis",10,120
+"2017-05-19","D2AS1",1,"Bruyere arborescente","Erica arborea",10,130
+"2017-05-18","D2AS2",1,"Bruyere arborescente","Erica arborea",35,125
+"2017-05-18","D2AS2",1,"Ciste a feuilles de sauge","Cistus salviifolius",25,70
+"2017-05-18","D2AS2",1,"Arbousier","Arbutus unedo",15,145
+"2017-05-17","D2AS3",1,"Arbousier","Arbutus unedo",NA,260
+"2017-05-17","D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia",7,240
+"2017-05-17","D2AS3",1,"Bruyere arborescente","Erica arborea",25,180
+"2017-05-17","D2AS3",1,"Filaire a feuilles etroites","Phillyrea angustifolia",25,170
+"2017-05-17","D2AS3",1,"Ciste de Montpellier","Cistus monspeliensis",5.6,85
+"2017-05-17","D2AS3",1,"Ciste de Montpellier","Cistus monspeliensis",1.4,140
+"2017-05-16","D2BS2",1,"Chene vert","Quercus ilex",100,450
+"2017-05-16","D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",9,40
+"2017-05-16","D2BS2",1,"Ciste de Montpellier","Cistus monspeliensis",36,80
+"2017-05-16","D2BS2",1,"Bruyere arborescente","Erica arborea",5,80
+"2017-05-16","D2BS2",1,"Bruyere arborescente","Erica arborea",5,200
+"2017-05-16","D2BS2",1,"Lavande stéchade","Lavandula stoechas",10,40
+"2017-05-15","D2BS3",1,"Arbousier","Arbutus unedo",5,280
+"2017-05-15","D2BS3",1,"Bruyere arborescente","Erica arborea",5,250
+"2017-05-15","D2BS3",1,"Ciste de Crête","Cistus creticus",15,80
+"2017-05-15","D2BS3",1,"Ciste de Montpellier","Cistus monspeliensis",10,70
+"2017-05-15","D2BS3",1,"Bruyere arborescente","Erica arborea",10,160
+"2016-07-25","D30S1",1,"Pin maritime","Pinus pinaster",70,1500
+"2016-07-25","D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",31.5,80
+"2016-07-25","D30S1",1,"Bruyere à balai","Erica scoparia subsp. scoparia",13.5,120
+"2016-07-25","D30S1",1,"Bruyere cendree","Erica cinerea",13.5,40
+"2016-07-25","D30S1",1,"Bruyere cendree","Erica cinerea",1.5,60
+"2016-07-25","D30S1",1,"Bruyere arborescente","Erica arborea",9,200
+"2016-07-26","D30S2",1,"Chene vert","Quercus ilex",30,300
+"2016-07-26","D30S2",1,"Pin d'alep","Pinus halepensis",20,600
+"2016-07-26","D30S2",1,"Chene kermes","Quercus coccifera",14,30
+"2016-07-26","D30S2",1,"Chene kermes","Quercus coccifera",6,70
+"2016-07-26","D30S2",1,"Ciste cotonneux","Cistus albidus",15,70
+"2016-07-26","D30S2",1,"Buis","Buxus sempervirens",10,90
+"2016-06-06","D34S1",1,"Romarin","Rosmarinus officinalis",21,40
+"2016-06-06","D34S1",1,"Romarin","Rosmarinus officinalis",9,65
+"2016-06-06","D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",1.5,70
+"2016-06-06","D34S1",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",13.5,200
+"2016-06-07","D34S1",2,"Genet scorpion","Genista scorpius",60,220
+"2016-06-06","D34S2",1,"Chene kermes","Quercus coccifera",18,80
+"2016-06-06","D34S2",1,"Chene kermes","Quercus coccifera",72,140
+"2016-06-06","D34S2",1,"Ciste cotonneux","Cistus albidus",1.5,80
+"2016-06-06","D34S2",1,"Ciste cotonneux","Cistus albidus",3.5,120
+"2016-07-25","D48S1",1,"Pin sylvestre","Pinus sylvestris",10,550
+"2016-07-25","D48S1",1,"Genet purgatif","Cytisus oromediterraneus",36,80
+"2016-07-25","D48S1",1,"Genet purgatif","Cytisus oromediterraneus",54,110
+"2016-07-25","D48S1",1,"Bruyere cendree","Erica cinerea",10,45
+"2016-06-08","D66S1",1,"Ciste de Montpellier","Cistus monspeliensis",30,90
+"2016-06-08","D66S1",1,"Genet scorpion","Genista scorpius",25,80
+"2016-06-08","D66S1",1,"Bruyere arborescente","Erica arborea",10,180
+"2016-06-09","D66S2",1,"Chene liège","Quercus suber",NA,470
+"2016-06-09","D66S2",1,"Chene blanc","Quercus pubescens",NA,250
+"2016-06-09","D66S2",1,"Genevrier cade","Juniperus oxycedrus subsp. oxycedrus",NA,220
+"2016-06-09","D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",11,85
+"2016-06-09","D66S2",1,"Ciste de Montpellier","Cistus monspeliensis",44,120
+"2016-06-09","D66S2",1,"Chene kermes","Quercus coccifera",2,90
+"2016-06-09","D66S2",1,"Chene kermes","Quercus coccifera",18,160
+"2016-06-09","D66S2",1,"Genet d'Espagne","Spartium junceum",1.5,80
+"2016-06-09","D66S2",1,"Genet d'Espagne","Spartium junceum",13.5,190
+"2016-07-07","D83S1",1,"Chene kermes","Quercus coccifera",16.25,35
+"2016-07-07","D83S1",1,"Chene kermes","Quercus coccifera",48.75,80
+"2016-07-07","D83S1",1,"Bruyere arborescente","Erica arborea",20,140
+"2016-07-07","D83S1",1,"Ciste de Montpellier","Cistus monspeliensis",15,75
+"2016-05-31","D83S2",1,"Chene vert","Quercus ilex",35,310
+"2016-05-31","D83S2",1,"Chene blanc","Quercus pubescens",15,450
+"2016-05-31","D83S2",1,"Pin d'Alep","Pinus halepensis",10,550
+"2016-05-31","D83S2",1,"Ciste cotonneux","Cistus albidus",25,80
+"2016-05-31","D83S2",1,"Thym","Thymus vulgaris",25,25
+"2016-05-31","D83S3",1,"Pin d'Alep","Pinus halepensis",20,1500
+"2016-05-31","D83S3",1,"Chene vert","Quercus ilex",15,400
+"2016-05-31","D83S3",1,"Ciste de Montpellier","Cistus monspeliensis",20,95
+"2016-05-31","D83S3",1,"Ciste cotonneux","Cistus albidus",7.5,40
+"2016-05-31","D83S3",1,"Ciste cotonneux","Cistus albidus",7.5,95
+"2016-05-31","D83S3",1,"Thym","Thymus vulgaris",20,20
+"2016-04-28","D84S1",1,"Chene vert","Quercus ilex",10,280
+"2016-05-26","D84S2",1,"Chene vert","Quercus ilex",30,300
+"2016-05-26","D84S2",1,"Pin d'Alep","Pinus halepensis",5,350
+"2016-05-26","D84S2",1,"Chene vert","Quercus ilex",0.5,60
+"2016-05-26","D84S2",1,"Chene vert","Quercus ilex",24.5,180
+"2016-05-26","D84S2",1,"Romarin","Rosmarinus officinalis",8,40
+"2016-05-26","D84S2",1,"Romarin","Rosmarinus officinalis",12,80
+"2016-05-26","D84S2",1,"Chene kermes","Quercus coccifera",4.5,40
+"2016-05-26","D84S2",1,"Chene kermes","Quercus coccifera",10.5,70
