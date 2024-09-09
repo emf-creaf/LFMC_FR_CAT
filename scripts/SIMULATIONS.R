@@ -1,5 +1,5 @@
 library(medfate)
-library(medfateutils)
+#library(medfateutils)
 library(tidyverse)
 
 
@@ -9,7 +9,7 @@ CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
 #################################FUNCTIONS######################################
 
 # #SIMULATION PARAMETERS
-# site_name<- "D13S2"
+# site_name<- "Badalona"
 # years<-c(2012:2022) #VECTOR OF YEARS
 # type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
 # sp<-"Quercus coccifera" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
@@ -71,11 +71,14 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   if (SOIL_MOD == TRUE) {
     #LOAD THE MODIFIED ROCK SOIL
     soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil_mod.csv"))
+    soil <- medfate::soil_redefineLayers(soil_table, widths = c(200, 300, 600, 1000, 2000))
+    #soil <- medfate::soil_redefineLayers(soil_table, widths = c(200, 300, 600, 3000))
   }else {
     soil_table <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/soil.csv"))
+    soil <- medfate::soil_redefineLayers(soil_table, widths = c(200, 300, 600, 1000, 2000))
+    #soil <- medfate::soil_redefineLayers(soil_table, widths = c(200, 300, 600, 3000))
   }
   
-  soil <- redefineSoilLayers(soil_table, widths = c(200, 300, 600, 1000, 2000))
   
   # Read the meteorological data for the site
   
@@ -332,98 +335,85 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #################################SIMULATIONS####################################
 
-sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="FR"]
-#sites<-CAT_FR_SITES$site_name
-
-#sites<- c("Badalona","Port de la Selva")
-
-#sites<-"Badalona"
-
-for (site_name in sites) {
+run_simulation_save_data <- function(sites, lai, meteo, soil_mod) {
   
   #SIMULATION PARAMETERS
-  years<-c(2012:2022) #VECTOR OF YEARS
-  type<-"SINGLE" #ALL_FILTERED, #ALL_SINGLE #SINGLE
-  sp<-"MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
-  transpirationMode <- "Sureau" #“Granier”, “Sperry”, “Cochard”, “Sureau”
-  lfmcomp<-"leaf" #"leaf" or "fine"
+  years <- c(2012:2022) # VECTOR OF YEARS
+  type <- "SINGLE" # ALL_FILTERED, #ALL_SINGLE #SINGLE
+  sp <- "MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
+  transpirationMode <- "Sureau" # “Granier”, “Sperry”, “Cochard”, “Sureau”
+  lfmcomp <- "leaf" #"leaf" or "fine"
+  control <- defaultControl(transpirationMode)
+  control$segmentedXylemVulnerability <- FALSE
+  control$lfmcComponent <- lfmcomp
   
-  control<-defaultControl(transpirationMode)
-  control$segmentedXylemVulnerability=F
-  control$lfmcComponent = lfmcomp
   
-  lai<-"MEDFATE" #MODIS (MODIS LAI DATA, CONSTAT LAI FROM THE YEAR OF MEASURED DATA) OR MEDFATE
-  meteo<-"ERA5" #INTER, ERA5
-  soil_mod<-F #T or F
-  
-  #RUN SIMULATION
-  
-  SIM <- run_simulation(
-    SITE_NAME = site_name,
-    YEARS = years,
-    TYPE = type,
-    SP = sp,
-    CONTROL = control,
-    LAI = lai,
-    METEO = meteo,
-    SOIL_MOD = soil_mod
-  )
-  
-  #EXTRACT SIMULATION DATA
-  
-  SIM_data <- extract_output(
-    SIM,
-    LEAFPSIMAX = T,
-    LEAFRWC = T,
-    LFMC = T,
-    LFMC_rodrigo = T
-  )
-  
-  #SAVE SIMULATION OBJECT AS .RDS
-  
-  if (type == "SINGLE"){
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),sp,lai,meteo,soil_mod, sep = "_")
+  for (site_name in sites) {
     
-  } else {
-    name<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_mod, sep = "_")
-  }
-  
-  path<-file.path("data","PLOTS_SIMULATIONS",site_name,name)
-  dir.create(path, showWarnings = FALSE, recursive = T)
-  
-  saveRDS(SIM, file.path(path, paste0(name, ".RDS")))
-  
-  #SAVE SIMULATION DATA AS .CSV
-  
-  if (class(SIM_data)=="list") {
-    for (j in 1:length(SIM_data)) {
-      name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),names(SIM_data)[j],lai,meteo,soil_mod, sep = "_")
-      write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = F)
-      cat(paste0(site_name," ",names(SIM_data)[j]," SIMULATION DATA SAVED"),"\n\n")
+    #RUN SIMULATION
+    SIM <- run_simulation(
+      SITE_NAME = site_name,
+      YEARS = years,
+      TYPE = type,
+      SP = sp,
+      CONTROL = control,
+      LAI = lai,
+      METEO = meteo,
+      SOIL_MOD = soil_mod
+    )
+    
+    #EXTRACT SIMULATION DATA
+    SIM_data <- extract_output(
+      SIM,
+      LEAFPSIMAX = TRUE,
+      LEAFRWC = TRUE,
+      LFMC = TRUE,
+      LFMC_rodrigo = TRUE
+    )
+    
+    #SAVE SIMULATION OBJECT AS .RDS
+    if (type == "SINGLE") {
+      name <- paste(site_name, paste0(years[1], "-", years[length(years)]), sp, lai, meteo, soil_mod, sep = "_")
+    } else {
+      name <- paste(site_name, paste0(years[1], "-", years[length(years)]), lai, meteo, soil_mod, sep = "_")
     }
-  }
-  
-  if (class(SIM_data)=="data.frame"){
-    name2<-paste(site_name,paste0(years[1],"-",years[length(years)]),lai,meteo,soil_mod, sep = "_")
-    write.csv(SIM_data,file.path(path, paste0(name2, ".csv")), row.names = F)
-    cat(paste0(site_name," SIMULATION DATA SAVED"),"\n\n")
+    
+    path <- file.path("results", "SIMULATION_RESULTS", site_name, name)
+    dir.create(path, showWarnings = FALSE, recursive = TRUE)
+    
+    saveRDS(SIM, file.path(path, paste0(name, ".RDS")))
+    
+    #SAVE SIMULATION DATA AS .CSV
+    if (class(SIM_data) == "list") {
+      for (j in 1:length(SIM_data)) {
+        name2 <- paste(site_name, paste0(years[1], "-", years[length(years)]), names(SIM_data)[j], lai, meteo, soil_mod, sep = "_")
+        write.csv(SIM_data[[j]], file.path(path, paste0(name2, ".csv")), row.names = FALSE)
+        cat(paste0(site_name, " ", names(SIM_data)[j], " SIMULATION DATA SAVED"), "\n\n")
+      }
+    }
+    
+    if (class(SIM_data) == "data.frame") {
+      name2 <- paste(site_name, paste0(years[1], "-", years[length(years)]), lai, meteo, soil_mod, sep = "_")
+      write.csv(SIM_data, file.path(path, paste0(name2, ".csv")), row.names = FALSE)
+      cat(paste0(site_name, " SIMULATION DATA SAVED"), "\n\n")
+    }
   }
 }
 
-###########################
-# lai_options <- c("MODIS", "MEDFATE")
-# meteo_options <- c("ERA5", "INTER")
-# soil_options <- c(TRUE, FALSE)
-# 
-# parameter_combinations <- expand.grid(LAI = lai_options, 
-#                                       METEO = meteo_options, 
-#                                       SOIL_MOD = soil_options)
-#
-# write.csv(parameter_combinations, "data/aaaaaaaaaaaaaaaaa.csv", row.names = F)
+
+# sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
+
+# run_simulation_save_data(sites,"MODIS",  "INTER", TRUE)
+# run_simulation_save_data(sites,"MEDFATE","INTER", TRUE)
+# run_simulation_save_data(sites,"MODIS",  "INTER", FALSE)
+# run_simulation_save_data(sites,"MEDFATE","INTER", FALSE)
+
+# sites<-CAT_FR_SITES$site_name
+
+# run_simulation_save_data(sites,"MODIS",  "ERA5", TRUE)
+# run_simulation_save_data(sites,"MEDFATE","ERA5", TRUE)
+# run_simulation_save_data(sites,"MODIS",  "ERA5", FALSE)
+# run_simulation_save_data(sites,"MEDFATE","ERA5", FALSE)
 
 
-###############################
 
-# save<-list(forest = forest, forest2spwbInput = x, sim = results[[1]])
-# 
-# saveRDS(save, paste0("enviar/",SP,"_",SITE_NAME,"_",LAI,"_",METEO,"_",SOIL_MOD,".RDS"))
