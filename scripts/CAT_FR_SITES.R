@@ -141,14 +141,6 @@ CAT_FR_SITES$source<-NA
 CAT_FR_SITES$source <- replace(CAT_FR_SITES$source, 1:9, "CAT")
 CAT_FR_SITES$source <- replace(CAT_FR_SITES$source, 10:40, "FR")
 
-
-
-<<<<<<< HEAD
-#####REMOVE D2BS1 AND D07S2 PLOT WE DON'T HAVE VEGETATION DATA IN THIS PLOTS ####
-=======
-#####REMOVE D2BS1 AND D07S2#### WE DON'T HAVE VEGETATION DATA IN THIS PLOTS 
->>>>>>> b458091555f4e0f970eecdc9f5bfc182f00c0d44
-
 CAT_FR_SITES<-CAT_FR_SITES[!CAT_FR_SITES$site_name %in% c("D2BS1", "D07S2"),]
 
 write.csv(CAT_FR_SITES,"data/CAT_FR_SITES.csv", row.names = F)
