@@ -2,8 +2,7 @@ raw_data/
 scripts/raw_scripts/
 data/PLOTS
 results/
-data/METEO_ERA5_DATA.csv
-data/METEO_INTERPOLATED_CAT_DATA.csv
+
 # History files
 .Rhistory
 .Rapp.history
