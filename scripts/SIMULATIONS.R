@@ -107,58 +107,77 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
   # Create an empty forest object
   forest <- emptyforest()
   
-  # if (TYPE == "ALL_FILTERED") {
-  #   
-  #   #keep only one of the repeated species
-  #   df_filtered <- shrubData %>%
-  #     group_by(Species) %>%
-  #     slice(which.max(Cover)) #if there are repeated measurement of one sp. choose the one with higher coverage
-  #   
-  #   
-  #   forest$shrubData <- df_filtered
-  #   
-  #   # Prepare the input for the SPWB model
-  #   x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
-  #   
-  #   # Run the SPWB
-  #   simulation <- spwb(x, 
-  #                      met, 
-  #                      latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
-  #                      elevation = elevation, 
-  #                      slope = slope, 
-  #                      aspect = aspect)
-  #   
-  #   return(simulation)
-  #   
-  # }
-  # 
+  if (TYPE == "ALL_FILTERED") {
+
+    #keep only one of the repeated species
+    df_filtered <- shrubData %>%
+      group_by(Species) %>%
+      slice(which.max(Cover)) #if there are repeated measurement of one sp. choose the one with higher coverage
+
+
+    forest$shrubData <- df_filtered
+
+    # Prepare the input for the SPWB model
+    x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
+
+    # Run the SPWB
+    simulation <- spwb(x,
+                       met,
+                       latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME],
+                       elevation = elevation,
+                       slope = slope,
+                       aspect = aspect)
+
+    return(simulation)
+
+  }
+  
+  if (TYPE == "ALL") {
+    
+    forest$shrubData <- shrubData
+    
+    # Prepare the input for the SPWB model
+    x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
+    
+    # Run the SPWB
+    simulation <- spwb(x,
+                       met,
+                       latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME],
+                       elevation = elevation,
+                       slope = slope,
+                       aspect = aspect)
+    
+    return(simulation)
+    
+  }
+
   # if (TYPE == "ALL_SINGLE")  {
-  #     
+  # 
   #   results <- list()  # Create an empty list to store the results
   #   for (i in 1:nrow(shrubData)) {
-  #     
+  # 
   #     df_species <- shrubData[i,]
   #     forest$shrubData <- df_species
-  #     
+  # 
   #     # Prepare the input for the SPWB model
   #     x <- forest2spwbInput(forest, soil, SpParams, CONTROL)
-  #     
+  # 
   #     # Run the simulation for this species
-  #     simulation <- spwb(x, 
-  #                        met, 
-  #                        latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME], 
-  #                        elevation = elevation, 
-  #                        slope = slope, 
+  #     simulation <- spwb(x,
+  #                        met,
+  #                        latitude = CAT_FR_SITES$LAT[CAT_FR_SITES$site_name == SITE_NAME],
+  #                        elevation = elevation,
+  #                        slope = slope,
   #                        aspect = aspect)
-  #     
+  # 
   #     # Create a unique identifier combining Species and Plot
   #     id <- paste(i,df_species$Species, sep="_")
   #     # Store the result in the list
   #     results[[id]] <- simulation
   #   }
-  #   
+  # 
   #   return(results)
-  #   
+  # 
   #   }
   
   if (TYPE == "SINGLE") {
@@ -335,11 +354,11 @@ extract_output<-function(SIMULATION,LEAFPSIMAX=FALSE,LEAFRWC=FALSE,LFMC=FALSE,LF
 
 #################################SIMULATIONS####################################
 
-run_simulation_save_data <- function(sites, lai, meteo, soil_mod) {
+run_simulation_save_data <- function(sites, lai, meteo, soil_mod, type) {
   
   #SIMULATION PARAMETERS
   years <- c(2012:2022) # VECTOR OF YEARS
-  type <- "SINGLE" # ALL_FILTERED, #ALL_SINGLE #SINGLE
+  # type <- "SINGLE" # ALL_FILTERED, #ALL_SINGLE #SINGLE
   sp <- "MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
   transpirationMode <- "Sureau" # “Granier”, “Sperry”, “Cochard”, “Sureau”
   lfmcomp <- "leaf" #"leaf" or "fine"
@@ -403,17 +422,55 @@ run_simulation_save_data <- function(sites, lai, meteo, soil_mod) {
 
 # sites<-CAT_FR_SITES$site_name[CAT_FR_SITES$source=="CAT"]
 
-# run_simulation_save_data(sites,"MODIS",  "INTER", TRUE)
-# run_simulation_save_data(sites,"MEDFATE","INTER", TRUE)
-# run_simulation_save_data(sites,"MODIS",  "INTER", FALSE)
-# run_simulation_save_data(sites,"MEDFATE","INTER", FALSE)
+# run_simulation_save_data(sites,"MODIS",  "INTER", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","INTER", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MODIS",  "INTER", FALSE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","INTER", FALSE, "SINGLE")
 
 # sites<-CAT_FR_SITES$site_name
 
-# run_simulation_save_data(sites,"MODIS",  "ERA5", TRUE)
-# run_simulation_save_data(sites,"MEDFATE","ERA5", TRUE)
-# run_simulation_save_data(sites,"MODIS",  "ERA5", FALSE)
-# run_simulation_save_data(sites,"MEDFATE","ERA5", FALSE)
+# run_simulation_save_data(sites,"MODIS",  "ERA5", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","ERA5", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MODIS",  "ERA5", FALSE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","ERA5", FALSE, "SINGLE")
 
+##################################################################################################################################
 
+simulation <- function(sites, lai, meteo, soil_mod, type) {
+  
+  #SIMULATION PARAMETERS
+  years <- c(2012:2022) # VECTOR OF YEARS
+  # type <- "SINGLE" # ALL_FILTERED, #ALL_SINGLE #SINGLE
+  sp <- "MEASURED" # !!ONLY IF TYPE IS SINGLE!! vector of Species Names for specific species OR "MEASURED" for measured LFMC species
+  transpirationMode <- "Sureau" # “Granier”, “Sperry”, “Cochard”, “Sureau”
+  lfmcomp <- "leaf" #"leaf" or "fine"
+  control <- defaultControl(transpirationMode)
+  control$segmentedXylemVulnerability <- FALSE
+  control$lfmcComponent <- lfmcomp
+  
+  
+  for (site_name in sites) {
+    
+    #RUN SIMULATION
+    SIM <- run_simulation(
+      SITE_NAME = site_name,
+      YEARS = years,
+      TYPE = type,
+      SP = sp,
+      CONTROL = control,
+      LAI = lai,
+      METEO = meteo,
+      SOIL_MOD = soil_mod
+    )
+  }
+  
+  return(SIM)
+}
+
+sites <- "D2AS1"
+all_filtered <- simulation(sites,"MODIS","ERA5", FALSE, "ALL_FILTERED")
+all <- simulation(sites,"MODIS","ERA5", FALSE, "ALL")
+
+shinyplot(all_filtered)
+shinyplot(all)
 
