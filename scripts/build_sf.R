@@ -102,6 +102,46 @@ build_sf<-function(plot_source = c("CAT", "FR"),
   sf<- sf::st_as_sf(tibble::as_tibble(sf[keep,,drop = FALSE]))
 }
 
+extract_output<-function(x,
+                         LEAFPSIMAX=TRUE,
+                         LEAFRWC=TRUE,
+                         LFMC=TRUE,
+                         LFMC_rodrigo=TRUE){
+  
+  extracted_data<-list()
+  
+  if (LEAFPSIMAX==T) {
+    extracted_data[["LEAFPSIMAX_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafPsiMax")
+  }
+  
+  if (LEAFRWC==T) {
+    extracted_data[["LEAFRWC_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafRWC")
+  }
+  
+  if (LFMC==T) {
+    extracted_data[["LFMC_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LFMC")
+    
+    if (LFMC_rodrigo==T) {
+      extracted_data[["LFMC_data"]]$LFMC_rodrigo <- 91.87 - (31.12 * log10(-(extracted_data[["LEAFPSIMAX_data"]]$LeafPsiMax)))
+      
+    }
+  }
+  
+  for (i in 1:length(extracted_data)) {
+    if (i==1){
+      df<-extracted_data[[i]]
+    }else {
+      df<-merge(df,extracted_data[[i]], by = intersect(c("date","cohort","species"), c("date","cohort","species")))
+    }
+  }
+  
+  df <- df[order(df$species, df$date),]
+  
+  return(df)
+  
+}
+
+
 library(medfateland)
 SpParams<-read.csv("data/SpParamsAlbert.csv")
 
@@ -136,18 +176,20 @@ for(i in 1:length(sp)) {
 sf <- dplyr::bind_rows(sf_vec)
 saveRDS(sf, "results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
 
-# Simulations before soil rock optimization
+# Granier simulations before soil rock optimization
 res <- spwb_spatial(sf, SpParams = SpParams, meteo = NULL, 
                     local_control = defaultControl("Granier"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
 saveRDS(res, "results/res_granier_FR_MODIS_ERA5_SOIL_MOD.rds")
 
-# Soil optimization
+# Simulations before soil rock optimization
 res <- spwb_spatial(sf, SpParams = SpParams, meteo = NULL, 
                     local_control = defaultControl("Sureau"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
+res[["simulated_data"]] <- lapply(res$result, extract_output)
 saveRDS(res, "results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 
+# Soil optimization
 sf_opt <- optimization_rock(sf, SpParams = SpParams, meteo = NULL, 
                              local_control = medfate::defaultControl("Sureau"),
                              parallelize = TRUE, chunk_size = 1)
@@ -156,4 +198,5 @@ saveRDS(sf_opt, "results/sf_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 res_opt <- spwb_spatial(sf_opt, SpParams = SpParams, meteo = NULL, 
                     local_control = defaultControl("Sureau"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
+res_opt[["simulated_data"]] <- lapply(res_opt$result, extract_output)
 saveRDS(res_opt, "results/res_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")

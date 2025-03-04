@@ -3,6 +3,9 @@ scripts/raw_scripts/
 data/PLOTS
 results/
 
+#Project file
+TFM_ALBERT.Rprok
+
 # History files
 .Rhistory
 .Rapp.history
