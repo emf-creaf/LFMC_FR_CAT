@@ -129,33 +129,52 @@ sp <- c("Acacia dealbata", # (1) Simulation fails
 # Cistus salviifolius 
 # Hippocrepis emerus 
 
+# Sureau simulations before soil modification
 sf_vec <- vector("list", length(sp))
 for(i in 1:length(sp)) {
   print(sp[i])
-  sf_vec[[i]] <- build_sf(plot_source = c("FR"), meteo_source="ERA5", species = sp[i], lai_source = "MODIS", years = 2008:2022)
-}
-sf <- dplyr::bind_rows(sf_vec)
-saveRDS(sf, "results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
+  sf_vec[[i]] <- build_sf(plot_source = c("FR"), 
+                          meteo_source="ERA5", 
+                          species = sp[i], 
+                          lai_source = "MODIS",
+                          soil_mod = FALSE,
+                          years = 2008:2022)}
+sf_nomod <- dplyr::bind_rows(sf_vec)
+saveRDS(sf_nomod, "results/sf_FR_MODIS_ERA5_SOIL_NOMOD.rds")
 
-# Granier simulations before soil rock optimization
-res <- spwb_spatial(sf, SpParams = SpParams, meteo = NULL, 
-                    local_control = defaultControl("Granier"), parallelize = TRUE,
+res <- spwb_spatial(sf_nomod, SpParams = SpParams, meteo = NULL, 
+                    local_control = defaultControl("Sureau"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
-saveRDS(res, "results/res_granier_FR_MODIS_ERA5_SOIL_MOD.rds")
+saveRDS(res, "results/res_sureau_FR_MODIS_ERA5_SOIL_NOMOD.rds")
 
-# Simulations before soil rock optimization
-res <- spwb_spatial(sf, SpParams = SpParams, meteo = NULL, 
+
+# Sureau simulations after soil modification
+sf_vec <- vector("list", length(sp))
+for(i in 1:length(sp)) {
+  print(sp[i])
+  sf_vec[[i]] <- build_sf(plot_source = c("FR"), 
+                          meteo_source="ERA5", 
+                          species = sp[i], 
+                          lai_source = "MODIS",
+                          soil_mod = TRUE,
+                          years = 2008:2022)
+}
+sf_mod <- dplyr::bind_rows(sf_vec)
+saveRDS(sf_mod, "results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
+
+res <- spwb_spatial(sf_mod, SpParams = SpParams, meteo = NULL, 
                     local_control = defaultControl("Sureau"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
 saveRDS(res, "results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 
 # Soil optimization
-sf_opt <- optimization_rock(sf, SpParams = SpParams, meteo = NULL, 
+sf_opt <- optimization_rock(sf_mod, SpParams = SpParams, meteo = NULL, 
                              local_control = medfate::defaultControl("Sureau"),
-                             parallelize = TRUE, chunk_size = 1, PLCquantile = 0.7,
+                             parallelize = TRUE, chunk_size = 1, PLCquantile = 0.5,
                              qPLC_target = 12, qPLC_tol = 1)
 saveRDS(sf_opt, "results/sf_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 
+# Sureau simulations after soil rock optimization
 res_opt <- spwb_spatial(sf_opt, SpParams = SpParams, meteo = NULL, 
                     local_control = defaultControl("Sureau"), parallelize = TRUE,
                     summary_function = summary.spwb, chunk_size = 1)
