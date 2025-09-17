@@ -97,13 +97,13 @@ comparison_tables <- function(sf, res, DF_TYPE = c("ALL"), TH = 3,
         dplyr::rename(date = date, site = LocalityName, specie = sp_correct_name, LFMC_observed = LFMC) |>
         dplyr::filter(specie == sp) |>
         dplyr::filter(site == site_name, lubridate::year(date) >= years[1])|>
-        dplyr::select(date, LFMC_observed, specie)
+        dplyr::select(site, date, LFMC_observed, specie)
     } else if (source == "FR") {
       FILTERED_LFMC <- FR_LFMC |>
         dplyr::rename(date = date, site = SiteCode, specie = sp_correct_name, LFMC_observed = RobustLFMC) |>
         dplyr::filter(specie == sp) |>
         dplyr::filter(site == site_name, lubridate::year(date) >= years[1]) |> 
-        dplyr::select(date, LFMC_observed, specie)
+        dplyr::select(site, date, LFMC_observed, specie)
         
     }
     MERGED_LFMC_ALL <- simulation_data[[i]] |>
@@ -186,8 +186,12 @@ scatter_plot <- function(ct, detect_outliers = TRUE, remove_outlier = TRUE, LFMC
 
   x_variable <- if (LFMC_TYPE == "MODELED") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_full_mechanistic, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_full_mechanistic)
+    x_label = "LFMC fully mechanistic (%)"
   } else if (LFMC_TYPE == "RODRIGO") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_rodrigo, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_rodrigo)
+    x_label = "LFMC semi-mechanistic (%)"
   }
   
    base_plot <- base_plot +
@@ -200,7 +204,7 @@ scatter_plot <- function(ct, detect_outliers = TRUE, remove_outlier = TRUE, LFMC
   if (detect_outliers) {
     if (remove_outlier) {
       scatter_p <- base_plot +
-        geom_point(data = ct |> dplyr::filter(!is_outlier), colour = "black") #alpha = .3, stroke = 1, size = 2
+        geom_point(data = ct |> dplyr::filter(!is_outlier), colour = "black", alpha = 0.8) #alpha = .3, stroke = 1, size = 2
     } else {
       scatter_p <- base_plot +
         geom_point(aes(colour = is_outlier)) +
@@ -208,78 +212,86 @@ scatter_plot <- function(ct, detect_outliers = TRUE, remove_outlier = TRUE, LFMC
     }
   } else {
     scatter_p <- base_plot +
-      geom_point()
+      geom_point(colour = "black", alpha = 0.8)
   }
   
   scatter_p <- scatter_p +
     stat_smooth(method = "lm", se = FALSE)
   
-  
+  scatter_p <- scatter_p +
+    annotate(geom = "text", x = 150, y = 20, size= 3, 
+             label = paste0("Bias = ", round(stats$Bias,1),
+                            " MAE = ", round(stats$MAE,1), 
+                            " R2 = ", round(100*stats$r2,1),"%"))
+
+  scatter_p <- scatter_p +
+    xlab(x_label)+ ylab("LFMC observed (%)")
   return(scatter_p)
 }
 
+scatter_plot_panel<-function(ct, detect_outliers = TRUE, remove_outlier = TRUE, title = "") {
+  p1 <- scatter_plot(ct, detect_outliers, remove_outlier, "MODELED") +
+    labs(subtitle = "Fully mechanistic", title = title)
+  p2 <- scatter_plot(ct, detect_outliers, remove_outlier, "RODRIGO") +
+    labs(subtitle = "Semi-mechanistic", title = "")
+  return(cowplot::plot_grid(p1, p2, ncol = 2))
+}
+scatter_plot_three_panels <-function(ct1, ct2, ct3, 
+                                     label1 = "Soilgrids", 
+                                     label2 = "Soilgrids + soil depth", 
+                                     label3 = "Soilgrids + soil depth + rock optimization", 
+                                     detect_outliers = TRUE, remove_outlier = TRUE) {
+  p1 <- scatter_plot_panel(ct1, detect_outliers, remove_outlier, title = label1)
+  p2 <- scatter_plot_panel(ct2, detect_outliers, remove_outlier, title = label2)
+  p3 <- scatter_plot_panel(ct3, detect_outliers, remove_outlier, title = label3)
+  return(cowplot::plot_grid(p1, p2, p3, nrow = 3))
+}
 
 sf <- readRDS("results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
-res <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
-res[["comparison_tables"]] <- comparison_tables(sf, res, DF_TYPE = c("summer", "outlier"))
+res_nomod <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_NOMOD.rds")
+res_nomod[["comparison_tables"]] <- comparison_tables(sf, res_nomod, DF_TYPE = c("summer", "outlier"))
+res_mod <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
+res_mod[["comparison_tables"]] <- comparison_tables(sf, res_mod, DF_TYPE = c("summer", "outlier"))
 res_opt <- readRDS("results/res_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 res_opt[["comparison_tables"]] <- comparison_tables(sf, res_opt, DF_TYPE = c("summer", "outlier"))
 
-res_comparison_all <- dplyr::bind_rows(res$comparison_tables)
+res_nomod_comparison_all <- dplyr::bind_rows(res_nomod$comparison_tables)
+res_mod_comparison_all <- dplyr::bind_rows(res_mod$comparison_tables)
 res_opt_comparison_all <- dplyr::bind_rows(res_opt$comparison_tables)
 
-i = 47
-time_plot_summer(res$comparison_tables[[i]])
+i = 2
+time_plot_summer(res_nomod$comparison_tables[[i]])
+time_plot_summer(res_mod$comparison_tables[[i]])
 time_plot_summer(res_opt$comparison_tables[[i]])
-scatter_plot(res$comparison_tables[[i]], LFMC_TYPE = "MODELED")
-scatter_plot(res$comparison_tables[[i]], LFMC_TYPE = "RODRIGO")
-scatter_plot(res_opt$comparison_tables[[i]], LFMC_TYPE = "MODELED")
-scatter_plot(res_opt$comparison_tables[[i]], LFMC_TYPE = "RODRIGO")
 
 
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Arbutus unedo"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Arbutus unedo"), LFMC_TYPE = "MODELED")
+spp <- c("Acacia dealbata", # (1) Simulation fails
+        "Arbutus unedo", # (2) OK
+        "Buxus sempervirens", # (1) OK
+        "Cistus albidus", # (5) OK
+        "Cistus monspeliensis", # (9) OK
+        "Cytisophyllum sessilifolium", # (1) OK
+        "Cytisus oromediterraneus", # (1) OK
+        "Erica arborea", # (7) OK
+        "Erica cinerea", # (1) OK
+        "Erica scoparia subsp. scoparia", # (2) OK
+        "Genista cinerea", # (3) OK
+        "Genista scorpius", # (1) OK
+        "Juniperus oxycedrus subsp. oxycedrus", # (2) OK
+        "Pinus halepensis", # (0)
+        "Quercus coccifera", # (4) OK
+        "Quercus ilex", # (4) OK
+        "Rosmarinus officinalis")
 
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Buxus sempervirens"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Buxus sempervirens"), LFMC_TYPE = "MODELED")
+for(sp in spp) {
+  print(sp)
+  p<- scatter_plot_three_panels(res_nomod_comparison_all |> dplyr::filter(species==sp),
+                                res_mod_comparison_all |> dplyr::filter(species==sp),
+                                res_opt_comparison_all |> dplyr::filter(species==sp))
+  ggsave(paste0("plots/scatter_plots_", sp, ".png"), p, width = 9, height=10)
+}
 
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Cistus albidus"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Cistus albidus"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Cistus monspeliensis"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Cistus monspeliensis"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Cytisophyllum sessilifolium"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Cytisophyllum sessilifolium"), LFMC_TYPE = "MODELED")
-
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Erica arborea"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Erica arborea"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Genista cinerea"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Genista cinerea"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Juniperus oxycedrus subsp. oxycedrus"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Juniperus oxycedrus subsp. oxycedrus"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Juniperus oxycedrus subsp. oxycedrus"), LFMC_TYPE = "RODRIGO")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Juniperus oxycedrus subsp. oxycedrus"), LFMC_TYPE = "RODRIGO")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Quercus coccifera"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Quercus coccifera"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Quercus ilex"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Quercus ilex"), LFMC_TYPE = "MODELED")
-
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Rosmarinus officinalis"), LFMC_TYPE = "MODELED")
-scatter_plot(res_opt_comparison_all|> dplyr::filter(species=="Rosmarinus officinalis"), LFMC_TYPE = "MODELED")
-scatter_plot(res_comparison_all |> dplyr::filter(species=="Rosmarinus officinalis"), LFMC_TYPE = "RODRIGO")
-
-scatter_plot(res_comparison_all, LFMC_TYPE = "RODRIGO")
-scatter_plot(res_opt_comparison_all, LFMC_TYPE = "RODRIGO")
-
-evalstats(res_comparison_all$LFMC_observed, res_comparison_all$LFMC_full_mechanistic)
-evalstats(res_opt_comparison_all$LFMC_observed, res_opt_comparison_all$LFMC_full_mechanistic)
-
-evalstats(res_comparison_all$LFMC_observed, res_comparison_all$LFMC_rodrigo)
-evalstats(res_opt_comparison_all$LFMC_observed, res_opt_comparison_all$LFMC_rodrigo)
+p<- scatter_plot_three_panels(res_nomod_comparison_all,
+                              res_mod_comparison_all,
+                              res_opt_comparison_all)
+ggsave(paste0("plots/scatter_plots_all.png"), p, width = 9, height=10)

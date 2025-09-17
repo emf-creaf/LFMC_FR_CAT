@@ -1,6 +1,7 @@
 library(medfateland)
 sf <- readRDS("results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
-res <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
+res_nomod <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_NOMOD.rds")
+res_mod <- readRDS("results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 res_opt <- readRDS("results/res_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
 
 extract_spparams<-function(x, param_selection = c( "Name","Z50", "Z95", "SLA",
@@ -29,5 +30,6 @@ extract_sew<-function(x) {
 }
 
 df <- sf::st_drop_geometry(sf[,c("id", "site_name", "species")])
-df$SEW_MOD <- unlist(lapply(res$state, extract_sew))
+df$SEW_NOMOD <- unlist(lapply(res_nomod$state, extract_sew))
+df$SEW_MOD <- unlist(lapply(res_mod$state, extract_sew))
 df$SEW_OPT <- unlist(lapply(res_opt$state, extract_sew))
