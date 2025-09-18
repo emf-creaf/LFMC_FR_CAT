@@ -2,10 +2,10 @@ library(medfateland)
 library(medfate)
 library(ggplot2)
 
-CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
+CAT_LFMC<-read.csv("data/inputs/CAT_LFMC.csv")
 CAT_LFMC$date<-as.Date(CAT_LFMC$date)
 
-FR_LFMC<-read.csv("data/FR_LFMC.csv")
+FR_LFMC<-read.csv("data/inputs/FR_LFMC.csv")
 FR_LFMC$date<-as.Date(FR_LFMC$date,format = "%d/%m/%Y")
 
 
@@ -49,7 +49,7 @@ extract_output<-function(x,
                          LEAFPSIMAX=TRUE,
                          LEAFRWC=TRUE,
                          LFMC=TRUE,
-                         LFMC_rodrigo=TRUE){
+                         LFMC_semi_mechanistic=TRUE){
   
   extracted_data<-list()
   
@@ -65,8 +65,8 @@ extract_output<-function(x,
     extracted_data[["LFMC_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LFMC") |>
       dplyr::rename(LFMC_full_mechanistic = LFMC)
     
-    if (LFMC_rodrigo==T) {
-      extracted_data[["LFMC_data"]]$LFMC_rodrigo <- 91.87 - (31.12 * log10(-(extracted_data[["LEAFPSIMAX_data"]]$LeafPsiMax)))
+    if (LFMC_semi_mechanistic==T) {
+      extracted_data[["LFMC_data"]]$LFMC_semi_mechanistic <- 91.87 - (31.12 * log10(-(extracted_data[["LEAFPSIMAX_data"]]$LeafPsiMax)))
       
     }
   }
@@ -91,24 +91,30 @@ comparison_tables <- function(sf, res, DF_TYPE = c("ALL"), TH = 3,
   simulation_data <- lapply(res$result, extract_output)
   for(i in 1:nrow(sf)) {
     source <- sf$source[i]
-    sp <- sf$species[i]
     site_name <- sf$site_name[i]
+    lai_source <- sf$lai_source[i]
+    meteo_source <- sf$meteo_source[i]
+    soil_mod <- sf$soil_mod[i]
     if (source == "CAT") {
       FILTERED_LFMC <- CAT_LFMC |>
         dplyr::rename(date = date, site = LocalityName, specie = sp_correct_name, LFMC_observed = LFMC) |>
-        dplyr::filter(specie == sp) |>
         dplyr::filter(site == site_name, lubridate::year(date) >= years[1])|>
-        dplyr::select(site, date, LFMC_observed, specie)
+        dplyr::select(date, LFMC_observed, specie)
     } else if (source == "FR") {
       FILTERED_LFMC <- FR_LFMC |>
         dplyr::rename(date = date, site = SiteCode, specie = sp_correct_name, LFMC_observed = RobustLFMC) |>
-        dplyr::filter(specie == sp) |>
         dplyr::filter(site == site_name, lubridate::year(date) >= years[1]) |> 
-        dplyr::select(site, date, LFMC_observed, specie)
+        dplyr::select(date, LFMC_observed, specie)
         
     }
+    measured_species <- unique(FILTERED_LFMC$specie)
     MERGED_LFMC_ALL <- simulation_data[[i]] |>
-      dplyr::mutate(date = as.Date(date)) |>
+      dplyr::filter(species %in% measured_species) |>
+      dplyr::mutate(date = as.Date(date),
+                    site = site_name,
+                    lai_source = lai_source,
+                    meteo_source = meteo_source,
+                    soil_mod = soil_mod) |>
       dplyr::full_join(FILTERED_LFMC, by = c("date" = "date", "species" = "specie"))
     
     if ("summer" %in% DF_TYPE) {
