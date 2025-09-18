@@ -1,8 +1,9 @@
 library(medfateland)
 library(medfate)
 library(ggplot2)
-# CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
-# CAT_LFMC$date<-as.Date(CAT_LFMC$date)
+
+CAT_LFMC<-read.csv("data/CAT_LFMC.csv")
+CAT_LFMC$date<-as.Date(CAT_LFMC$date)
 
 FR_LFMC<-read.csv("data/FR_LFMC.csv")
 FR_LFMC$date<-as.Date(FR_LFMC$date,format = "%d/%m/%Y")

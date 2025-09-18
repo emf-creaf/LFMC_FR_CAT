@@ -1,7 +1,7 @@
 
 build_sf<-function(plot_source = c("CAT", "FR"), 
-                   meteo_source = "ERA5", 
-                   lai_source = "MODIS",
+                   meteo_source = "INTER", 
+                   lai_source = "MEDFATE",
                    soil_mod = TRUE,
                    species = "ALL",
                    years = c(2012:2022)) {
@@ -83,13 +83,11 @@ build_sf<-function(plot_source = c("CAT", "FR"),
       met <- met[met$YEAR %in% years, ]
       row.names(met) <- as.character(met$Dates)
       met$Precipitation <- floor(met$Precipitation) # To avoid drizzle effect on PET
-    } else if (meteo_source == "INTER" && plot_source == "CAT")  {
+    } else if (meteo_source == "INTER")  {
       met <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_interpolator.csv"))
       met$dates <- as.Date(met$dates)
       met$YEAR <- as.numeric(format(met$dates, "%Y"))
       met <- met[met$YEAR %in% years, ]
-    } else if (meteo_source == "INTER" && plot_source == "FR") {
-      stop("No interpolators meteo data in FR plots, \nMETEO = INTERPOLATORS only in CAT plots. ")
     }
 
     sf$meteo[[i]] <- met
