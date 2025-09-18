@@ -1,10 +1,12 @@
 raw_data/
 scripts/raw_scripts/
-data/PLOTS
-results/
+data/inputs/PLOTS
+data/results/
+data/inputs/Mete*
+data/inputs/CAT_LFMC.csv
 
 #Project file
-TFM_ALBERT.Rprok
+TFM_ALBERT.Rproj
 
 # History files
 .Rhistory
