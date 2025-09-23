@@ -1,9 +1,12 @@
 raw_data/
 scripts/raw_scripts/
+plots/
 data/inputs/PLOTS
 data/results/
 data/inputs/Mete*
 data/inputs/CAT_LFMC.csv
+data/comparison_tables/*
+data/eval*
 
 #Project file
 TFM_ALBERT.Rproj
