@@ -102,7 +102,7 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FAL
   }
   
   scatter_p <- scatter_p +
-    stat_smooth(method = "lm", se = FALSE)
+    stat_smooth(method = "lm", se = FALSE, formula = "y ~ x")
   
   scatter_p <- scatter_p +
     annotate(geom = "text", x = 150, y = 20, size= 3, 
@@ -134,7 +134,7 @@ combined_plot<-function(ct, sp_name, site_name, scenario, ...) {
   return(cowplot::plot_grid(p1, p2, nrow=2))
 }
 
-for(taw in c(60, 80, 100)) {
+for(taw in c(40, 60, 80, 100, 120)) {
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {
       cat(paste0("METEO: " , meteo, " / LAI: ", lai,  " / TAW: ", taw, "\n\n"))

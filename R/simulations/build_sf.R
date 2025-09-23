@@ -76,8 +76,10 @@ build_sf<-function(SpParams,
       #Read the MODIS LAI data
       LAI_MODIS<-read.csv(paste0("data/inputs/PLOTS/", SITE_NAME, "/MODIS_LAI.csv"))
       LAI_YEAR<-unique(format(as.Date(f$shrubData$Date),"%Y"))
+      ## Truncate to LAI = 3.0
+      lai_modis <- min(3.0, LAI_MODIS$MCD15A2H_Lai_mean_top5[LAI_MODIS$YEAR %in% LAI_YEAR])
       #New column LAI in shrubData
-      if(nrow(f$shrubData)>0) f$shrubData$LAI<-f$shrubData$LAI/sum(f$shrubData$LAI)*LAI_MODIS$MCD15A2H_Lai_mean_top5[LAI_MODIS$YEAR %in% LAI_YEAR]
+      if(nrow(f$shrubData)>0) f$shrubData$LAI<-f$shrubData$LAI/sum(f$shrubData$LAI)*lai_modis
     }
     sf$forest[[i]] <- f
     sf$lai_stand[i] <- sum(f$shrubData$LAI)

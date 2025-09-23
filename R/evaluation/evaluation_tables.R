@@ -43,7 +43,7 @@ for(meteo in c("ERA5", "INTER")) {
     et_table_comb <- data.frame() 
     cat(paste0(meteo, "-", lai, "\n"))
     # for(taw in c(40,60,80,100,120,140,160)) {
-    for(taw in c(40, 60, 80, 100)) {
+    for(taw in c(40, 60, 80, 100, 120)) {
       ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_",taw,".rds"))
       et <- dplyr::bind_rows(lapply(ct, evaluation_table))
       et_table_comb <- dplyr::bind_rows(et_table_comb, et)
@@ -114,25 +114,83 @@ print(table(et_table_all$lai_source[et_table_all$MinMAEsemi], et_table_all$meteo
 cat("FULL vs SEMI: \n")
 print(table(et_table_all$lfmc[et_table_all$MinMAEall]))
 
+et_table_best <- et_table_all[et_table_all$MinMAE, ]
+saveRDS(et_table_best, "data/evaluation_table_best.rds")
 et_table_best_all <- et_table_all[et_table_all$MinMAEall, ]
-saveRDS(et_table_best_all, "data/evaluation_table_best.rds")
+saveRDS(et_table_best_all, "data/evaluation_table_best_all.rds")
 et_table_best_full <- et_table_all[et_table_all$MinMAEfull, ]
 saveRDS(et_table_best_full, "data/evaluation_table_best_full.rds")
 et_table_best_semi <- et_table_all[et_table_all$MinMAEsemi, ]
 saveRDS(et_table_best_semi, "data/evaluation_table_best_semi.rds")
 
-et_table_best_full |>
+sum_full <- et_table_best_full |>
   dplyr::group_by(species) |>
   dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias),
                    MAE = mean(MAE),
                    RMSE = mean(RMSE),
-                   r2 = mean(r2)) |>
-  dplyr::arrange(r2)
+                   r2 = mean(r2)) 
 
-et_table_best_semi |>
+sum_semi <- et_table_best_semi |>
   dplyr::group_by(species) |>
   dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias),
                    MAE = mean(MAE),
                    RMSE = mean(RMSE),
-                   r2 = mean(r2)) |>
-  dplyr::arrange(r2)
+                   r2 = mean(r2)) 
+
+
+# Which is the best combination of lai/meteo source, soil taw and lfmc estimation method
+# Highest r2 
+# ERA5/MODIS with 120 mm and semi
+# ERA5/MODIS with 120 mm and full
+# Lowest bias
+# ERA5/MODIS with 80 mm and full
+# ERA5/ALLOM with 60 mm and full
+evaluation_table_all |>
+  dplyr::group_by(meteo_source, lai_source, taw, lfmc) |>
+  dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias, na.rm = TRUE),
+                   MAE = mean(MAE, na.rm = TRUE),
+                   RMSE = mean(RMSE, na.rm = TRUE),
+                   r2 = mean(r2, na.rm = TRUE)) |>
+  dplyr::arrange(abs(Bias))
+
+# What is the best combination of lai/meteo source and lfmc assuming optimum soil estimation?
+# Highest r2 
+# ERA5/ALLOM/full
+# ERA5/MODIS/full
+# Lowest bias
+# INTER/MODIS/semi
+# INTER/MODIS/full
+evaluation_table_best |>
+  dplyr::group_by(meteo_source, lai_source, lfmc) |>
+  dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias, na.rm = TRUE),
+                   MAE = mean(MAE, na.rm = TRUE),
+                   RMSE = mean(RMSE, na.rm = TRUE),
+                   r2 = mean(r2, na.rm = TRUE)) |>
+  dplyr::arrange(-abs(r2))
+  
+
+# What is the best combination for full LFMC? (assuming optimum soil)
+# ERA5/ALLOM
+et_table_best_full |>
+  dplyr::group_by(meteo_source, lai_source) |>
+  dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias, na.rm = TRUE),
+                   MAE = mean(MAE, na.rm = TRUE),
+                   RMSE = mean(RMSE, na.rm = TRUE),
+                   r2 = mean(r2, na.rm = TRUE)) 
+
+# What is the best combination for semi LFMC? (assuming optimum soil)
+# ERA5/MODIS
+et_table_best_semi |>
+  dplyr::group_by(meteo_source, lai_source) |>
+  dplyr::summarise(n = dplyr::n(),
+                   Bias = mean(Bias, na.rm = TRUE),
+                   MAE = mean(MAE, na.rm = TRUE),
+                   RMSE = mean(RMSE, na.rm = TRUE),
+                   r2 = mean(r2, na.rm = TRUE)) 
+
+

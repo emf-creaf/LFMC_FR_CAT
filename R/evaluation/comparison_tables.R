@@ -48,7 +48,7 @@ extract_output<-function(x,
   
 }
 
-comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2,
+comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5,
                               years = c(2012:2022)) {
   output <- vector("list", nrow(sf))
   simulation_data <- lapply(res$result, extract_output)
@@ -75,6 +75,7 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2,
       dplyr::filter(species %in% measured_species) |>
       dplyr::mutate(date = as.Date(date),
                     site = site_name,
+                    source = source,
                     lai_source = lai_source,
                     meteo_source = meteo_source,
                     soil_mod = soil_mod) |>
@@ -98,7 +99,7 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2,
     # Add taw info
     MERGED_LFMC_ALL <-  MERGED_LFMC_ALL |>
       dplyr::mutate(taw = taw) |>
-      dplyr::relocate("site", "lai_source", "meteo_source", "soil_mod", "taw", .before = "LeafPsiMax")
+      dplyr::relocate("site", "source","lai_source", "meteo_source", "soil_mod", "taw", .before = "LeafPsiMax")
     
     output[[i]] <- MERGED_LFMC_ALL
     
@@ -111,7 +112,7 @@ for(meteo in c("ERA5", "INTER")) {
   for(lai in c("ALLOM", "MODIS")) {
     sf <- readRDS(paste0("data/results/sf_", meteo, "_", lai, "_MOD.rds"))
     # for(taw in c(40,60,80,100,120,140,160)) {
-    for(taw in c(40, 60, 80,100)) {
+    for(taw in c(40, 60, 80,100, 120)) {
       cat(paste0(meteo, "-", lai, "-",taw,"\n"))
       res <- readRDS(paste0("data/results/spwb_", meteo, "_", lai, "_MOD_",taw,".rds"))
       ct <- comparison_tables(sf, res, taw, DF_TYPE = c("outlier_top"))
