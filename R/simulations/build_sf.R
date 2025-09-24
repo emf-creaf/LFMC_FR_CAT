@@ -42,7 +42,7 @@ build_sf<-function(SpParams,
     f$shrubData$Date <- date
     
     ## Estimate plant LAI (for single species simulations or correction using MODIS)
-    f$shrubData$LAI <- medfate::plant_LAI(f, SpParams)
+    f$shrubData$LAI <- pmax(0.01, medfate::plant_LAI(f, SpParams))
     
     if(species !="ALL") {
       lai_tot <- sum(f$shrubData$LAI)
@@ -123,16 +123,16 @@ build_sf<-function(SpParams,
 SpParams<-read.csv("data/inputs/SpParamsAlbert.csv")
 
 sf_inter_allom_mod <- build_sf(SpParams, meteo_source = "INTER", lai_source = "ALLOM", soil_mod = TRUE)
-saveRDS(sf_inter_allom_mod, "data/results/sf_INTER_ALLOM_MOD.rds")
+saveRDS(sf_inter_allom_mod, "data/sf_inputs/sf_INTER_ALLOM_MOD.rds")
 
 sf_era5_allom_mod <- build_sf(SpParams, meteo_source = "ERA5", lai_source = "ALLOM", soil_mod = TRUE)
-saveRDS(sf_era5_allom_mod, "data/results/sf_ERA5_ALLOM_MOD.rds")
+saveRDS(sf_era5_allom_mod, "data/sf_inputs/sf_ERA5_ALLOM_MOD.rds")
 
 sf_inter_modis_mod <- build_sf(SpParams, meteo_source = "INTER", lai_source = "MODIS", soil_mod = TRUE)
-saveRDS(sf_inter_modis_mod, "data/results/sf_INTER_MODIS_MOD.rds")
+saveRDS(sf_inter_modis_mod, "data/sf_inputs/sf_INTER_MODIS_MOD.rds")
 
 sf_era5_modis_mod <- build_sf(SpParams, meteo_source = "ERA5", lai_source = "MODIS", soil_mod = TRUE)
-saveRDS(sf_era5_modis_mod, "data/results/sf_ERA5_MODIS_MOD.rds")
+saveRDS(sf_era5_modis_mod, "data/sf_inputs/sf_ERA5_MODIS_MOD.rds")
 
 # 
 # sp <- c("Acacia dealbata", # (1) Simulation fails

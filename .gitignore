@@ -7,6 +7,8 @@ data/inputs/Mete*
 data/inputs/CAT_LFMC.csv
 data/comparison_tables/*
 data/eval*
+data/TableS*
+data/sf_inputs/*
 
 #Project file
 TFM_ALBERT.Rproj

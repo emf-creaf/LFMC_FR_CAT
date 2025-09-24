@@ -110,9 +110,9 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
 
 for(meteo in c("ERA5", "INTER")) {
   for(lai in c("ALLOM", "MODIS")) {
-    sf <- readRDS(paste0("data/results/sf_", meteo, "_", lai, "_MOD.rds"))
+    sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
     # for(taw in c(40,60,80,100,120,140,160)) {
-    for(taw in c(40, 60, 80,100, 120)) {
+    for(taw in c(100)) {
       cat(paste0(meteo, "-", lai, "-",taw,"\n"))
       res <- readRDS(paste0("data/results/spwb_", meteo, "_", lai, "_MOD_",taw,".rds"))
       ct <- comparison_tables(sf, res, taw, DF_TYPE = c("outlier_top"))

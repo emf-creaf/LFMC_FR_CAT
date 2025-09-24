@@ -3,6 +3,10 @@ library(medfateland)
 ct <- readRDS(paste0("data/comparison_tables/ct_INTER_ALLOM_MOD_40.rds"))
 ct_bind <- dplyr::bind_rows(ct)
 
+TS_full <- ct_bind |>
+  dplyr::group_by(species, site) |>
+  dplyr::summarize(maxFMC = ceiling(max(LFMC_full_mechanistic)), .groups = "drop")
+
 TS2 <- ct_bind |>
   dplyr::filter(!is.na(LFMC_observed))|>
   dplyr::filter(is_summer)|>
@@ -10,8 +14,10 @@ TS2 <- ct_bind |>
   dplyr::group_by(species, site) |>
   dplyr::summarize(Date_ini = as.character(min(date)), 
                    Date_fin = as.character(max(date)), 
+                   n = dplyr::n(),
                    LFMC_min = min(LFMC_observed), 
                    LFMC_median = median(LFMC_observed), 
-                   LFMC_max = max(LFMC_observed), .groups = "drop")
+                   LFMC_max = max(LFMC_observed), .groups = "drop") |>
+  dplyr::left_join(TS_full, by=c( "species", "site"))
 
-write.csv2(TS2, "data/results/TableS2.csv", row.names = FALSE)
+write.csv2(TS2, "data/TableS2.csv", row.names = FALSE)

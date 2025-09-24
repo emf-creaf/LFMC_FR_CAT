@@ -108,8 +108,10 @@ saveRDS(et_table_all, "data/evaluation_table_all.rds")
 
 
 cat("FULL source: \n")
+print(table(et_table_all$taw[et_table_all$MinMAEfull]))
 print(table(et_table_all$lai_source[et_table_all$MinMAEfull], et_table_all$meteo_source[et_table_all$MinMAEfull]))
 cat("SEMI source: \n")
+print(table(et_table_all$taw[et_table_all$MinMAEsemi]))
 print(table(et_table_all$lai_source[et_table_all$MinMAEsemi], et_table_all$meteo_source[et_table_all$MinMAEsemi]))
 cat("FULL vs SEMI: \n")
 print(table(et_table_all$lfmc[et_table_all$MinMAEall]))
@@ -139,6 +141,12 @@ sum_semi <- et_table_best_semi |>
                    RMSE = mean(RMSE),
                    r2 = mean(r2)) 
 
+# Range of results
+evaluation_table_all <- readRDS("data/evaluation_table_all.rds")
+evaluation_table_best <- readRDS("data/evaluation_table_best.rds")
+summary(evaluation_table_all$r2)
+summary(evaluation_table_all$MAE)
+summary(evaluation_table_all$Bias)
 
 # Which is the best combination of lai/meteo source, soil taw and lfmc estimation method
 # Highest r2 
