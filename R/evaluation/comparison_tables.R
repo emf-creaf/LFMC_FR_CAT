@@ -67,8 +67,9 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
       FILTERED_LFMC <- FR_LFMC |>
         dplyr::rename(date = date, site = SiteCode, specie = sp_correct_name, LFMC_observed = RobustLFMC) |>
         dplyr::filter(site == site_name, lubridate::year(date) >= years[1]) |> 
-        dplyr::select(date, LFMC_observed, specie)
-      
+        dplyr::select(date, LFMC_observed, specie) |> 
+        dplyr::mutate(specie = ifelse(specie == "Calicotome", "Calicotome spinosa", specie))|> 
+        dplyr::mutate(specie = ifelse(specie == "Calluna vulgaris", "Erica cinerea", specie)) # Erica cinerea in plot data and Calluna vulgaris in LFMC data
     }
     measured_species <- unique(FILTERED_LFMC$specie)
     MERGED_LFMC_ALL <- simulation_data[[i]] |>
@@ -108,11 +109,11 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
 }
 
 
-for(meteo in c("ERA5", "INTER")) {
+for(meteo in c("INTER", "ERA5")) {
   for(lai in c("ALLOM", "MODIS")) {
     sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
-    # for(taw in c(40,60,80,100,120,140,160)) {
-    for(taw in c(100)) {
+    # for(taw in c(30, 40, 50, 60,80,100,120,140,160)) {
+    for(taw in c(30,40,50,60)) {
       cat(paste0(meteo, "-", lai, "-",taw,"\n"))
       res <- readRDS(paste0("data/results/spwb_", meteo, "_", lai, "_MOD_",taw,".rds"))
       ct <- comparison_tables(sf, res, taw, DF_TYPE = c("outlier_top"))

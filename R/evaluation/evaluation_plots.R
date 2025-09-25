@@ -134,7 +134,7 @@ combined_plot<-function(ct, sp_name, site_name, scenario, ...) {
   return(cowplot::plot_grid(p1, p2, nrow=2))
 }
 
-for(taw in c(100)) {
+for(taw in c(30,40,50, 60)) {
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {
       cat(paste0("METEO: " , meteo, " / LAI: ", lai,  " / TAW: ", taw, "\n\n"))
