@@ -19,7 +19,7 @@ evalstats <- function(obs, pred, is_outlier, remove_outlier = TRUE) {
   MAE.rel <- 100 * MAE / abs(mean(obs))
   r <- cor(obs, pred)
   r2<- r^2
-  #NSE <- 1 - (sum((obs - pred) ^ 2) / sum((obs - mean(obs)) ^ 2)) #Nash–Sutcliffe model efficiency coefficient (NSE)
+  NSE <- 1 - (sum((obs - pred) ^ 2) / sum((obs - mean(obs)) ^ 2)) #Nash–Sutcliffe model efficiency coefficient (NSE)
   #NSE.abs <- 1 - (sum(abs(obs - pred)) / sum(abs(obs - mean(obs))))
   return(
     list(
@@ -32,8 +32,8 @@ evalstats <- function(obs, pred, is_outlier, remove_outlier = TRUE) {
       RMSE = RMSE,
       MAE.rel = MAE.rel,
       #r = r,
-      r2 = r2#,
-      #NSE = NSE,
+      r2 = r2,
+      NSE = NSE
       #NSE.abs = NSE.abs
     )
   )

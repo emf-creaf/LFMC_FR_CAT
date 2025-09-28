@@ -3,15 +3,11 @@ library(medfate)
 library(ggplot2)
 source("R/evaluation/evalstats.R")
 
-CAT_LFMC<-read.csv("data/inputs/CAT_LFMC.csv")
-CAT_LFMC$date<-as.Date(CAT_LFMC$date)
-
-FR_LFMC<-read.csv("data/inputs/FR_LFMC.csv")
-FR_LFMC$date<-as.Date(FR_LFMC$date,format = "%d/%m/%Y")
-
 
 time_plot_summer <- function(ct, sp_name, site_name, scenario, 
-                             detect_outliers = TRUE, remove_outlier = FALSE, include_RWC = FALSE) {
+                             detect_outliers = TRUE, 
+                             remove_outlier = FALSE,
+                             trim_observed = TRUE) {
 
   ct <- ct |> 
     dplyr::filter(species == sp_name) |>
@@ -19,16 +15,17 @@ time_plot_summer <- function(ct, sp_name, site_name, scenario,
     dplyr::mutate(summer_group = cumsum(lag(is.summer, default = FALSE) != is.summer)) |>
     dplyr::mutate(summer_group = ifelse(is.summer, summer_group, NA))
 
-  if(include_RWC) {
-    time_p <- ggplot(data = ct, aes(x = date)) +
-      geom_line(aes(y = LeafRWC*100, colour = "Leaf RWC (%)")) +
-      geom_line(aes(y = LFMC_full_mechanistic, colour = "Fully-mechanistic LFMC")) +
-      geom_line(aes(y = LFMC_semi_mechanistic, colour = "Semi-mechanistic LFMC"))
-  } else {
-    time_p <- ggplot(data = ct, aes(x = date)) +
-      geom_line(aes(y = LFMC_full_mechanistic, colour = "Fully-mechanistic LFMC")) +
-      geom_line(aes(y = LFMC_semi_mechanistic, colour = "Semi-mechanistic LFMC"))
+  if(trim_observed) {
+    min_year <- min(lubridate::year(ct$date[!is.na(ct$LFMC_observed)]))
+    max_year <- max(lubridate::year(ct$date[!is.na(ct$LFMC_observed)]))
+    ct <- ct |> 
+      dplyr::filter(lubridate::year(date) >= min_year & lubridate::year(date) <= max_year)
   }
+  time_p <- ggplot(data = ct, aes(x = date)) +
+    geom_line(aes(y = LFMC_full1, colour = "Full1")) +
+    geom_line(aes(y = LFMC_full2, colour = "Full2")) +
+    geom_line(aes(y = LFMC_full3, colour = "Full3")) +
+    geom_line(aes(y = LFMC_semi, colour = "Semi"))
   
   if (detect_outliers) {
     if (!remove_outlier) {
@@ -36,18 +33,22 @@ time_plot_summer <- function(ct, sp_name, site_name, scenario,
         geom_point(data = ct |> dplyr::filter(is_outlier & is.summer), aes(y = LFMC_observed, colour = "outlier"))
     }
     time_p <- time_p +
-      geom_point(data = ct |> dplyr::filter(!is_outlier & is.summer), aes(y = LFMC_observed, colour = "Measured LFMC")) 
+      geom_point(data = ct |> dplyr::filter(!is_outlier & is.summer), aes(y = LFMC_observed, colour = "Measured")) 
     # +
     #   geom_line(data = ct |> dplyr::filter(!is_outlier & is.summer) |> na.omit(), aes(y = LFMC_observed, group = summer_group, colour = "Measured LFMC"))
   } else {
     time_p <- time_p +
-      geom_point(data = ct |> dplyr::filter(is.summer), aes(y = LFMC_observed, colour = "Measured LFMC")) 
+      geom_point(data = ct |> dplyr::filter(is.summer), aes(y = LFMC_observed, colour = "Measured")) 
     # +
     #   geom_line(data = ct |> dplyr::filter(is.summer) |> na.omit(), aes(y = LFMC_observed, group = summer_group, colour = "Measured LFMC"))
   }
   
   time_p <- time_p +
-    scale_color_manual(values = c("Leaf RWC (%)" = "green","Fully-mechanistic LFMC" = "black", "Semi-mechanistic LFMC" = "blue", "Measured LFMC" = "red", "outlier" = "orange")) +
+    scale_color_manual(values = c("Full1" = "brown",
+                                  "Full2" = "gray",
+                                  "Full3" = "black", 
+                                  "Semi" = "blue", 
+                                  "Measured" = "red", "outlier" = "orange")) +
     theme_classic() +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     xlab(NULL) +
@@ -59,7 +60,7 @@ time_plot_summer <- function(ct, sp_name, site_name, scenario,
   
   return(time_p)
 }
-scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FALSE, remove_outlier = TRUE, LFMC_TYPE = "FULL") {
+scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FALSE, remove_outlier = TRUE, LFMC_TYPE = "FULL3") {
 
   ct <- ct |> 
     dplyr::filter(species == sp_name)
@@ -71,18 +72,22 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FAL
   if(remove_outlier) ct <- ct |> 
       dplyr::filter(!is_outlier)
   
-  if (LFMC_TYPE == "FULL") {
-    base_plot <- ggplot(data = ct, aes(x = LFMC_full_mechanistic, y = LFMC_observed))
-    stats <- evalstats(ct$LFMC_observed, ct$LFMC_full_mechanistic, ct$is_outlier, remove_outlier)
-    x_label = "LFMC fully mechanistic (%)"
-  } else if (LFMC_TYPE == "LEAFRWC") {
-    base_plot <- ggplot(data = ct, aes(x = LeafRWC*100, y = LFMC_observed))
-    stats <- evalstats(ct$LFMC_observed, ct$LeafRWC*100, ct$is_outlier, remove_outlier)
-    x_label = "Leaf RWC (%)"
+  if (LFMC_TYPE == "FULL1") {
+    base_plot <- ggplot(data = ct, aes(x = LFMC_full1, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_full1, ct$is_outlier, remove_outlier)
+    x_label = "LFMC full1 (%)"
+  } else if (LFMC_TYPE == "FULL2") {
+    base_plot <- ggplot(data = ct, aes(x = LFMC_full2, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_full2, ct$is_outlier, remove_outlier)
+    x_label = "LFMC full2 (%)"
+  } else if (LFMC_TYPE == "FULL3") {
+    base_plot <- ggplot(data = ct, aes(x = LFMC_full3, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_full3, ct$is_outlier, remove_outlier)
+    x_label = "LFMC full3 (%)"
   } else if (LFMC_TYPE == "SEMI") {
-    base_plot <- ggplot(data = ct, aes(x = LFMC_semi_mechanistic, y = LFMC_observed))
-    stats <- evalstats(ct$LFMC_observed, ct$LFMC_semi_mechanistic, ct$is_outlier, remove_outlier)
-    x_label = "LFMC semi-mechanistic (%)"
+    base_plot <- ggplot(data = ct, aes(x = LFMC_semi, y = LFMC_observed))
+    stats <- evalstats(ct$LFMC_observed, ct$LFMC_semi, ct$is_outlier, remove_outlier)
+    x_label = "LFMC semi (%)"
   }
   
    base_plot <- base_plot +
@@ -105,10 +110,11 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FAL
     stat_smooth(method = "lm", se = FALSE, formula = "y ~ x")
   
   scatter_p <- scatter_p +
-    annotate(geom = "text", x = 150, y = 20, size= 3, 
+    annotate(geom = "text", x = 130, y = 20, size= 3, 
              label = paste0("Bias = ", round(stats$Bias,1),
-                            " MAE = ", round(stats$MAE,1), 
-                            " R2 = ", round(100*stats$r2,1),"%"))
+                            " MAE = ", round(stats$MAE,1), "\n",
+                            " R2 = ", round(100*stats$r2,1),"%",
+                            " NSE = ", round(stats$NSE,2)))
 
   scatter_p <- scatter_p +
     xlab(x_label)+ ylab("LFMC observed (%)")
@@ -118,14 +124,15 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, detect_outliers = FAL
 scatter_plot_panel<-function(ct, sp_name, focus_summer = TRUE, detect_outliers = FALSE, remove_outlier = TRUE, 
                              include_RWC = FALSE, title = "") {
   if(title=="") title = sp_name
-  p1 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "FULL") +
-    labs(subtitle = "Fully mechanistic", title = title)
-  p2 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "SEMI") +
+  p1 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "FULL1") +
+    labs(subtitle = "Fully mechanistic (1)", title = title)
+  p2 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "FULL2") +
+    labs(subtitle = "Fully mechanistic (2)", title = title)
+  p3 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "FULL3") +
+    labs(subtitle = "Fully mechanistic (3)", title = title)
+  ps <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "SEMI") +
     labs(subtitle = "Semi-mechanistic", title = "")
-  p3 <- scatter_plot(ct, sp_name, focus_summer, detect_outliers, remove_outlier, LFMC_TYPE = "LEAFRWC") +
-    labs(subtitle = "Leaf RWC", title = "")
-  if(include_RWC) return(cowplot::plot_grid(p1, p2, p3, ncol = 3))
-  return(cowplot::plot_grid(p1, p2, ncol = 2))
+  return(cowplot::plot_grid(p1, p2, p3, ps, ncol = 4))
 }
 
 combined_plot<-function(ct, sp_name, site_name, scenario, ...) {
@@ -134,7 +141,7 @@ combined_plot<-function(ct, sp_name, site_name, scenario, ...) {
   return(cowplot::plot_grid(p1, p2, nrow=2))
 }
 
-for(taw in c(30,40,50, 60)) {
+for(taw in c(140)) {
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {
       cat(paste0("METEO: " , meteo, " / LAI: ", lai,  " / TAW: ", taw, "\n\n"))
@@ -154,7 +161,7 @@ for(taw in c(30,40,50, 60)) {
           p <-combined_plot(ct[[i]], species[j], site, scenario)
           file <- paste0(species_site_dir, "/", species[j], "_", site, "_", meteo, "_", lai,"_",taw,"mm.png")
           file <- stringr::str_replace_all(file, " ", "_")
-          ggsave(file, p, width = 10, height = 8, units = "in")
+          ggsave(file, p, width = 14, height = 8, units = "in")
         }
       }
     }

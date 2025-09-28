@@ -30,7 +30,8 @@ build_sf<-function(SpParams,
     SITE_NAME <- sf$site_name[i]
     f <- medfate::emptyforest()
     f$shrubData <- read.csv(paste0("data/inputs/PLOTS/", SITE_NAME, "/shrubData_ALL.csv")) |>
-      dplyr::filter(!is.na(Cover) & !is.na(Height))
+      dplyr::filter(!is.na(Height)) 
+    f$shrubData$Cover[is.na(f$shrubData$Cover)] <- 5 ## This happens for french trees often
     
     nplots <- length(unique(f$shrubData$Plot))
     if(nplots>1) {
@@ -44,8 +45,8 @@ build_sf<-function(SpParams,
     ## Estimate plant LAI (for single species simulations or correction using MODIS)
     f$shrubData$LAI <- pmax(0.01, medfate::plant_LAI(f, SpParams))
     
+    lai_tot <- max(1.0, min(3.0, sum(f$shrubData$LAI)))
     if(species !="ALL") {
-      lai_tot <- sum(f$shrubData$LAI)
       if (sf$source[i] == "CAT") {
         CAT_LFMC<-read.csv("data/inputs/CAT_LFMC.csv")
         CAT_LFMC$date<-as.Date(CAT_LFMC$date)
@@ -69,6 +70,8 @@ build_sf<-function(SpParams,
       } else {
         f$shrubData <- f$shrubData[numeric(0),,drop=FALSE]
       }
+    } else {
+      f$shrubData$LAI <- f$shrubData$LAI/sum(f$shrubData$LAI)*lai_tot
     }
     
     #LAI from MODIS
@@ -76,8 +79,8 @@ build_sf<-function(SpParams,
       #Read the MODIS LAI data
       LAI_MODIS<-read.csv(paste0("data/inputs/PLOTS/", SITE_NAME, "/MODIS_LAI.csv"))
       LAI_YEAR<-unique(format(as.Date(f$shrubData$Date),"%Y"))
-      ## Truncate to LAI = 3.0
-      lai_modis <- min(3.0, LAI_MODIS$MCD15A2H_Lai_mean_top5[LAI_MODIS$YEAR %in% LAI_YEAR])
+      ## Truncate to LAI between 1.0 and 3.0
+      lai_modis <- max(1.0, min(3.0, LAI_MODIS$MCD15A2H_Lai_mean_top5[LAI_MODIS$YEAR %in% LAI_YEAR]))
       #New column LAI in shrubData
       if(nrow(f$shrubData)>0) f$shrubData$LAI<-f$shrubData$LAI/sum(f$shrubData$LAI)*lai_modis
     }

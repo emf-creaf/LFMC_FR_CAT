@@ -29,6 +29,7 @@ mean(TS1$LAI_ALLOM)
 sd(TS1$LAI_ALLOM)
 mean(TS1$LAI_MODIS)
 sd(TS1$LAI_MODIS)
+t.test(TS1$LAI_ALLOM - TS1$LAI_MODIS, alternative = "less")
 cor.test(TS1$LAI_ALLOM, TS1$LAI_MODIS)
 
 # Variation and covariation in MAP inputs
@@ -36,4 +37,5 @@ mean(TS1$MAP_INTER)
 sd(TS1$MAP_INTER)
 mean(TS1$MAP_ERA5)
 sd(TS1$MAP_ERA5)
+t.test(TS1$MAP_INTER - TS1$MAP_ERA5)
 cor.test(TS1$MAP_INTER, TS1$MAP_ERA5)

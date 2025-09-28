@@ -9,30 +9,21 @@ FR_LFMC$date<-as.Date(FR_LFMC$date,format = "%d/%m/%Y")
 
 
 extract_output<-function(x,
-                         LEAFPSIMAX=TRUE,
-                         LEAFRWC=TRUE,
-                         LFMC=TRUE,
-                         LFMC_semi_mechanistic=TRUE){
+                         LFMC_full1=TRUE,
+                         LFMC_full2=TRUE,
+                         LFMC_full3=TRUE,
+                         LFMC_semi=TRUE){
   
   extracted_data<-list()
   
-  if (LEAFPSIMAX==T) {
-    extracted_data[["LEAFPSIMAX_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafPsiMax")
-  }
-  
-  if (LEAFRWC==T) {
-    extracted_data[["LEAFRWC_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafRWC")
-  }
-  
-  if (LFMC==T) {
-    extracted_data[["LFMC_data"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LFMC") |>
-      dplyr::rename(LFMC_full_mechanistic = LFMC)
-    
-    if (LFMC_semi_mechanistic==T) {
-      extracted_data[["LFMC_data"]]$LFMC_semi_mechanistic <- 91.87 - (31.12 * log10(-(extracted_data[["LEAFPSIMAX_data"]]$LeafPsiMax)))
-      
-    }
-  }
+  extracted_data[["LAI"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LAI")
+  extracted_data[["LAIlive"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LAIlive")
+  extracted_data[["LeafPsiMax"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafPsiMax")
+  extracted_data[["LeafRWC"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafRWC")
+  extracted_data[["StemRWC"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "StemRWC")
+  extracted_data[["LeafPLC"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LeafPLC")
+  extracted_data[["StemPLC"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "StemPLC")
+  extracted_data[["LFMC"]]<-medfate::extract(x, level = "cohort", output = "Plants", vars = "LFMC")
   
   for (i in 1:length(extracted_data)) {
     if (i==1){
@@ -41,6 +32,21 @@ extract_output<-function(x,
       df<-merge(df,extracted_data[[i]], by = intersect(c("date","cohort","species"), c("date","cohort","species")))
     }
   }
+  
+  params <- data.frame(species = x$spwbInput$cohorts$Name,
+                       r635 = x$spwbInput$paramsAnatomy$r635,
+                       FMCmax = x$spwbInput$paramsWaterStorage$maxFMC,
+                       maxMCleaf = x$spwbInput$paramsWaterStorage$maxMCleaf,
+                       maxMCstem = x$spwbInput$paramsWaterStorage$maxMCstem)
+  
+  df <- df |>
+    dplyr::left_join(params, by="species") |>
+    dplyr::mutate(fleaf = 1/r635,
+                  fleafmod = fleaf*(LAI/LAIlive))|>
+    dplyr::mutate(LFMC_full1 = FMCmax*LeafRWC,
+                  LFMC_full2 = maxMCleaf*LeafRWC*fleaf + maxMCstem*StemRWC*(1.0 - fleaf),
+                  LFMC_full3 = maxMCleaf*LeafRWC*fleafmod + maxMCstem*StemRWC*(1.0 - fleafmod),
+                  LFMC_semi = 91.87 - (31.12 * log10(-(LeafPsiMax))))
   
   df <- df[order(df$species, df$date),]
   
@@ -100,7 +106,7 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
     # Add taw info
     MERGED_LFMC_ALL <-  MERGED_LFMC_ALL |>
       dplyr::mutate(taw = taw) |>
-      dplyr::relocate("site", "source","lai_source", "meteo_source", "soil_mod", "taw", .before = "LeafPsiMax")
+      dplyr::relocate("site", "source","lai_source", "meteo_source", "soil_mod", "taw", .before = "LAI")
     
     output[[i]] <- MERGED_LFMC_ALL
     
@@ -112,8 +118,8 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
 for(meteo in c("INTER", "ERA5")) {
   for(lai in c("ALLOM", "MODIS")) {
     sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
-    # for(taw in c(30, 40, 50, 60,80,100,120,140,160)) {
-    for(taw in c(30,40,50,60)) {
+    # for(taw in c(30, 40, 50, 60,70,80,90,100,120,140,160)) {
+    for(taw in c(140)) {
       cat(paste0(meteo, "-", lai, "-",taw,"\n"))
       res <- readRDS(paste0("data/results/spwb_", meteo, "_", lai, "_MOD_",taw,".rds"))
       ct <- comparison_tables(sf, res, taw, DF_TYPE = c("outlier_top"))
