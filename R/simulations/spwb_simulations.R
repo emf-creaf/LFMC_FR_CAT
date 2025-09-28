@@ -31,7 +31,7 @@ modify_soil_taw <- function(s, target_taw, max_rocks = 97.5, soilFunctions = "VG
 
 dates = seq(as.Date("2012-01-01"), as.Date("2022-12-31"), "day")
 
-for(target_taw in c(30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160)) {
+for(target_taw in c(30, 40, 50, 60, 70, 80, 90, 100, 120, 130, 140, 150, 160)) {
 
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {
