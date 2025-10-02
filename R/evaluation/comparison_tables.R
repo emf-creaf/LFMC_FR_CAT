@@ -89,7 +89,8 @@ comparison_tables <- function(sf, res, taw, DF_TYPE = c("outlier_top"), TH = 2.5
       dplyr::full_join(FILTERED_LFMC, by = c("date" = "date", "species" = "specie"))
     
     MERGED_LFMC_ALL <- MERGED_LFMC_ALL |>
-      dplyr::mutate(is_summer = (lubridate::month(date) >= 6 & lubridate::month(date) <= 9),
+      dplyr::mutate(is_summer = (lubridate::month(date) >= 5 & lubridate::month(date) <= 9),
+                    is_outrange = LFMC_observed > FMCmax,
                     is_outlier = FALSE)
     
     if ("outlier_top" %in% DF_TYPE) {
@@ -119,7 +120,7 @@ for(meteo in c("INTER", "ERA5")) {
   for(lai in c("ALLOM", "MODIS")) {
     sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
     # for(taw in c(30, 40, 50, 60,70,80,90,100,120,140,160)) {
-    for(taw in c(140)) {
+    for(taw in c(140,150)) {
       cat(paste0(meteo, "-", lai, "-",taw,"\n"))
       res <- readRDS(paste0("data/results/spwb_", meteo, "_", lai, "_MOD_",taw,".rds"))
       ct <- comparison_tables(sf, res, taw, DF_TYPE = c("outlier_top"))
