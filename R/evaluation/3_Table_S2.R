@@ -1,5 +1,7 @@
 library(medfateland)
 
+
+# Creates supplementary table with LFMC statistics ------------------------
 ct <- readRDS(paste0("data/comparison_tables/ct_INTER_ALLOM_MOD_30.rds"))
 ct_bind <- dplyr::bind_rows(ct)
 
