@@ -4,6 +4,8 @@ library(tidyverse)
 library(readxl)
 
 
+# Loads custom params and merges with SpParamsFR --------------------------
+
 #SpParamsAlbert FINAL CORRECT PARAMS
 SpParamsAlbert <- read_excel("data/inputs/SpParamsAlbert.xlsx", sheet = "SpParams_final") %>% 
   #select(-c("maxLFMC_95Q","LDMC" ,"TLP")) %>% 

@@ -1,5 +1,6 @@
 library(medfateland)
 
+# Builds sf input objects for medfateland ---------------------------------
 build_sf<-function(SpParams,
                    plot_source = c("CAT", "FR"), 
                    meteo_source = "INTER", 
@@ -137,77 +138,3 @@ saveRDS(sf_inter_modis_mod, "data/sf_inputs/sf_INTER_MODIS_MOD.rds")
 sf_era5_modis_mod <- build_sf(SpParams, meteo_source = "ERA5", lai_source = "MODIS", soil_mod = TRUE)
 saveRDS(sf_era5_modis_mod, "data/sf_inputs/sf_ERA5_MODIS_MOD.rds")
 
-# 
-# sp <- c("Acacia dealbata", # (1) Simulation fails
-#         "Arbutus unedo", # (2) OK
-#         "Buxus sempervirens", # (1) OK
-#         "Cistus albidus", # (5) OK
-#         "Cistus monspeliensis", # (9) OK
-#         "Cytisophyllum sessilifolium", # (1) OK
-#         "Cytisus oromediterraneus", # (1) OK
-#         "Erica arborea", # (7) OK
-#         "Erica cinerea", # (1) OK
-#         "Erica scoparia subsp. scoparia", # (2) OK
-#         "Genista cinerea", # (3) OK
-#         "Genista scorpius", # (1) OK
-#         "Juniperus oxycedrus subsp. oxycedrus", # (2) OK
-#         "Pinus halepensis", # (0)
-#         "Quercus coccifera", # (4) OK
-#         "Quercus ilex", # (4) OK
-#         "Rosmarinus officinalis") # (5)
-# Cytisus scoparius 
-# Calluna vulgaris 
-# Quercus pubescens
-# Cistus salviifolius 
-# Hippocrepis emerus 
-# 
-# # Sureau simulations before soil modification
-# sf_vec <- vector("list", length(sp))
-# for(i in 1:length(sp)) {
-#   print(sp[i])
-#   sf_vec[[i]] <- build_sf(plot_source = c("FR"), 
-#                           meteo_source="ERA5", 
-#                           species = sp[i], 
-#                           lai_source = "MODIS",
-#                           soil_mod = FALSE,
-#                           years = 2008:2022)}
-# sf_nomod <- dplyr::bind_rows(sf_vec)
-# saveRDS(sf_nomod, "results/sf_FR_MODIS_ERA5_SOIL_NOMOD.rds")
-# 
-# res <- spwb_spatial(sf_nomod, SpParams = SpParams, meteo = NULL, 
-#                     local_control = defaultControl("Sureau"), parallelize = TRUE,
-#                     summary_function = summary.spwb, chunk_size = 1)
-# saveRDS(res, "results/res_sureau_FR_MODIS_ERA5_SOIL_NOMOD.rds")
-# 
-# 
-# # Sureau simulations after soil modification
-# sf_vec <- vector("list", length(sp))
-# for(i in 1:length(sp)) {
-#   print(sp[i])
-#   sf_vec[[i]] <- build_sf(plot_source = c("FR"), 
-#                           meteo_source="ERA5", 
-#                           species = sp[i], 
-#                           lai_source = "MODIS",
-#                           soil_mod = TRUE,
-#                           years = 2008:2022)
-# }
-# sf_mod <- dplyr::bind_rows(sf_vec)
-# saveRDS(sf_mod, "results/sf_FR_MODIS_ERA5_SOIL_MOD.rds")
-# 
-# res <- spwb_spatial(sf_mod, SpParams = SpParams, meteo = NULL, 
-#                     local_control = defaultControl("Sureau"), parallelize = TRUE,
-#                     summary_function = summary.spwb, chunk_size = 1)
-# saveRDS(res, "results/res_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
-# 
-# # Soil optimization
-# sf_opt <- optimization_rock(sf_mod, SpParams = SpParams, meteo = NULL, 
-#                              local_control = medfate::defaultControl("Sureau"),
-#                              parallelize = TRUE, chunk_size = 1, PLCquantile = 0.5,
-#                              qPLC_target = 12, qPLC_tol = 1)
-# saveRDS(sf_opt, "results/sf_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")
-# 
-# # Sureau simulations after soil rock optimization
-# res_opt <- spwb_spatial(sf_opt, SpParams = SpParams, meteo = NULL, 
-#                     local_control = defaultControl("Sureau"), parallelize = TRUE,
-#                     summary_function = summary.spwb, chunk_size = 1)
-# saveRDS(res_opt, "results/res_opt_sureau_FR_MODIS_ERA5_SOIL_MOD.rds")

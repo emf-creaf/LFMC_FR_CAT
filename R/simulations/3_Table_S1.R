@@ -2,6 +2,7 @@ library(medfate)
 library(medfateland)
 library(sf)
 
+# Builds table describing sites -------------------------------------------
 sf_ALLOM <- readRDS("data/sf_inputs/sf_INTER_ALLOM_MOD.rds")
 sf_MODIS <- readRDS("data/sf_inputs/sf_INTER_MODIS_MOD.rds")
 cc <- sf::st_coordinates(sf_ALLOM)

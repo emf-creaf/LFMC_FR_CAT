@@ -1,5 +1,7 @@
 library(medfateland)
 
+
+# Species parameters and simulation control -------------------------------
 SpParams<-read.csv("data/inputs/SpParamsAlbert.csv")
 SpParams$LeafAngle[SpParams$Name=="Ulex parviflorus"] <- 50
 
@@ -17,6 +19,8 @@ control$stemCavitationRecovery <- "annual"
 ## This assumes leaf growth occurs during winter
 control$leafCavitationRecovery <- "annual"
 
+
+# Function to estimate rfc for a target taw -------------------------------
 modify_soil_taw <- function(s, target_taw, max_rocks = 97.5, soilFunctions = "VG") {
   f_sew_diff <- function(factor, sew_target, max_rocks, soil, soilFunctions) {
     soil_tmp <- soil
@@ -29,9 +33,12 @@ modify_soil_taw <- function(s, target_taw, max_rocks = 97.5, soilFunctions = "VG
   return(s)
 }
 
-dates = seq(as.Date("2012-01-01"), as.Date("2022-12-31"), "day")
 
-for(target_taw in c(110)) {
+
+# Performs all simulations (two days in server) ---------------------------
+
+dates <- seq(as.Date("2012-01-01"), as.Date("2022-12-31"), "day")
+for(target_taw in seq(30,160, by = 10)) {
 
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {

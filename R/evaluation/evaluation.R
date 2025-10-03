@@ -10,7 +10,7 @@ for(meteo in c("ERA5", "INTER")) {
     sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
     et_comb <- data.frame() 
     cat(paste0(meteo, "-", lai, "\n"))
-    for(taw in c(30, 40, 50, 60, 70, 80, 90, 100, 120, 130, 140, 150)) {
+    for(taw in seq(30,160, by = 10)) {
       file_ct <- paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_",taw,".rds")
       if(file.exists(file_ct)) {
         ct <- readRDS(file_ct)
@@ -30,7 +30,7 @@ saveRDS(et_all, "data/evaluation_table_all.rds")
 
 
 
-# Select best combinations ------------------------------------------------
+# Select best combinations under different subgroups ------------------------------------------------
 et_best <- et_all |>
   dplyr::group_by(species, site, lfmc) |>
   dplyr::filter(MAE == min(MAE))
@@ -214,7 +214,7 @@ print(table(et_best_all$meteo_source, et_best_all$taw))
 #                    r2 = mean(r2, na.rm = TRUE), .groups = "drop") 
 # 
 
-# Evaluation plots for the best combinations -----------------------------------
+# Draw evaluation plots for the best combinations -----------------------------------
 sf <- readRDS(paste0("data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
 site_names <- sf$site_name
 
@@ -238,8 +238,8 @@ for(i in 1:nrow(et_best_all)) {
   ggsave(file, p, width = 14, height = 8, units = "in")
 }
 
-# Evaluation plots for all combinations -----------------------------------
-for(taw in c(140, 150)) {
+# Draw evaluation plots for all combinations -----------------------------------
+for(taw in seq(30,160, by = 10)) {
   for(meteo in c("INTER", "ERA5")) {
     for(lai in c("ALLOM", "MODIS")) {
       cat(paste0("METEO: " , meteo, " / LAI: ", lai,  " / TAW: ", taw, "\n\n"))
