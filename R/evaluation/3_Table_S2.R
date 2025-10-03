@@ -7,12 +7,12 @@ ct_bind <- dplyr::bind_rows(ct)
 
 TS_full <- ct_bind |>
   dplyr::group_by(species, site) |>
-  dplyr::summarize(maxFMC = ceiling(max(LFMC_full_mechanistic)), .groups = "drop")
+  dplyr::summarize(maxFMC = ceiling(max(LFMC_full3)), .groups = "drop")
 
 TS2 <- ct_bind |>
   dplyr::filter(!is.na(LFMC_observed))|>
   dplyr::filter(is_summer)|>
-  dplyr::filter(!is_outlier)|>
+  dplyr::filter(!is_outrange)|>
   dplyr::group_by(species, site) |>
   dplyr::summarize(Date_ini = as.character(min(date)), 
                    Date_fin = as.character(max(date)), 
