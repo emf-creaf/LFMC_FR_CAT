@@ -13,7 +13,7 @@ control$temperatureResults  <- FALSE
 control$snowResults <- FALSE
 ## Root truncation should lead to more realistic results (update v. 4.8.4)
 ## but presently leads to model crashes
-control$truncateRootDistribution <- FALSE
+control$truncateRootDistribution <- TRUE
 ## This assumes stem growth occurs during winter
 control$stemCavitationRecovery <- "annual"
 ## This assumes leaf growth occurs during winter
