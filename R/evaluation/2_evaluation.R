@@ -1,3 +1,4 @@
+source("R/evaluation/evalstats.R")
 source("R/evaluation/evalplots.R")
 source("R/evaluation/evaltable.R")
 
@@ -79,6 +80,7 @@ saveRDS(et_best_all, "data/evaluation_table_best_all.rds")
 
 print(table(et_best_all$taw))
 print(table(et_best_all$lfmc))
+print(table(et_best_full_all$lfmc))
 print(table(et_best_all$lfmc, et_best_all$taw))
 print(table(et_best_all$lai_source))
 print(table(et_best_all$lai_source, et_best_all$taw))

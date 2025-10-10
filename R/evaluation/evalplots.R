@@ -1,7 +1,6 @@
 library(medfateland)
 library(medfate)
 library(ggplot2)
-source("R/evaluation/evalstats.R")
 
 
 time_plot_summer <- function(ct, sp_name, site_name, scenario, 

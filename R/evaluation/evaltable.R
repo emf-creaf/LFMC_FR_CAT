@@ -1,4 +1,3 @@
-source("R/evaluation/evalstats.R")
 evaluation_table <-function(ct_i, remove_outlier = FALSE, remove_outrange = TRUE) {
   species_measured <- unique(ct_i$species)
   ct_filtered <- ct_i |>
