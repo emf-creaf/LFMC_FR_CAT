@@ -1,0 +1,44 @@
+---
+title: "Detailed results"
+author: "Miquel De Cáceres"
+date: "2025-10-09"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE, warning = FALSE}
+source("../R/evaluation/evalstats.R")
+source("../R/evaluation/evalplots.R")
+```
+
+```{r, results = 'asis', echo = FALSE, warning= FALSE}
+et_best_all <- readRDS("../data/evaluation_table_best_all.rds")
+sf <- readRDS(paste0("../data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
+site_names <- sf$site_name
+
+for(i in 1:nrow(et_best_all)) {
+  meteo <- et_best_all$meteo_source[i]
+  lai <- et_best_all$lai_source[i]
+  site <- et_best_all$site[i]
+  isite <- which(site_names==site)
+  species <- et_best_all$species[i]
+  taw <- et_best_all$taw[i]
+  lfmc <- et_best_all$lfmc[i]
+
+  scenario <- paste0(meteo,"/", lai, "/", taw, "mm")
+  cat(paste0("### ", site, " / ", species, "  [", scenario, " : ", lfmc, "] \n"))
+
+  res <- knitr::knit_child(
+    "_best_plots_child.Rmd",
+    quiet = TRUE
+  )
+  cat(res, sep = "\n")
+  cat("\n")
+}
+```

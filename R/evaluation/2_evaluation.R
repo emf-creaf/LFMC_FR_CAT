@@ -1,0 +1,271 @@
+source("R/evaluation/evalstats.R")
+source("R/evaluation/evalplots.R")
+source("R/evaluation/evaltable.R")
+
+
+# Build evaluation table of all combinations -----------------------------
+
+et_all <- data.frame() 
+for(meteo in c("ERA5", "INTER")) {
+  for(lai in c("ALLOM", "MODIS")) {
+    sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
+    et_comb <- data.frame() 
+    cat(paste0(meteo, "-", lai, "\n"))
+    for(taw in seq(30,160, by = 10)) {
+      file_ct <- paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_",taw,".rds")
+      if(file.exists(file_ct)) {
+        ct <- readRDS(file_ct)
+        et <- dplyr::bind_rows(lapply(ct, evaluation_table, remove_outlier = FALSE, remove_outrange = TRUE))
+        et_comb <- dplyr::bind_rows(et_comb, et)
+      }
+    }
+    et_all <- dplyr::bind_rows(et_all, et_comb)
+  }
+}
+# Add indicator of minimum MAE or maximum NSE
+et_all <-et_all |>
+  dplyr::group_by(site, species,meteo_source, lai_source, lfmc) |>
+  dplyr::mutate(minMAETAW = (MAE == min(MAE)),
+                maxNSETAW = (NSE == max(NSE)))
+saveRDS(et_all, "data/evaluation_table_all.rds")
+
+
+
+# Select best combinations under different subgroups ------------------------------------------------
+et_best <- et_all |>
+  dplyr::group_by(species, site, lfmc) |>
+  dplyr::filter(MAE == min(MAE))
+saveRDS(et_best, "data/evaluation_table_best.rds")
+
+et_best_full1 <- et_all |>
+  dplyr::filter(lfmc == "full1") |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_full1, "data/evaluation_table_best_full1.rds")
+
+et_best_full2 <- et_all |>
+  dplyr::filter(lfmc == "full2") |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_full2, "data/evaluation_table_best_full2.rds")
+
+et_best_full3 <- et_all |>
+  dplyr::filter(lfmc == "full3") |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_full3, "data/evaluation_table_best_full3.rds")
+
+et_best_semi <- et_all |>
+  dplyr::filter(lfmc == "semi") |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_semi, "data/evaluation_table_best_semi.rds")
+
+et_best_full_all <- et_all |>
+  dplyr::filter(lfmc %in% c("full1", "full2", "full3")) |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_full_all, "data/evaluation_table_best_full_all.rds")
+
+et_best_all <- et_all |>
+  dplyr::group_by(species, site) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species)
+saveRDS(et_best_all, "data/evaluation_table_best_all.rds")
+
+print(table(et_best_all$taw))
+print(table(et_best_all$lfmc))
+print(table(et_best_full_all$lfmc))
+print(table(et_best_all$lfmc, et_best_all$taw))
+print(table(et_best_all$lai_source))
+print(table(et_best_all$lai_source, et_best_all$taw))
+print(table(et_best_all$meteo_source))
+print(table(et_best_all$meteo_source, et_best_all$taw))
+
+
+# Select comparison tables of the best combinations -----------------------
+sf <- readRDS(paste0("data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
+site_names <- sf$site_name
+# Full1
+ct_best_full1 <- vector("list", nrow(et_best_full1))
+for(i in 1:nrow(et_best_full1)) {
+  meteo <- et_best_full1$meteo_source[i]
+  lai <- et_best_full1$lai_source[i]
+  site <- et_best_full1$site[i]
+  isite <- which(site_names==site)
+  taw <- et_best_full1$taw[i]
+  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  ct_best_full1[[i]] <- ct[[isite]]
+}
+ct_best_full1 <- dplyr::bind_rows(ct_best_full1)
+saveRDS(ct_best_full1, paste0("data/comparison_tables/ct_best_full1.rds"))
+# Full2
+ct_best_full2 <- vector("list", nrow(et_best_full2))
+for(i in 1:nrow(et_best_full2)) {
+  meteo <- et_best_full2$meteo_source[i]
+  lai <- et_best_full2$lai_source[i]
+  site <- et_best_full2$site[i]
+  taw <- et_best_full2$taw[i]
+  isite <- which(site_names==site)
+  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  ct_best_full2[[i]] <- ct[[isite]]
+}
+ct_best_full2 <- dplyr::bind_rows(ct_best_full2)
+saveRDS(ct_best_full2, paste0("data/comparison_tables/ct_best_full2.rds"))
+# Full3
+ct_best_full3 <- vector("list", nrow(et_best_full3))
+for(i in 1:nrow(et_best_full3)) {
+  meteo <- et_best_full3$meteo_source[i]
+  lai <- et_best_full3$lai_source[i]
+  site <- et_best_full3$site[i]
+  taw <- et_best_full3$taw[i]
+  isite <- which(site_names==site)
+  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  ct_best_full3[[i]] <- ct[[isite]]
+}
+ct_best_full3 <- dplyr::bind_rows(ct_best_full3)
+saveRDS(ct_best_full3, paste0("data/comparison_tables/ct_best_full3.rds"))
+# Semi
+ct_best_semi <- vector("list", nrow(et_best_semi))
+for(i in 1:nrow(et_best_semi)) {
+  meteo <- et_best_semi$meteo_source[i]
+  lai <- et_best_semi$lai_source[i]
+  site <- et_best_semi$site[i]
+  taw <- et_best_semi$taw[i]
+  isite <- which(site_names==site)
+  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  ct_best_semi[[i]] <- ct[[isite]]
+}
+ct_best_semi <- dplyr::bind_rows(ct_best_semi)
+saveRDS(ct_best_semi, paste0("data/comparison_tables/ct_best_semi.rds"))
+
+print(dplyr::bind_rows(as.data.frame(evalstats(ct_best_full1$LFMC_observed, ct_best_full1$LFMC_full1, ct_best_full1$is_outlier)),
+                 as.data.frame(evalstats(ct_best_full2$LFMC_observed, ct_best_full2$LFMC_full2, ct_best_full2$is_outlier)),
+                 as.data.frame(evalstats(ct_best_full3$LFMC_observed, ct_best_full3$LFMC_full3, ct_best_full3$is_outlier)),
+                 as.data.frame(evalstats(ct_best_semi$LFMC_observed, ct_best_semi$LFMC_semi, ct_best_semi$is_outlier))))
+ 
+
+# 
+# # Comparison of lfmc approach by species
+# # Pooling all sources
+# species_means <- et_all |>
+#   dplyr::filter(maxNSETAW) |>
+#   dplyr::group_by(species, lfmc) |>
+#   dplyr::summarise(n = dplyr::n(),
+#                    taw = mean(taw, na.rm = TRUE),
+#                    Bias = mean(Bias, na.rm = TRUE),
+#                    Bias.rel = mean(Bias.rel, na.rm=TRUE),
+#                    MAE = mean(MAE, na.rm=TRUE),
+#                    MAE.rel = mean(MAE.rel, na.rm = TRUE),
+#                    r2 = mean(r2, na.rm = TRUE), .groups = "drop") 
+# 
+# # Comparing best sources only
+# species_means_optTAW <- et_best_semi |>
+#   dplyr::bind_rows(et_best_full1)|>
+#   dplyr::bind_rows(et_best_full2)|>
+#   dplyr::bind_rows(et_best_full3)|>
+#   dplyr::group_by(species, lfmc) |>
+#   dplyr::summarise(n = dplyr::n(),
+#                    taw = mean(taw, na.rm = TRUE),
+#                    Bias = mean(Bias, na.rm = TRUE),
+#                    Bias.rel = mean(Bias.rel, na.rm=TRUE),
+#                    MAE = mean(MAE, na.rm=TRUE),
+#                    MAE.rel = mean(MAE.rel, na.rm = TRUE),
+#                    r2 = mean(r2, na.rm = TRUE), 
+#                    NSE = mean(NSE, na.rm = TRUE),.groups = "drop") 
+# 
+# ## Which TAW should we use by default?
+# taw_means <- et_all |>
+#   dplyr::group_by(meteo_source, lai_source, lfmc, taw) |>
+#   dplyr::summarise(Bias = mean(Bias, na.rm = TRUE),
+#                    Bias.rel = mean(Bias.rel, na.rm=TRUE),
+#                    MAE = mean(MAE, na.rm=TRUE),
+#                    MAE.rel = mean(MAE.rel, na.rm = TRUE),
+#                    r2 = mean(r2, na.rm = TRUE), .groups = "drop") 
+# taw_means |>
+#   dplyr::group_by(meteo_source, lai_source, lfmc) |>
+#   dplyr::mutate(minMAErel = min(MAE.rel)) |>
+#   dplyr::filter(MAE.rel ==minMAErel)
+# 
+# et_all |>
+#   dplyr::group_by(taw, lfmc) |>
+#   dplyr::summarise(Bias = mean(Bias, na.rm = TRUE),
+#                    Bias.rel = mean(Bias.rel, na.rm=TRUE),
+#                    MAE = mean(MAE, na.rm=TRUE),
+#                    MAE.rel = mean(MAE.rel, na.rm = TRUE),
+#                    r2 = mean(r2, na.rm = TRUE),
+#                    NSE = mean(NSE, na.rm = TRUE), .groups = "drop") |>
+#   dplyr::arrange(lfmc)
+# 
+# 
+# 
+# ## If TAW was known, which combination should we use?
+# comb_means <- et_all |>
+#   dplyr::filter(minMAETAW) |>
+#   dplyr::group_by(meteo_source, lai_source, lfmc) |>
+#   dplyr::summarise(Bias = mean(Bias, na.rm = TRUE),
+#                    Bias.rel = mean(Bias.rel, na.rm=TRUE),
+#                    MAE = mean(MAE, na.rm=TRUE),
+#                    MAE.rel = mean(MAE.rel, na.rm = TRUE),
+#                    r2 = mean(r2, na.rm = TRUE), .groups = "drop") 
+# 
+
+# Draw evaluation plots for the best combinations -----------------------------------
+sf <- readRDS(paste0("data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
+site_names <- sf$site_name
+
+for(i in 1:nrow(et_best_all)) {
+  meteo <- et_best_all$meteo_source[i]
+  lai <- et_best_all$lai_source[i]
+  site <- et_best_all$site[i]
+  isite <- which(site_names==site)
+  species <- et_best_all$species[i]
+  taw <- et_best_all$taw[i]
+  lfmc <- et_best_all$lfmc[i]
+  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  
+  scenario <- paste0(meteo,"/", lai, "/", taw, "mm")
+  cat(paste0(site, " / ", species, "  [", scenario, " : ", lfmc, "] \n"))
+  best_dir <- paste0("plots/0_BEST")
+  if(!dir.exists(best_dir)) dir.create(best_dir)
+  p <-combined_evaluation_plot(ct[[isite]], species, site, scenario)
+  file <- paste0(best_dir, "/0_BEST_", species, "_", site, ".png")
+  file <- stringr::str_replace_all(file, " ", "_")
+  ggsave(file, p, width = 14, height = 8, units = "in")
+}
+
+# Draw evaluation plots for all combinations -----------------------------------
+# for(taw in seq(30,160, by = 10)) {
+#   for(meteo in c("INTER", "ERA5")) {
+#     for(lai in c("ALLOM", "MODIS")) {
+#       cat(paste0("METEO: " , meteo, " / LAI: ", lai,  " / TAW: ", taw, "\n\n"))
+#       ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+#       scenario <- paste0(meteo,"/", lai, "/", taw, "mm")
+#       for(i in 1:length(ct)) {
+#         species <- unique(ct[[i]]$species)
+#         site <- ct[[i]]$site[1]
+#         for(j in 1:length(species)) {
+#           species_dir <- paste0("plots/",species[j])
+#           species_dir <- stringr::str_replace_all(species_dir, " ", "_")
+#           if(!dir.exists(species_dir)) dir.create(species_dir)
+#           species_site_dir <- paste0("plots/",species[j],"/", site)
+#           species_site_dir <- stringr::str_replace_all(species_site_dir, " ", "_")
+#           if(!dir.exists(species_site_dir)) dir.create(species_site_dir)
+#           cat(paste0(site, " / ", species[j], "\n"))
+#           p <-combined_evaluation_plot(ct[[i]], species[j], site, scenario)
+#           file <- paste0(species_site_dir, "/", species[j], "_", site, "_", meteo, "_", lai,"_",taw,"mm.png")
+#           file <- stringr::str_replace_all(file, " ", "_")
+#           ggsave(file, p, width = 14, height = 8, units = "in")
+#         }
+#       }
+#     }
+#   }
+# }
+
+
+

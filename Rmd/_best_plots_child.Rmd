@@ -1,0 +1,8 @@
+
+```{r, echo = FALSE, warning= FALSE, fig.width=14, fig.height=8}
+
+  ct <- readRDS(paste0("../data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+  
+  combined_evaluation_plot(ct[[isite]], species, site, scenario)
+
+```

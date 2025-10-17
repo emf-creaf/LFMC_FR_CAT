@@ -1,7 +1,21 @@
 raw_data/
 scripts/raw_scripts/
-data/PLOTS
-results/
+plots/
+data/inputs/PLOTS
+data/results/
+data/inputs/Mete*
+data/inputs/CAT_LFMC.csv
+data/comparison_tables/*
+data/eval*
+data/TableS*
+data/sf_inputs/*
+
+Rmd/*.docx
+Rmd/*.html
+Rmd/Best_plots_files/*
+
+#Project file
+TFM_ALBERT.Rproj
 
 # History files
 .Rhistory
