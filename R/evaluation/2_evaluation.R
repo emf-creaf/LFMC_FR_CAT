@@ -11,7 +11,7 @@ for(meteo in c("ERA5", "INTER")) {
     sf <- readRDS(paste0("data/sf_inputs/sf_", meteo, "_", lai, "_MOD.rds"))
     et_comb <- data.frame() 
     cat(paste0(meteo, "-", lai, "\n"))
-    for(taw in seq(30,160, by = 10)) {
+    for(taw in seq(30,200, by = 10)) {
       file_ct <- paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_",taw,".rds")
       if(file.exists(file_ct)) {
         ct <- readRDS(file_ct)
@@ -36,6 +36,13 @@ et_best <- et_all |>
   dplyr::group_by(species, site, lfmc) |>
   dplyr::filter(MAE == min(MAE))
 saveRDS(et_best, "data/evaluation_table_best.rds")
+
+# Best TAW simulation for all combinations of lfmc, meteo source and lai source
+et_best_comb <- et_all |>
+  dplyr::group_by(species, site, lfmc, meteo_source, lai_source) |>
+  dplyr::filter(MAE == min(MAE)) |>
+  dplyr::arrange(species, site, meteo_source, lai_source, lfmc)
+saveRDS(et_best_comb, "data/evaluation_table_best_per_comb.rds")
 
 et_best_full1 <- et_all |>
   dplyr::filter(lfmc == "full1") |>
@@ -78,6 +85,8 @@ et_best_all <- et_all |>
   dplyr::arrange(species)
 saveRDS(et_best_all, "data/evaluation_table_best_all.rds")
 
+print(table(et_best_comb$taw, et_best_comb$lfmc))
+
 print(table(et_best_all$taw))
 print(table(et_best_all$lfmc))
 print(table(et_best_full_all$lfmc))
@@ -87,68 +96,42 @@ print(table(et_best_all$lai_source, et_best_all$taw))
 print(table(et_best_all$meteo_source))
 print(table(et_best_all$meteo_source, et_best_all$taw))
 
+print(table(et_best_semi$taw))
+print(table(et_best_full1$taw))
+print(table(et_best_full2$taw))
+print(table(et_best_full3$taw))
+
 
 # Select comparison tables of the best combinations -----------------------
 sf <- readRDS(paste0("data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
 site_names <- sf$site_name
-# Full1
-ct_best_full1 <- vector("list", nrow(et_best_full1))
-for(i in 1:nrow(et_best_full1)) {
-  meteo <- et_best_full1$meteo_source[i]
-  lai <- et_best_full1$lai_source[i]
-  site <- et_best_full1$site[i]
-  isite <- which(site_names==site)
-  taw <- et_best_full1$taw[i]
-  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
-  ct_best_full1[[i]] <- ct[[isite]]
+ct_best_comb <- vector("list", nrow(et_best_comb))
+for(meteo in c("ERA5", "INTER")) {
+  for(lai in c("ALLOM", "MODIS")) {
+    for(taw in seq(30,200, by=10)) {
+      cat(".")
+      sel <- (et_best_comb$lai_source==lai) & (et_best_comb$meteo_source==meteo) & (et_best_comb$taw == taw)
+      if(sum(sel)>0)  {
+        ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
+        for(i in which(sel)) {
+          site <- et_best_comb$site[i]
+          lfmc_i <- et_best_comb$lfmc[i]
+          isite <- which(site_names==site)
+          ct_i <- ct[[isite]]
+          ct_i <- ct_i |> 
+            dplyr::select(c(date, species, site, lai_source, meteo_source, taw, 
+                            LFMC_full1, LFMC_full2, LFMC_full3, LFMC_semi, LFMC_observed)) |>
+            dplyr::mutate(lfmc = lfmc_i)
+          ct_best_comb[[i]] <- ct_i
+        }
+      }
+    }
+  }
 }
-ct_best_full1 <- dplyr::bind_rows(ct_best_full1)
-saveRDS(ct_best_full1, paste0("data/comparison_tables/ct_best_full1.rds"))
-# Full2
-ct_best_full2 <- vector("list", nrow(et_best_full2))
-for(i in 1:nrow(et_best_full2)) {
-  meteo <- et_best_full2$meteo_source[i]
-  lai <- et_best_full2$lai_source[i]
-  site <- et_best_full2$site[i]
-  taw <- et_best_full2$taw[i]
-  isite <- which(site_names==site)
-  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
-  ct_best_full2[[i]] <- ct[[isite]]
-}
-ct_best_full2 <- dplyr::bind_rows(ct_best_full2)
-saveRDS(ct_best_full2, paste0("data/comparison_tables/ct_best_full2.rds"))
-# Full3
-ct_best_full3 <- vector("list", nrow(et_best_full3))
-for(i in 1:nrow(et_best_full3)) {
-  meteo <- et_best_full3$meteo_source[i]
-  lai <- et_best_full3$lai_source[i]
-  site <- et_best_full3$site[i]
-  taw <- et_best_full3$taw[i]
-  isite <- which(site_names==site)
-  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
-  ct_best_full3[[i]] <- ct[[isite]]
-}
-ct_best_full3 <- dplyr::bind_rows(ct_best_full3)
-saveRDS(ct_best_full3, paste0("data/comparison_tables/ct_best_full3.rds"))
-# Semi
-ct_best_semi <- vector("list", nrow(et_best_semi))
-for(i in 1:nrow(et_best_semi)) {
-  meteo <- et_best_semi$meteo_source[i]
-  lai <- et_best_semi$lai_source[i]
-  site <- et_best_semi$site[i]
-  taw <- et_best_semi$taw[i]
-  isite <- which(site_names==site)
-  ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
-  ct_best_semi[[i]] <- ct[[isite]]
-}
-ct_best_semi <- dplyr::bind_rows(ct_best_semi)
-saveRDS(ct_best_semi, paste0("data/comparison_tables/ct_best_semi.rds"))
+cat("\n")
+ct_best_comb <- dplyr::bind_rows(ct_best_comb)
+saveRDS(ct_best_comb, paste0("data/comparison_tables/ct_best_comb.rds"))
 
-print(dplyr::bind_rows(as.data.frame(evalstats(ct_best_full1$LFMC_observed, ct_best_full1$LFMC_full1, ct_best_full1$is_outlier)),
-                 as.data.frame(evalstats(ct_best_full2$LFMC_observed, ct_best_full2$LFMC_full2, ct_best_full2$is_outlier)),
-                 as.data.frame(evalstats(ct_best_full3$LFMC_observed, ct_best_full3$LFMC_full3, ct_best_full3$is_outlier)),
-                 as.data.frame(evalstats(ct_best_semi$LFMC_observed, ct_best_semi$LFMC_semi, ct_best_semi$is_outlier))))
- 
 
 # 
 # # Comparison of lfmc approach by species

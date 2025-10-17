@@ -3,9 +3,9 @@ title: "Detailed results"
 author: "Miquel De Cáceres"
 date: "2025-10-09"
 output:
-  word_document: default
   html_document:
     df_print: paged
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
