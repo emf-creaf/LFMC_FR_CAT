@@ -88,15 +88,23 @@ run_simulation <- function(SITE_NAME,YEARS,TYPE,SP=NULL,CONTROL,LAI=NULL,METEO,S
     met <- met[met$YEAR %in% YEARS, ]
   }
   
-  if (METEO == "INTER" && SOURCE == "CAT")  {
+  # if (METEO == "INTER" && SOURCE == "CAT")  {
+  #   met <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_interpolator.csv"))
+  #   met$dates <- as.Date(met$dates)
+  #   met$YEAR <- format(met$dates, "%Y")
+  #   met <- met[met$YEAR %in% YEARS, ]
+  # }
+  # 
+  # if (METEO == "INTER" && SOURCE == "FR") {
+  #   stop("No interpolators meteo data in FR plots, \nMETEO = INTERPOLATORS only in CAT plots. ")
+  # }
+  
+  
+  if (METEO == "INTER")  {
     met <- read.csv(paste0("data/PLOTS/", SITE_NAME, "/meteo_interpolator.csv"))
     met$dates <- as.Date(met$dates)
     met$YEAR <- format(met$dates, "%Y")
     met <- met[met$YEAR %in% YEARS, ]
-  }
-  
-  if (METEO == "INTER" && SOURCE == "FR") {
-    stop("No interpolators meteo data in FR plots, \nMETEO = INTERPOLATORS only in CAT plots. ")
   }
   
   # Read the topo data for the site
@@ -427,12 +435,17 @@ run_simulation_save_data <- function(sites, lai, meteo, soil_mod, type) {
 # run_simulation_save_data(sites,"MODIS",  "INTER", FALSE, "SINGLE")
 # run_simulation_save_data(sites,"MEDFATE","INTER", FALSE, "SINGLE")
 
-# sites<-CAT_FR_SITES$site_name
+sites<-CAT_FR_SITES$site_name
 
 # run_simulation_save_data(sites,"MODIS",  "ERA5", TRUE, "SINGLE")
 # run_simulation_save_data(sites,"MEDFATE","ERA5", TRUE, "SINGLE")
 # run_simulation_save_data(sites,"MODIS",  "ERA5", FALSE, "SINGLE")
 # run_simulation_save_data(sites,"MEDFATE","ERA5", FALSE, "SINGLE")
+# 
+# run_simulation_save_data(sites,"MODIS",  "INTER", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","INTER", TRUE, "SINGLE")
+# run_simulation_save_data(sites,"MODIS",  "INTER", FALSE, "SINGLE")
+# run_simulation_save_data(sites,"MEDFATE","INTER", FALSE, "SINGLE")
 
 ##################################################################################################################################
 
@@ -474,3 +487,5 @@ all <- simulation(sites,"MODIS","ERA5", FALSE, "ALL")
 shinyplot(all_filtered)
 shinyplot(all)
 
+SIM <- simulation("D04S1","MODIS","INTER", FALSE, "SINGLE")
+shinyplot(SIM[[1]])
