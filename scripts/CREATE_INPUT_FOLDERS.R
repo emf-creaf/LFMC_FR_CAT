@@ -313,6 +313,54 @@ for (i in CAT_SITES_NAMES) {
   }
 }
 
+
+###################FR METEO INTERPOLATORS#####################################
+
+# CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
+# 
+# #CAT SITES
+# FR_SITES <- CAT_FR_SITES[CAT_FR_SITES$source == "FR", ]
+# 
+# #SF OBJECT
+# SF_FR_SITES<-st_as_sf(FR_SITES, coords = c("LON", "LAT"), crs = 4326)
+# 
+# #INTERPOLATE METEO DATA
+# 
+# m<-read_interpolator("raw_data/Meteo_RH/MeteoRH_1950_2022.nc")
+# meteo_FR<-interpolate_data(SF_FR_SITES, m)
+# 
+# saveRDS(meteo_FR ,"raw_data/Meteo_RH/MeteoRH_interpolated.RDS")
+# 
+# meteo_FR<-readRDS("raw_data/Meteo_RH/MeteoRH_interpolated.RDS")
+# 
+#Add site column and Join.
+# 
+# interpolated_FR_all <- meteo_FR |>
+#   mutate(interpolated_data = map2(interpolated_data, site_name, ~ mutate(.x, Site = .y))) |>
+#   pull(interpolated_data) |>
+#   bind_rows()
+# 
+# write.csv(interpolated_FR_all, "data/METEO_INTERPOLATED_FR_DATA.csv", row.names = F)
+
+#SAVE INTERPOLATED METEO TO FR PLOTS
+CAT_FR_SITES<-read.csv("data/CAT_FR_SITES.csv")
+FR_SITES <- CAT_FR_SITES[CAT_FR_SITES$source == "FR", ]$site_name
+interpolated_FR_all <- read.csv("data/METEO_INTERPOLATED_FR_DATA.csv")
+
+for (i in FR_SITES) {
+  df <- interpolated_FR_all[interpolated_FR_all$Site == i,]
+  dir <- file.path(getwd(), "data", "PLOTS", i)
+  if (dir.exists(dir)) {
+    write.csv(df, file.path(dir,"meteo_interpolator.csv"),row.names = F)
+    print(paste("meteo interpolator", i, "saved."))
+  } else {
+    warning(paste(" directory", dir, "not found","\n", i, "meteo, not saved."))
+  }
+}
+
+
+
+
 ###########################################LAI##################################
 
 #export LAI_data to the correct plot directory, with medfate format
