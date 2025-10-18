@@ -18,7 +18,7 @@ source("../R/evaluation/evalplots.R")
 ```
 
 ```{r, results = 'asis', echo = FALSE, warning= FALSE}
-et_best_all <- readRDS("../data/evaluation_table_best_all.rds")
+et_best_all <- readRDS("../data/evaluation_tables/evaluation_table_best_all.rds")
 sf <- readRDS(paste0("../data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
 site_names <- sf$site_name
 
