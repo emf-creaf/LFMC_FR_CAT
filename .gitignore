@@ -2,6 +2,7 @@ raw_data/
 scripts/raw_scripts/
 plots/
 data/inputs/PLOTS
+data/report_tables/
 data/results/
 data/inputs/Mete*
 data/inputs/CAT_LFMC.csv
@@ -9,6 +10,8 @@ data/comparison_tables/*
 data/eval*
 data/TableS*
 data/sf_inputs/*
+
+README.html
 
 Rmd/*.docx
 Rmd/*.html
