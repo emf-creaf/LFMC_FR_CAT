@@ -2,9 +2,9 @@ library(medfate)
 library(ggplot2)
 
 SpParams_imputed <- readxl::read_excel("data/inputs/SpParamsAlbert.xlsx", sheet = "SpParams_final_imputed") |> 
-  mutate(Name = ifelse(Name == "Erica scoparia subsp. scoparia", "Erica scoparia", Name))|> 
-  mutate(Name = ifelse(Name == "Juniperus oxycedrus subsp. oxycedrus", "Juniperus oxycedrus", Name)) |>
-  mutate(LeafPI0 = as.numeric(LeafPI0))
+  dplyr::mutate(Name = ifelse(Name == "Erica scoparia subsp. scoparia", "Erica scoparia", Name))|> 
+  dplyr::mutate(Name = ifelse(Name == "Juniperus oxycedrus subsp. oxycedrus", "Juniperus oxycedrus", Name)) |>
+  dplyr::mutate(LeafPI0 = as.numeric(LeafPI0))
 
 n_sp <- nrow(SpParams_imputed)
 psi_seq <- seq(0, -15, by=-0.1)
@@ -88,4 +88,4 @@ p <- cowplot::plot_grid(plc_trees, plc_resp, plc_seed,
                    rwcstem_trees, rwcstem_resp, rwcstem_seed, 
                    nrow=3, ncol=3)
 
-ggsave("plots/curve_plots.png", p, width = 20, height = 15)
+ggsave("plots/figures/curve_plots.png", p, width = 20, height = 15)

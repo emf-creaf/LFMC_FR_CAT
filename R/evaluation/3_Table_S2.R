@@ -22,4 +22,4 @@ TS2 <- ct_bind |>
                    LFMC_max = max(LFMC_observed), .groups = "drop") |>
   dplyr::left_join(TS_full, by=c( "species", "site"))
 
-write.csv2(TS2, "data/TableS2.csv", row.names = FALSE)
+write.csv2(TS2, "data/report_tables/TableS2.csv", row.names = FALSE)

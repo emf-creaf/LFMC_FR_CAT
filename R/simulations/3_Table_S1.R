@@ -23,7 +23,7 @@ for(i in 1:38) {
   TS1$MAP_ERA5[i] <- mean(summary(res_ERA5$result[[i]])[,"Precipitation"])
 }
 
-write.csv2(TS1, "data/TableS1.csv", row.names = FALSE)
+write.csv2(TS1, "data/report_tables/TableS1.csv", row.names = FALSE)
 
 # Variation and covariation in LAI inputs
 mean(TS1$LAI_ALLOM)

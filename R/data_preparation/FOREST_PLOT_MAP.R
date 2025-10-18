@@ -82,7 +82,7 @@ p <- plot_with_inset(site_p,area_p, zoom = .4)
 
 #SAVE MAPS
 
-map_path <- "plots/maps/"
+map_path <- "plots/figures/"
 
 ggsave(filename = "site_plot.png",plot = site_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
 ggsave(filename = "area_plot.png",plot = area_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
