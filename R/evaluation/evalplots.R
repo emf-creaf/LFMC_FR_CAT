@@ -116,7 +116,8 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, remove_outlier = FALS
   
   scatter_p <- scatter_p +
     annotate(geom = "text", x = 105, y = 38, size= 3, 
-             label = paste0("Bias = ", round(stats$Bias,1),
+             label = paste0("n = ", stats$n,
+                            " Bias = ", round(stats$Bias,1),
                             " MAE = ", round(stats$MAE,1), "\n",
                             " slope = ", round(stats$b, 2),
                             " R2 = ", round(100*stats$r2,1),"%",

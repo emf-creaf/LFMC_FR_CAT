@@ -22,11 +22,6 @@ for(meteo in c("ERA5", "INTER")) {
     et_all <- dplyr::bind_rows(et_all, et_comb)
   }
 }
-# Add indicator of minimum MAE or maximum NSE
-et_all <-et_all |>
-  dplyr::group_by(site, species,meteo_source, lai_source, lfmc) |>
-  dplyr::mutate(minMAETAW = (MAE == min(MAE)),
-                maxNSETAW = (NSE == max(NSE)))
 saveRDS(et_all, "data/evaluation_tables/evaluation_table_all.rds")
 
 
@@ -85,22 +80,6 @@ et_best_all <- et_all |>
   dplyr::arrange(species)
 saveRDS(et_best_all, "data/evaluation_tables/evaluation_table_best_all.rds")
 
-print(table(et_best_comb$taw, et_best_comb$lfmc))
-
-print(table(et_best_all$taw))
-print(table(et_best_all$lfmc))
-print(table(et_best_full_all$lfmc))
-print(table(et_best_all$lfmc, et_best_all$taw))
-print(table(et_best_all$lai_source))
-print(table(et_best_all$lai_source, et_best_all$taw))
-print(table(et_best_all$meteo_source))
-print(table(et_best_all$meteo_source, et_best_all$taw))
-
-print(table(et_best_semi$taw))
-print(table(et_best_full1$taw))
-print(table(et_best_full2$taw))
-print(table(et_best_full3$taw))
-
 
 # Select comparison tables of the best combinations -----------------------
 sf <- readRDS(paste0("data/sf_inputs/sf_ERA5_MODIS_MOD.rds"))
@@ -115,12 +94,15 @@ for(meteo in c("ERA5", "INTER")) {
         ct <- readRDS(paste0("data/comparison_tables/ct_", meteo, "_", lai, "_MOD_", taw, ".rds"))
         for(i in which(sel)) {
           site <- et_best_comb$site[i]
+          species_i <- et_best_comb$species[i]
           lfmc_i <- et_best_comb$lfmc[i]
           isite <- which(site_names==site)
           ct_i <- ct[[isite]]
           ct_i <- ct_i |> 
+            dplyr::filter(species == species_i) |>
             dplyr::select(c(date, species, site, lai_source, meteo_source, taw, 
-                            LFMC_full1, LFMC_full2, LFMC_full3, LFMC_semi, LFMC_observed)) |>
+                            LFMC_full1, LFMC_full2, LFMC_full3, LFMC_semi, LFMC_observed,
+                            is_summer, is_outrange, is_outlier)) |>
             dplyr::mutate(lfmc = lfmc_i)
           ct_best_comb[[i]] <- ct_i
         }
