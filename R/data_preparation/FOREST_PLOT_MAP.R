@@ -1,6 +1,7 @@
 library(sf)
 library(tidyverse)
 library(rnaturalearth) #natural earth map data
+library(rnaturalearthhires) #natural earth map data
 library(ggspatial) # annotation_scale()
 library(ggrepel) #geom_text_repel()
 library(patchwork)
@@ -81,7 +82,7 @@ p <- plot_with_inset(site_p,area_p, zoom = .4)
 
 #SAVE MAPS
 
-map_path <- "results/MAP/"
+map_path <- "plots/maps/"
 
 ggsave(filename = "site_plot.png",plot = site_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
 ggsave(filename = "area_plot.png",plot = area_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
