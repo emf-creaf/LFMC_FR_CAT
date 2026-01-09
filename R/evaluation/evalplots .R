@@ -39,11 +39,11 @@ time_plot_summer <- function(ct, sp_name, site_name, scenario,
                size = 0.7) 
   
   time_p <- time_p +
-    scale_color_manual(values = c("Full1" = "darkgreen",
-                                  "Full2" = "gray",
-                                  "Full3" = "black", 
-                                  "Semi" = "blue", 
-                                  "Measured" = "red", "Excluded" = "orange"),
+    scale_color_manual(values = c("Full1" = "#00BE7DFF",
+                                  "Full2" = "#007094FF",
+                                  "Full3" = "#4B0055FF", 
+                                  "Semi" = "#FDE333FF", 
+                                  "Measured" = "red", "Excluded" = "grey50"),
                        breaks = c("Measured", "Excluded", "Semi", "Full1", "Full2", "Full3")) +
     theme_classic() +
     theme(legend.position = "bottom", legend.title = element_blank()) +
@@ -51,7 +51,7 @@ time_plot_summer <- function(ct, sp_name, site_name, scenario,
     ylab("LFMC (%)") +
     labs(title = paste0(sp_name, " - ", site_name), 
          subtitle = scenario) +
-    scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+    scale_x_date(date_breaks = "1 year", date_labels = "%Y", expand = c(0,1)) +
     scale_y_continuous(limits = c(20, 170), expand = c(0,0))
   
   return(time_p)
@@ -81,23 +81,23 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, remove_outlier = FALS
   if (LFMC_TYPE == "FULL1") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_full1, y = LFMC_observed))
     stats <- evalstats(ct$LFMC_observed, ct$LFMC_full1, ct$is_outlier, ct$is_outrange, remove_outlier, remove_outrange)
-    col <- "darkgreen"
+    col <- "#00BE7DFF"
     x_label = "LFMC full1 (%)"
   } else if (LFMC_TYPE == "FULL2") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_full2, y = LFMC_observed))
     stats <- evalstats(ct$LFMC_observed, ct$LFMC_full2, ct$is_outlier, ct$is_outrange, remove_outlier, remove_outrange)
-    col <- "gray"
+    col <- "#007094FF"
     x_label = "LFMC full2 (%)"
   } else if (LFMC_TYPE == "FULL3") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_full3, y = LFMC_observed))
     stats <- evalstats(ct$LFMC_observed, ct$LFMC_full3, ct$is_outlier, ct$is_outrange, remove_outlier, remove_outrange)
     x_label = "LFMC full3 (%)"
-    col <- "black"
+    col <- "#4B0055FF"
   } else if (LFMC_TYPE == "SEMI") {
     base_plot <- ggplot(data = ct, aes(x = LFMC_semi, y = LFMC_observed))
     stats <- evalstats(ct$LFMC_observed, ct$LFMC_semi, ct$is_outlier, ct$is_outrange, remove_outlier, remove_outrange)
     x_label = "LFMC semi (%)"
-    col <- "blue"
+    col <- "#FDE333FF"
   }
   
    base_plot <- base_plot +
@@ -117,25 +117,21 @@ scatter_plot <- function(ct, sp_name, focus_summer = TRUE, remove_outlier = FALS
   scatter_p <- scatter_p +
     annotate(geom = "text", x = 105, y = 38, size= 3, 
              label = paste0("n = ", stats$n,
-                            " Bias = ", round(stats$Bias,1),
                             " MAE = ", round(stats$MAE,1), "\n",
-                            " slope = ", round(stats$b, 2),
-                            " R2 = ", round(100*stats$r2,1),"%",
-                            " NSE = ", round(stats$NSE,2)))
+                            " R2 = ", round(100*stats$r2,1),"%"))
 
-  
   if (LFMC_TYPE == "FULL1") {
     scatter_p <- scatter_p +
-      geom_point(data = ct_excl, aes(x = LFMC_full1, y = LFMC_observed), colour = "orange", alpha = 0.8, size = 0.7)
+      geom_point(data = ct_excl, aes(x = LFMC_full1, y = LFMC_observed), colour = "grey50", alpha = 0.8, size = 0.7)
   } else if (LFMC_TYPE == "FULL2") {
     scatter_p <- scatter_p +
-      geom_point(data = ct_excl, aes(x = LFMC_full2, y = LFMC_observed), colour = "orange", alpha = 0.8, size = 0.7)
+      geom_point(data = ct_excl, aes(x = LFMC_full2, y = LFMC_observed), colour = "grey50", alpha = 0.8, size = 0.7)
   } else if (LFMC_TYPE == "FULL3") {
     scatter_p <- scatter_p +
-      geom_point(data = ct_excl, aes(x = LFMC_full3, y = LFMC_observed), colour = "orange", alpha = 0.8, size = 0.7)
+      geom_point(data = ct_excl, aes(x = LFMC_full3, y = LFMC_observed), colour = "grey50", alpha = 0.8, size = 0.7)
   } else if (LFMC_TYPE == "SEMI") {
     scatter_p <- scatter_p +
-      geom_point(data = ct_excl, aes(x = LFMC_semi, y = LFMC_observed), colour = "orange", alpha = 0.8, size = 0.7)
+      geom_point(data = ct_excl, aes(x = LFMC_semi, y = LFMC_observed), colour = "grey50", alpha = 0.8, size = 0.7)
   }
   
   scatter_p <- scatter_p +
@@ -162,3 +158,4 @@ combined_evaluation_plot<-function(ct, sp_name, site_name, scenario, ...) {
   p2 <- scatter_plot_panel(ct, sp_name, title=" ", ...)
   return(cowplot::plot_grid(p1, p2, nrow=2))
 }
+

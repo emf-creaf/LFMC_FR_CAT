@@ -1,10 +1,12 @@
+# Librerias
 library(sf)
-library(tidyverse)
 library(rnaturalearth) #natural earth map data
 library(rnaturalearthhires) #natural earth map data
 library(ggspatial) # annotation_scale()
 library(ggrepel) #geom_text_repel()
+library(tidyverse)
 library(patchwork)
+# Study sites location
 # Data
 CAT_FR_SITES <- read.csv("data/inputs/CAT_FR_SITES.csv")
 sites <- st_as_sf(CAT_FR_SITES, coords = c("LON", "LAT"), crs = 4326, remove = F)
@@ -26,7 +28,7 @@ site_p <- ggplot() +
   geom_sf(data = spain, fill = "NA", color = "grey30", linewidth = .5) + #spain contour
   geom_sf(data = france, fill = "NA", color = "grey30", linewidth = .5) + #france contour
   geom_sf(data = sites, aes(fill = source), size = 5, shape = 21, color = "grey30", alpha = .8, stroke = .5) +
-  scale_fill_manual(values = c("#96ceb4", "#ffcc5c")) +
+  scale_fill_manual(values = c("#41CA6CFF", "#FDE333FF")) +
   labs(title = element_blank(),#"STUDY AREA",
        fill = "LFMC sampling networks",
        x = element_blank(),
@@ -45,7 +47,7 @@ site_p <- ggplot() +
         axis.text = element_text(size = 15),
         legend.text = element_text(size = 15),
         legend.title = element_text(size = 15)
-        ) 
+  ) 
 
 # AREA MAP
 area_p <- ggplot() +
@@ -60,7 +62,7 @@ area_p <- ggplot() +
         plot.margin = margin(0, 0, 0, 0, "cm"),
         panel.background = element_rect(fill = "white"),
         panel.border = element_rect(color = "black", linewidth = 1.4)
-        )
+  )
 
 # INSET MAP
 plot_with_inset <- function(main, inset, zoom){
@@ -70,12 +72,8 @@ plot_with_inset <- function(main, inset, zoom){
   main + inset_element(inset, left, bottom, zoom, 1)
 }
 p <- plot_with_inset(site_p,area_p, zoom = .4)
+p
 #SAVE MAPS
-# map_path <- "plots/figures/"
-# ggsave(filename = "site_plot.png",plot = site_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-# ggsave(filename = "area_plot.png",plot = area_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-# ggsave(filename = "final_plot.png",plot = p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-# ggsave(filename = "site_plot.pdf",plot = site_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-# ggsave(filename = "area_plot.pdf",plot = area_p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-# ggsave(filename = "final_plot.pdf",plot = p,path = map_path ,width = 190,height = 190,units = "mm",dpi = 900)
-
+ggsave(filename = "plots/figures/Fig1/Fig1.png",width = 190,height = 190,units = "mm",dpi = 900)
+ggsave(filename = "plots/figures/Fig1/Fig1.pdf",width = 190,height = 190,units = "mm",dpi = 900)
+#
